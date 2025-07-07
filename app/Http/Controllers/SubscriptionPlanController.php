@@ -14,7 +14,7 @@ class SubscriptionPlanController extends Controller
      */
     public function index(): View
     {
-        $subscriptionPlans = SubscriptionPlan::latest()->paginate(10);
+        $subscriptionPlans = SubscriptionPlan::orderBy('id', 'asc')->paginate(10);
         return view('subscription-plans.index', compact('subscriptionPlans'));
     }
 

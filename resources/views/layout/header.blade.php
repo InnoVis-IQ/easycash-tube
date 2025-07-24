@@ -2,7 +2,7 @@
     <div class="text-center navbar-brand-wrapper d-flex align-items-top justify-content-center">
         <a class="navbar-brand brand-logo text-primary" href="{{ url('/') }}">
             <!--<img src="{{ url('assets/images/logo.svg') }}" alt="logo" />-->
-          <b>  MS Life Partner</b>
+          <b>  EasyCash Tube</b>
         </a>
         <a class="navbar-brand brand-logo-mini text-primary" href="{{ url('/') }}">
             <!--<img src="{{ url('assets/images/logo-mini.svg') }}" alt="logo" /> -->

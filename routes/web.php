@@ -58,7 +58,7 @@ Route::get('/clear-cache', function () {
     return "Cache is cleared";
 });
 
-// 404 for undefined routes
-Route::any('/{page?}', function () {
-    return View::make('pages.error-pages.error-404');
-})->where('page', '.*');
+// // 404 for undefined routes
+// Route::any('/{page?}', function () {
+//     return View::make('pages.error-pages.error-404');
+// })->where('page', '.*');

@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `mslifepartner`
+-- Database: `easycash-tube`
 --
 
 -- --------------------------------------------------------
@@ -211,8 +211,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `role`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 'Super Admin', 'SUPERADMIN', 'superadmin@mslifepartner.com', NULL, '$2y$10$L8zGrb1bo/fo1.G1NUx6eemvMAvrIr07Mq10Rkb1FbLnUCLson9Lm', NULL, '2023-04-06 05:12:54', '2023-04-06 05:12:54', NULL),
-(2, 'Admin', 'ADMIN', 'admin@mslifepartner.com', NULL, '$2y$10$A/U/3chI9WHPT1J6qewLbOx.4IGRYLN1G6kSSJqXloJzP3lXQqxvC', NULL, '2023-04-06 05:12:54', '2023-04-06 05:12:54', NULL),
+(1, 'Super Admin', 'SUPERADMIN', 'superadmin@easycash-tube.com', NULL, '$2y$10$L8zGrb1bo/fo1.G1NUx6eemvMAvrIr07Mq10Rkb1FbLnUCLson9Lm', NULL, '2023-04-06 05:12:54', '2023-04-06 05:12:54', NULL),
+(2, 'Admin', 'ADMIN', 'admin@easycash-tube.com', NULL, '$2y$10$A/U/3chI9WHPT1J6qewLbOx.4IGRYLN1G6kSSJqXloJzP3lXQqxvC', NULL, '2023-04-06 05:12:54', '2023-04-06 05:12:54', NULL),
 (3, 'Test User', 'USER', 'testuser@gmail.com', NULL, '$2y$10$3We4BFKSev9SpIK3eiVvXeC3GNLMoo7pEyH.IfRRervTm3G0I9pGq', NULL, '2023-04-06 07:12:54', '2023-04-07 05:56:14', NULL);
 
 -- --------------------------------------------------------

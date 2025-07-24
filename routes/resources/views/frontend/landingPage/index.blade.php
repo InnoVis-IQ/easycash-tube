@@ -38,7 +38,7 @@
                 <div class="navbar-brand">
 
                     <span class="navbar-caption-wrap"><a class="navbar-caption text-black display-7"
-                            href="{{route('home')}}">MSLifePartner</a></span>
+                            href="{{route('home')}}">easycash-tube</a></span>
                 </div>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-bs-toggle="collapse"
                     data-target="#navbarSupportedContent" data-bs-target="#navbarSupportedContent"
@@ -202,7 +202,7 @@
 
                 <div class="row row-copirayt">
                     <p class="mbr-text mb-0 mbr-fonts-style mbr-white align-center display-7">
-                        © Copyright 2023 MSLifePartner.
+                        © Copyright 2023 easycash-tube.
                     </p>
                 </div>
             </div>

@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="{{asset('web/assets/css/magnific-popup.css')}}">
     <link rel="stylesheet" href="{{asset('web/assets/css/owl.carousel.min.css')}}">
     <link rel="stylesheet" href="{{asset('web/assets/css/style.css')}}">
-	<title>MS life Partner</title>
+	<title>EasyCash Tube</title>
 
 </head>
 <body data-spy="scroll" data-target=".navbar">
@@ -25,7 +25,8 @@
             <nav class="navbar navbar-expand-lg navbar-dark fixed-top ts-separate-bg-element" data-bg-color="#141a3a">
                 <div class="container">
                     <a class="navbar-brand" href="#page-top">
-                        MS Life Partner
+                        Easy Cash Tube<br>
+                        <small>Watch. Earn. Repeat</small>
                     </a>
                     <!--end navbar-brand-->
                     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,6 +36,7 @@
                     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                         <div class="navbar-nav ml-auto text-center">
                             <a class="nav-item nav-link active ts-scroll" href="#page-top">Home <span class="sr-only">(current)</span></a>
+                            <a class="nav-item nav-link ts-scroll" href="#overview">Overview</a>
                             <a class="nav-item nav-link ts-scroll" href="#how-it-works">How It Works</a>
                             <a class="nav-item nav-link ts-scroll" href="#about-us">About Us</a>
                              <a class="nav-item nav-link ts-scroll" href="#pricing">Packages</a>
@@ -57,41 +59,14 @@
             <div class="container align-self-center align-items-center">
                 <div class="row align-items-center">
                     <div class="col-sm-7 col-md-7  d-sm-block">
-                        <h1 data-animate="ts-fadeInUp">Invest Now and start Earning Today</h1>
-                        <!-- <div data-animate="ts-fadeInUp" data-delay=".1s">
-                            <p class="w-75 text-white mb-5 ts-opacity__50">Morbi et nisl a sapien malesuada scelerisque. Suspendisse tempor turpis mattis</p>
-                        </div> -->
+                        <h1 data-animate="ts-fadeInUp">Earn Daily Just by Watching Videos!</h1>
+                        <div data-animate="ts-fadeInUp" data-delay=".1s">
+                            <p class="w-75 text-white mb-5 ts-opacity__50">Join Easycash Tube and get paid every day — earn upto 20% daily on your selected plan by watching just 1 video per day.</p>
+                        </div>
                         <a href="{{route('login')}}" class="btn btn-outline-light btn-lg ts-scroll mr-4" data-animate="ts-fadeInUp" data-delay=".2s">
-                            Invest Now
-                            <i class="fa fa-arrow-right small ml-3 ts-opacity__50"></i>
+                            Get Started <i class="fa fa-arrow-right small ml-3 ts-opacity__50"></i>
                         </a>
                     </div>
-                    <!-- <div class="col-sm-5 offset-lg-1 col-md-4">
-                        <form class="ts-form p-4 ts-border-radius__md text-white" data-php-path="assets/php/email.php" data-bg-color="rgba(255,255,255,.2)" data-animate="ts-fadeInUp" data-delay=".2s">
-                            <h3>Get a Quote</h3>
-                            <p class="text-white d-none d-lg-block">Vivamus fermentum magna non faucibus dignissim. Sed a venenatis </p>
-
-                            <div class="form-group">
-                                <input type="text" class="form-control" id="hero-name" name="name" placeholder="Your Name" required>
-                            </div>
-
-                            <div class="form-group">
-                                <input type="email" class="form-control" id="hero-email" name="email" placeholder="Your Email" required>
-                            </div>
-
-                            <div class="form-group">
-                                <select class="custom-select form-control" required>
-                                    <option selected>Select Interest</option>
-                                    <option value="1">Business Grow</option>
-                                    <option value="2">Brand Refresh</option>
-                                    <option value="3">Crypto Investments</option>
-                                </select>
-                            </div>
-
-                            <button type="submit" class="btn btn-primary w-100">Get a Quote</button>
-                        </form>
-
-                    </div> -->
                 </div>
             </div>
 
@@ -110,18 +85,35 @@
         <!--************ CONTENT ************************************************************************************-->
         <!--*********************************************************************************************************-->
         <main id="ts-content">
+            <!--OVERVIEW ********************************************************************************************-->
+            <section id="overview" class="">
+                <div class="container">
+                    <div class="ts-block pr-3 pb-2">
+                        <div class="ts-title mb-1">
+                            <h2>Overview</h2>
+                        </div>
+                        <!--end ts-title-->
+                        <p>
+                            Easycash Tube is a video-based earning platform where users earn upto 20% daily by watching 1 video per day for 5 days. The more you invest, the more you earn
+                        </p>
+                    </div>
+                </div>
+                <!--end container-->
 
+            </section>
+            <!--END OVERVIEW ****************************************************************************************-->
+                
             <!--HOW IT WORKS ****************************************************************************************-->
             <section id="how-it-works" class="ts-block ts-xs-text-center pb-5">
                 <div class="container">
-                    <div class="ts-title">
+                    <div class="ts-title mb-3">
                         <h2>How It Works</h2>
                     </div>
                     <!--end ts-title-->
                     <div class="row">
-                        <div class="col-sm-6 col-md-4 col-xl-4">
+                        <div class="col-sm-6 col-md-4 col-lg-3">
                             <div class="ts-item" data-animate="ts-fadeInUp">
-                                <div class="ts-item-content">
+                                <div class="ts-item-content text-center">
                                     <div class="ts-item-header">
                                         <figure class="icon">
                                             <span class="step" data-animate="ts-zoomIn">1</span>
@@ -133,9 +125,9 @@
                                     </div>
                                     <!--end ts-item-header-->
                                     <div class="ts-item-body">
-                                        <h4>We're Global</h4>
+                                        <h4>Choose Your Plan</h4>
                                         <p>
-                                           MS Life Partner is global company which is working in many countries
+                                            Start from as low as Rs. 500
                                         </p>
                                     </div>
                                     <!--end ts-item-body-->
@@ -145,9 +137,9 @@
                             <!--end ts-item-->
                         </div>
                         <!--end col-xl-4-->
-                        <div class="col-sm-6 col-md-4 col-xl-4">
+                        <div class="col-sm-6 col-md-4 col-lg-3">
                             <div class="ts-item" data-animate="ts-fadeInUp" data-delay="0.1s">
-                                <div class="ts-item-content">
+                                <div class="ts-item-content text-center">
                                     <div class="ts-item-header">
                                         <figure class="icon">
                                             <span class="step" data-animate="ts-zoomIn">2</span>
@@ -159,9 +151,9 @@
                                     </div>
                                     <!--end ts-item-header-->
                                     <div class="ts-item-body">
-                                        <h4>Profitable</h4>
+                                        <h4>Watch Videos</h4>
                                         <p>
-                                            MS life Partner is profitable where you get your profit on daily basis in 5 days a week.
+                                            Watch 1 video per day for 5 days a week.
                                         </p>
                                     </div>
                                     <!--end ts-item-body-->
@@ -171,9 +163,9 @@
                             <!--end ts-item-->
                         </div>
                         <!--end col-xl-4-->
-                        <div class="col-sm-6 offset-sm-4 col-md-4 offset-md-0 col-xl-4">
+                        <div class="col-sm-6 col-md-4 col-lg-3">
                             <div class="ts-item" data-animate="ts-fadeInUp" data-delay="0.2s">
-                                <div class="ts-item-content">
+                                <div class="ts-item-content text-center">
                                     <div class="ts-item-header">
                                         <figure class="icon">
                                             <span class="step" data-animate="ts-zoomIn">3</span>
@@ -185,9 +177,35 @@
                                     </div>
                                     <!--end ts-item-header-->
                                     <div class="ts-item-body">
-                                        <h4>We're Secure</h4>
+                                        <h4>Earn Daily</h4>
                                         <p>
-                                            MS Life Partner is secure company where you can not loose your money
+                                            Earn 10% of your plan amount daily. Total Return in 5 Days: 50%
+                                        </p>
+                                    </div>
+                                    <!--end ts-item-body-->
+                                </div>
+                                <!--end ts-item-content-->
+                            </div>
+                            <!--end ts-item-->
+                        </div>
+                        <!--end col-xl-4-->
+                        <div class="col-sm-6 col-md-4 col-lg-3">
+                            <div class="ts-item" data-animate="ts-fadeInUp" data-delay="0.2s">
+                                <div class="ts-item-content text-center">
+                                    <div class="ts-item-header">
+                                        <figure class="icon">
+                                            <span class="step" data-animate="ts-zoomIn">4</span>
+                                            <div class="ts-circle__md" data-bg-color="#ebf1fe">
+                                                <img src="{{asset('web/assets/img/c.png')}}" alt="">
+                                            </div>
+                                        </figure>
+                                        <!--end icon-->
+                                    </div>
+                                    <!--end ts-item-header-->
+                                    <div class="ts-item-body">
+                                        <h4>Withdraw</h4>
+                                        <p>
+                                            Withdraw earnings via Easypaisa, JazzCash, or NayaPay
                                         </p>
                                     </div>
                                     <!--end ts-item-body-->
@@ -199,6 +217,36 @@
                         <!--end col-xl-4-->
                     </div>
                     <!--end row-->
+
+                    <ul>
+                        <li>✅ Plan is valid for 7 days (5 active earning days + 2 buffer days)</li>
+                        <li>✅ Watch. Earn. Repeat.</li>
+                    </ul>
+
+                    <br>
+                    
+                    <h4 class="mb-2">Why Choose Easycash Tube</h4>
+                    <ul>
+                        <li>✅ Simple and fast income method</li>
+                        <li>✅ No technical skills needed</li>
+                        <li>✅ Watch anywhere, anytime</li>
+                        <li>✅ Reliable payments via Easypaisa, JazzCash, or NayaPay</li>
+                        <li>✅ Reinvest anytime after 5 days</li>
+                    </ul>
+
+                    <br>
+                    
+                    <h4 class="mb-2">Start Earning Today!</h4>
+                    <p>
+                        Whether you're a student, job holder, or freelancer — Easycash Tube gives you a smart way to earn extra income daily by just watching videos.
+                        <br><br>
+                        🎯 Watch. Earn. Repeat.
+                    </p>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <a href="{{ route('register') }}" class="btn btn-outline-primary mr-2">Join Now</a>
+                        <a href="{{ route('login') }}" class="btn btn-primary">Login</a>
+                    </div>
                 </div>
                 <!--end container-->
             </section>
@@ -237,45 +285,25 @@
             <!--ABOUT US ********************************************************************************************-->
             <section id="about-us">
                 <div class="container">
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="ts-block pr-3">
-                                <div class="ts-title">
-                                    <h2>About Us</h2>
-                                </div>
-                                <!--end ts-title-->
-                                <p>
-                                    Welcome to our investment firm! Our team is dedicated to helping individuals and organizations achieve their financial goals through strategic investments.
-
-With years of experience in the industry, we have developed a deep understanding of the financial markets and the factors that drive them. We utilize this expertise to create customized investment strategies that align with each client's unique objectives and risk tolerance.
-                                </p>
-                                <div class="list-group list-group-flush mb-5">
-                                    <a href="#collapseOne" class="list-group-item list-group-item-action border-top-0 pl-0 font-weight-bold bg-transparent" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseOne">Our Mission</a>
-                                    <div class="collapse" id="collapseOne">
-                                        <p class="pt-3 small">
-                                            Our mission is to provide our clients with expert investment guidance and superior service to help them achieve their financial goals.
-                                        </p>
-                                    </div>
-                                    <a href="#collapseTwo" class="list-group-item list-group-item-action pl-0 font-weight-bold bg-transparent" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseTwo">We Love Our Clients</a>
-                                    <div class="collapse" id="collapseTwo">
-                                        <p class="pt-3 small">
-                                            We love our clients and are committed to providing them with exceptional service and support throughout their investment journey.
-                                        </p>
-                                    </div>
-                                    <!-- <a href="#collapseThree" class="list-group-item list-group-item-action pl-0 font-weight-bold bg-transparent" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseThree">Awards and Wins</a>
-                                    <div class="collapse" id="collapseThree">
-                                        <p class="pt-3 small">
-                                            Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
-                                        </p>
-                                    </div> -->
-                                </div>
-                                <a href="{{route('login')}}" class="btn btn-primary mr-3 my-2">Invest Now</a>
-                                <!-- <a href="#" class="btn btn-outline-dark ts-btn-border-muted my-2">Get a Quote</a> -->
-                            </div>
+                    <div class="ts-block pr-3">
+                        <div class="ts-title mb-3">
+                            <h2>About Us</h2>
                         </div>
-                        <!--end col-md-6-->
+                        <!--end ts-title-->
+                        <p>
+                            Easycash Tube is a smart earning platform where you can Watch. Earn. Repeat.
+                            <br>
+                            We give users in Pakistan the opportunity to earn daily income by watching videos without any hustle. Our goal is to make online earning simple, safe, and accessible for everyone.
+                        </p>
+                        <h4 class="mb-2">What We Offer:</h4>
+                        <ul>
+                            <li>✅ Daily returns up to 10% for 5 days on investment plans</li>
+                            <li>✅ Exclusive Buy & Sell profit model with up to 20% return after 24 hours</li>
+                            <li>✅ Easy withdrawals via Easypaisa, JazzCash, and NayaPay</li>
+                            <li>✅ A trusted and growing community of digital earners</li>
+                            <li>✅ At Easycash Tube, we believe in transparency, flexibility, and financial freedom for all.</li>
+                        </ul>
                     </div>
-                    <!--end row-->
                 </div>
                 <!--end container-->
 
@@ -350,7 +378,7 @@ With years of experience in the industry, we have developed a deep understanding
                     <div class="row no-gutters ts-cards-same-height">
                         <!--Price Box-->
                         @foreach($data as $plan)
-                        <div class="col-sm-4 col-lg-4">
+                        <div class="col-sm-4 col-lg-4 px-2">
                             <div class="card text-center ts-price-box" data-animate="ts-fadeInUp">
                                 <div class="card-header p-0">
                                     <h5 class="mb-0 py-3 text-white" data-bg-color="#1b3874">{{$plan['title']}}</h5>
@@ -415,7 +443,7 @@ With years of experience in the industry, we have developed a deep understanding
                                     <br>
                                     <figure>
                                         <div class="font-weight-bold">Email:</div>
-                                        <a href="#">office@mslifepartner.com</a>
+                                        <a href="#">office@easycash-tube.com</a>
                                     </figure>
                                     <figure>
                                         <div class="font-weight-bold">Phone:</div>
@@ -473,7 +501,7 @@ With years of experience in the industry, we have developed a deep understanding
                     </div>
                     <!--end ts-box-->
                     <div class="text-center text-white py-4">
-                        <small>© 2023 MS life Partner, All Rights Reserved</small>
+                        <small>© 2023 EasyCash Tube, All Rights Reserved</small>
                     </div>
                 </div>
                 <!--end container-->

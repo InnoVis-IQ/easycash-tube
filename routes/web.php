@@ -31,6 +31,7 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::resource('withdraws', Controllers\WithdrawController::class)->withTrashed();
     Route::resource('userAccounts', Controllers\UserAccountController::class)->withTrashed();
     Route::resource('userSubscriptions', Controllers\UserSubscriptionController::class)->withTrashed();
+    Route::resource('videos', Controllers\VideoController::class);
 
     Route::get('/approveUser/{id}', [Controllers\UserController::class, 'approveUser'])->name('approveUser');
     Route::post('/withdrawToAccount', [Controllers\WithdrawController::class, 'withdrawToAccount'])->name('withdrawToAccount');

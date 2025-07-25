@@ -66,12 +66,12 @@
                     <a href="{{ route('withdraws.index') }}" class="btn btn-warning">Withdraw</a>
                 </div>
             </div>
-            <div class="row mt-3">
+            {{-- <div class="row mt-3">
                 <div class="col-md-10 offset-md-1 text-center">
                     <a data-toggle="modal" data-target="#referModal" class="btn btn-success text-white">Refer a
                         friend</a>
                 </div>
-            </div>
+            </div> --}}
         @endif
         <li class="nav-item active">
             <a class="nav-link" href="{{ route('dashboard') }}">
@@ -92,6 +92,12 @@
                 <a class="nav-link" href="{{ route('plans.index') }}">
                     <i class="fa-solid fa-compass-drafting"></i>
                     <span class="menu-title pl-2">Plans</span>
+                </a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{{ route('videos.index') }}">
+                    <i class="fa-solid fa-video"></i>
+                    <span class="menu-title pl-2">Videos</span>
                 </a>
             </li>
             <li class="nav-item active">

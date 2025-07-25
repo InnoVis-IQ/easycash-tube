@@ -47,7 +47,23 @@ class InvestmentPlanController extends Controller
      */
     public function store(StoreInvestmentPlanRequest $request)
     {
-        //
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'amount' => 'required|numeric',
+            'daily_profit' => 'required|numeric',
+            'plan_days' => 'required|numeric',
+            'buffer_days' => 'nullable|numeric',
+            'limit' => 'nullable|string',
+            'status' => 'required|string',
+        ]);
+
+        $validated['total_profit'] = $validated['daily_profit'] * $validated['plan_days'];
+
+        InvestmentPlan::create($validated);
+
+        return redirect()->route('plans.index')
+            ->with('success', 'Investment plan created successfully.');
     }
 
     /**
@@ -61,24 +77,47 @@ class InvestmentPlanController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(InvestmentPlan $investmentPlan)
+    public function edit($id)
     {
-        //
+        $investmentPlan = InvestmentPlan::find($id);
+        return view('backend.admin.investmentPlans.edit', compact('investmentPlan'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateInvestmentPlanRequest $request, InvestmentPlan $investmentPlan)
+    public function update(UpdateInvestmentPlanRequest $request, $id)
     {
-        //
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'amount' => 'required|numeric',
+            'daily_profit' => 'required|numeric',
+            'plan_days' => 'required|numeric',
+            'buffer_days' => 'nullable|numeric',
+            'limit' => 'nullable|string',
+            'status' => 'required|string',
+        ]);
+
+        if($validated){
+            $validated['total_profit'] = $validated['daily_profit'] * $validated['plan_days'];
+
+            InvestmentPlan::where('id', $id)->update($validated);
+        }
+
+        return redirect()->route('plans.index')
+            ->with('success', 'Investment plan updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(InvestmentPlan $investmentPlan)
+    public function destroy($id)
     {
-        //
+        InvestmentPlan::where('id', $id)->update(['status' => 'inactive']);
+        InvestmentPlan::where('id', $id)->delete();
+
+        return redirect()->route('plans.index')
+            ->with('success', 'Investment plan deleted successfully.');
     }
 }

@@ -11,4 +11,15 @@ class InvestmentPlan extends Model
     use HasFactory;
     use SoftDeletes;
 
+    protected $fillable = [
+        'title',
+        'description',
+        'amount',
+        'daily_profit',
+        'plan_days',
+        'buffer_days',
+        'plan_frequency',
+        'status',
+        'total_profit',
+    ];
 }

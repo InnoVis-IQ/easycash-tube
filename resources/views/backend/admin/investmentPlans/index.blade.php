@@ -31,6 +31,7 @@
                         <th>Amount</th>
                         <th>Daily Profit</th>
                         <th>Total Profit</th>
+                        <th>Limit</th>
                         <th>Status</th>
                         <th>Actions</th>
                     </tr>
@@ -41,14 +42,15 @@
                             @continue
                         @endif
                         <tr>
-                            <td>{{ $key + 1 }}</td>
-                            <td>{{ $item['title'] }}</td>
-                            <td>{{ $item['amount'] }}</td>
-                            <td>{{ $item['daily_profit'] }}</td>
-                            <td>{{ $item['total_profit'] }}</td>
-                            <td>{{ $item['status'] }}</td>
+                            <td class="{{$item['deleted_at'] ? 'bg-secondary' : ''}}">{{ $key + 1 }}</td>
+                            <td class="{{$item['deleted_at'] ? 'bg-secondary' : ''}}">{{ $item['title'] }}</td>
+                            <td class="{{$item['deleted_at'] ? 'bg-secondary' : ''}}">{{ $item['amount'] }}</td>
+                            <td class="{{$item['deleted_at'] ? 'bg-secondary' : ''}}">{{ $item['daily_profit'] }}</td>
+                            <td class="{{$item['deleted_at'] ? 'bg-secondary' : ''}}">{{ $item['total_profit'] }}</td>
+                            <td class="{{$item['deleted_at'] ? 'bg-secondary' : ''}}">{{ $item['limit'] }}</td>
+                            <td class="{{$item['deleted_at'] ? 'bg-secondary' : ''}}">{{ $item['status'] }}</td>
                             <td>
-                                {!! actionButtons($item) !!}
+                                {!! actionButtons($item, ['edit', 'destroy']) !!}
                             </td>
                         </tr>
                     @endforeach

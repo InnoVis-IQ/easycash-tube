@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('investment_plans', function (Blueprint $table) {
             $table->string('buffer_days')->nullable()->after('plan_days');
-            $table->string('plan_frequency')->nullable()->after('total_profit');
+            $table->string('limit')->nullable()->after('total_profit');
         });
     }
 
@@ -24,7 +24,7 @@ return new class extends Migration
     {
         Schema::table('investment_plans', function (Blueprint $table) {
             $table->dropColumn('buffer_days');
-            $table->dropColumn('plan_frequency');
+            $table->dropColumn('limit');
         });
     }
 };

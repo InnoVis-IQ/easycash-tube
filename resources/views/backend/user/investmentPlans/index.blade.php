@@ -63,7 +63,7 @@
                             <td class="text-center">{{ date('d-M-Y', strtotime($item['created_at'])) }}</td>
                             <td class="text-center">{{ date('d-M-Y', strtotime($item['expire_at'])) }}</td>
                             <td class="text-center">
-                                <a href="{{ route('videos.watch') }}" class="btn btn-primary">
+                                <a href="{{ route('videos.watch') }}" class="btn btn-primary" target="_blank">
                                     <i class="fa-solid fa-play"></i> Watch Video
                                 </a>
                             </td>

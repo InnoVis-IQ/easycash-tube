@@ -24,6 +24,12 @@ Route::get('/', [Controllers\FrontEndController::class, 'index'])->name('home');
 Route::middleware(['auth','verified'])->group(function () {
     Route::get('/dashboard', [Controllers\DashboardController::class, 'index'])->name('dashboard');
 
+    Route::get('videos/watch', [Controllers\VideoController::class, 'watch'])->name('videos.watch');
+    
+    Route::get('/approveUser/{id}', [Controllers\UserController::class, 'approveUser'])->name('approveUser');
+    Route::post('/withdrawToAccount', [Controllers\WithdrawController::class, 'withdrawToAccount'])->name('withdrawToAccount');
+    Route::get('/adjustUserAccount/{id}', [Controllers\SuperadminController::class, 'adjustUserAccount'])->name('adjustUserAccount');
+    
     Route::resource('users', Controllers\UserController::class)->withTrashed();
     Route::resource('plans', Controllers\InvestmentPlanController::class)->withTrashed();
     Route::resource('bankAccounts', Controllers\BankAccountController::class)->withTrashed();
@@ -32,11 +38,7 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::resource('userAccounts', Controllers\UserAccountController::class)->withTrashed();
     Route::resource('userSubscriptions', Controllers\UserSubscriptionController::class)->withTrashed();
     Route::resource('videos', Controllers\VideoController::class);
-    Route::get('/videos/watch', [Controllers\VideoController::class, 'watch'])->name('videos.watch');
 
-    Route::get('/approveUser/{id}', [Controllers\UserController::class, 'approveUser'])->name('approveUser');
-    Route::post('/withdrawToAccount', [Controllers\WithdrawController::class, 'withdrawToAccount'])->name('withdrawToAccount');
-    Route::get('/adjustUserAccount/{id}', [Controllers\SuperadminController::class, 'adjustUserAccount'])->name('adjustUserAccount');
 });
 
 

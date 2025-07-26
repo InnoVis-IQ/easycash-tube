@@ -97,8 +97,26 @@ class VideoController extends Controller
             ->orderBy('created_at', 'desc')
             ->first();
 
-        
-        $video = \App\Models\Video::withTrashed()->findOrFail($id);
-        return view('backend.user.videos.watch', compact('video'));
+        if (!$subscribedPlan) {
+            return redirect()->route('plans.index')->with('error', 'You are not subscribed to any plan.');
+        }
+
+        $watchedVideos = $subscribedPlan['watched_videos'];
+        $watchedVideos = is_array($watchedVideos) ? $watchedVideos : (json_decode($watchedVideos, true) ?: []);
+
+        // Get all videos for the user's subscribed plan that are active and not expired
+        $videos = \App\Models\Video::where('plan_id', $subscribedPlan->investment_plan_id)
+            ->where('status', 'active')
+            ->where(function($query) {
+                $query->whereNull('expiry_date')
+                      ->orWhere('expiry_date', '>', now());
+            })
+            ->get();
+
+        if (!$videos) {
+            return redirect()->route('plans.index')->with('error', 'No new videos available for your plan.');
+        }
+
+        return view('backend.user.videos.watch', compact('videos','watchedVideos'));
     }
 }

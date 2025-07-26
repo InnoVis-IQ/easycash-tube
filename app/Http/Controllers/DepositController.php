@@ -27,6 +27,7 @@ class DepositController extends Controller
             ]);
         }
         else{
+            $d = Deposit::where('user_id', Auth::user()['id'])->get();
             return view('backend.user.deposit.index')->with([
                 'data' => Deposit::where('user_id', Auth::user()['id'])->get(),
                 'totalDeposit' => Deposit::where('user_id', Auth::user()['id'])->sum('amount'),
@@ -55,7 +56,14 @@ class DepositController extends Controller
 
         $name = $file->getClientOriginalName();
         $extension = $file->getClientOriginalExtension();
-        $path = $request->file('proof')->store('public/depositProof');
+        
+        // Ensure the directory exists before storing
+        if (!file_exists(public_path('depositProof'))) {
+            mkdir(public_path('depositProof'), 0755, true);
+        }
+        
+        $fileName = time() . '_' . $file->getClientOriginalName();
+        $path = $file->move(public_path('depositProof'), $fileName);
 
         if(in_array($extension,['jpg','png'])){
             $data = new Deposit;
@@ -64,7 +72,7 @@ class DepositController extends Controller
             $data['amount'] = $request['amount'];
             $data['transaction_id'] = $request['transaction_id'];
             $data['deposit_date'] = $request['date'];
-            $data['picture_proof'] = Str::replace("public/","",$path);
+            $data['picture_proof'] = 'depositProof/' . $fileName;
             $data->save();
 
             return redirect()->route('deposits.index')->with(['message'=>'Deposited, Please wait for apprp']);

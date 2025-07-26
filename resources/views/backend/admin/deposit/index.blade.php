@@ -73,8 +73,7 @@
                             <td>{{ $item['bank']['bank_name'] . ' (' . $item['bank']['account_number'] . ')' }}</td>
                             <td>{{ date('d-M-Y', strtotime($item['deposit_date'])) }}</td>
                             <td>{{ $item['status'] }}</td>
-                            <td><img src="{{ asset('/storage/' . $item['picture_proof']) }}" data-toggle="modal"
-                                    data-target="#img{{ $key }}" style="width: 100px; "></td>
+                            <td><img src="{{ asset($item['picture_proof']) }}" data-toggle="modal" data-target="#img{{ $key }}" style="border-radius:unset!important;cursor:pointer;"></td>
                             <td>
                                 @if ($item['status'] == 'deposited')
                                     <form method="POST" action="{{ route($route[0] . '.update', $item['id']) }}">
@@ -98,22 +97,21 @@
                             <!-- Modal -->
                             <div class="modal fade" id="img{{ $key }}" tabindex="-1" role="dialog"
                                 aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                <div class="modal-dialog" role="document">
+                                <div class="modal-dialog modal-md" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            {{-- <h5 class="modal-title" id="exampleModalLabel">Modal title</h5> --}}
+                                            <h5 class="modal-title" id="exampleModalLabel">Deposit Proof - {{ $item['transaction_id'] }}</h5>
                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
                                             </button>
                                         </div>
                                         <div class="modal-body">
-                                            <center><img src="{{ asset('/storage/' . $item['picture_proof']) }}"
-                                                    style="width: 100%; height: auto;"></center>
+                                            <center><img src="{{ asset($item['picture_proof']) }}"
+                                                    style="max-height: 70vh;"></center>
                                         </div>
-                                        {{-- <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                        <button type="button" class="btn btn-primary">Save changes</button>
-                                    </div> --}}
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

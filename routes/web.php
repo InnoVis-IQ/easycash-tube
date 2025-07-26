@@ -25,6 +25,7 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::get('/dashboard', [Controllers\DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('videos/watch', [Controllers\VideoController::class, 'watch'])->name('videos.watch');
+    Route::post('videos/mark-watched', [Controllers\VideoController::class, 'markAsWatched'])->name('videos.mark-watched');
     
     Route::get('/approveUser/{id}', [Controllers\UserController::class, 'approveUser'])->name('approveUser');
     Route::post('/withdrawToAccount', [Controllers\WithdrawController::class, 'withdrawToAccount'])->name('withdrawToAccount');

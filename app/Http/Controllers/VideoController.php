@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Video;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class VideoController extends Controller
 {
@@ -118,5 +119,69 @@ class VideoController extends Controller
         }
 
         return view('backend.user.videos.watch', compact('videos','watchedVideos'));
+    }
+
+    /**
+     * Mark a video as watched for the authenticated user
+     */
+    public function markAsWatched(Request $request)
+    {
+        Log::info('markAsWatched called with data:', $request->all());
+        
+        $request->validate([
+            'video_id' => 'required|exists:videos,id'
+        ]);
+
+        $videoId = $request->video_id;
+        $userId = Auth::user()->id;
+
+        Log::info('Processing video_id: ' . $videoId . ' for user_id: ' . $userId);
+
+        // Get the user's active subscription
+        $subscribedPlan = \App\Models\UserSubscription::where('user_id', $userId)
+            ->where('expire_at', '>', date('Y-m-d'))
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        if (!$subscribedPlan) {
+            Log::error('No active subscription found for user: ' . $userId);
+            return response()->json(['success' => false, 'message' => 'No active subscription found.'], 400);
+        }
+
+        Log::info('Found subscription:', $subscribedPlan->toArray());
+
+        // Get current watched videos
+        $watchedVideos = $subscribedPlan->watched_videos;
+        $watchedVideos = is_array($watchedVideos) ? $watchedVideos : (json_decode($watchedVideos, true) ?: []);
+
+        Log::info('Current watched videos:', $watchedVideos);
+
+        // Add video to watched list if not already watched
+        if (!in_array($videoId, $watchedVideos)) {
+            $watchedVideos[] = $videoId;
+            
+            Log::info('Adding video to watched list. New list:', $watchedVideos);
+            
+            // Update the subscription with new watched videos
+            $result = $subscribedPlan->update([
+                'watched_videos' => $watchedVideos
+            ]);
+
+            Log::info('Update result:', ['success' => $result]);
+
+            return response()->json([
+                'success' => true, 
+                'message' => 'Video marked as watched successfully.',
+                'video_id' => $videoId
+            ]);
+        }
+
+        Log::info('Video was already marked as watched');
+
+        return response()->json([
+            'success' => true, 
+            'message' => 'Video was already marked as watched.',
+            'video_id' => $videoId
+        ]);
     }
 }

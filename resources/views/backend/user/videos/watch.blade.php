@@ -28,11 +28,15 @@
 <div class="container mt-4">
     <h2>Available Videos</h2>
     <div class="row">
-        @forelse($videos as $video)
+        @php
+            $unWatched = $videos->whereNotIn('id', $watchedVideos);
+        @endphp
+        @forelse($unWatched as $video)
             <div class="col-md-4 mb-4">
                 <div class="card h-100 video-card"
                      data-title="{{ $video->title }}"
                      data-url="{{ $video->video_url }}"
+                     data-video-id="{{ $video->id }}"
                      style="cursor:pointer;">
                     @if($video->video_thumbnail)
                         <img src="{{ asset($video->video_thumbnail) }}" class="card-img-top" alt="Thumbnail">
@@ -69,6 +73,7 @@
                 <div class="card h-100 border-success video-card"
                      data-title="{{ $video->title }}"
                      data-url="{{ $video->video_url }}"
+                     data-video-id="{{ $video->id }}"
                      style="cursor:pointer;">
                     @if($video->video_thumbnail)
                         <img src="{{ asset($video->video_thumbnail) }}" class="card-img-top" alt="Thumbnail">
@@ -101,16 +106,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <iframe id="videoUrl"
-            src=""
-            frameborder="0" allow="autoplay; fullscreen" allowfullscreen
-            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 10;">
-        </iframe>
-        <div class="video-wrapper">
-            <a class="play-btn popup-youtube" href="https://www.youtube.com/watch?v=FrTz_dKhGIM">
-                <i class="fas fa-play"></i>
-            </a>
-        </div>
+        <div id="videoUrl" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;"></div>
       </div>
     </div>
   </div>
@@ -118,16 +114,172 @@
 
 @push('scripts')
 <script>
+// YouTube iframe API
+var tag = document.createElement('script');
+tag.src = "https://www.youtube.com/iframe_api";
+var firstScriptTag = document.getElementsByTagName('script')[0];
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+var player;
+var currentVideoId;
+var currentVideoCard;
+
+function onYouTubeIframeAPIReady() {
+    // This function will be called when the YouTube API is ready
+}
+
+function createYouTubePlayer(videoUrl, videoId, videoCard) {
+    console.log('Creating YouTube player for:', videoUrl, 'Video ID:', videoId);
+    
+    // Extract video ID from YouTube URL
+    var videoIdFromUrl = extractVideoId(videoUrl);
+    if (!videoIdFromUrl) {
+        console.error('Invalid YouTube URL:', videoUrl);
+        return;
+    }
+    
+    console.log('Extracted YouTube video ID:', videoIdFromUrl);
+
+    currentVideoId = videoId;
+    currentVideoCard = videoCard;
+
+    // Create YouTube player
+    player = new YT.Player('videoUrl', {
+        height: '100%',
+        width: '100%',
+        videoId: videoIdFromUrl,
+        playerVars: {
+            'autoplay': 1,
+            'controls': 1,
+            'rel': 0,
+            'showinfo': 0,
+            'modestbranding': 1
+        },
+        events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange
+        }
+    });
+    
+    console.log('YouTube player created');
+}
+
+function extractVideoId(url) {
+    var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    var match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+}
+
+function onPlayerReady(event) {
+    console.log('YouTube player is ready');
+}
+
+function onPlayerStateChange(event) {
+    console.log('Player state changed:', event.data);
+    // Check if video has ended (state 0 = ended)
+    if (event.data === YT.PlayerState.ENDED) {
+        console.log('Video ended, marking as watched for video ID:', currentVideoId);
+        markVideoAsWatched(currentVideoId, currentVideoCard);
+    }
+}
+
+function markVideoAsWatched(videoId, videoCard) {
+    console.log('Attempting to mark video as watched:', videoId);
+    
+    // Get CSRF token
+    var csrfToken = document.querySelector('meta[name="_token"]').getAttribute('content');
+    console.log('CSRF Token:', csrfToken);
+    
+    // Send AJAX request to mark video as watched
+    fetch('{{ route("videos.mark-watched") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken
+        },
+        body: JSON.stringify({
+            video_id: videoId
+        })
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        return response.json();
+    })
+    .then(data => {
+        console.log('Response data:', data);
+        if (data.success) {
+            // Update the UI to show video as watched
+            updateVideoCardStatus(videoCard, true);
+            console.log('Video marked as watched:', data.message);
+        } else {
+            console.error('Error marking video as watched:', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Fetch error:', error);
+    });
+}
+
+function updateVideoCardStatus(videoCard, isWatched) {
+    if (isWatched) {
+        // Update badge to show watched status
+        var badge = videoCard.querySelector('.badge');
+        if (badge) {
+            badge.className = 'badge bg-success';
+            badge.textContent = 'Watched';
+        }
+        
+        // Add border-success class to card
+        videoCard.classList.add('border-success');
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.video-card').forEach(function(card) {
         card.addEventListener('click', function() {
             var title = this.getAttribute('data-title');
             var url = this.getAttribute('data-url');
+            var videoId = this.getAttribute('data-video-id');
+            
             document.getElementById('videoModalLabel').textContent = title;
-            document.getElementById('videoUrl').setAttribute('src', url);
+            
+            // Clear previous iframe content
+            var iframe = document.getElementById('videoUrl');
+            iframe.innerHTML = '';
+            
+            // Create YouTube player
+            createYouTubePlayer(url, videoId, this);
+            
             var videoModal = new bootstrap.Modal(document.getElementById('videoModal'));
             videoModal.show();
+            
+            // Add a manual button for testing (temporary)
+            setTimeout(function() {
+                if (document.querySelector('.manual-mark-btn')) {
+                    document.querySelector('.manual-mark-btn').remove();
+                }
+                var manualBtn = document.createElement('button');
+                manualBtn.className = 'btn btn-warning manual-mark-btn';
+                manualBtn.textContent = 'Mark as Watched (Manual)';
+                manualBtn.style.position = 'absolute';
+                manualBtn.style.top = '10px';
+                manualBtn.style.right = '10px';
+                manualBtn.style.zIndex = '1000';
+                manualBtn.onclick = function() {
+                    markVideoAsWatched(videoId, this.closest('.video-card'));
+                };
+                document.querySelector('.modal-content').appendChild(manualBtn);
+            }, 2000);
         });
+    });
+
+    // Clean up player when modal is closed
+    document.getElementById('videoModal').addEventListener('hidden.bs.modal', function () {
+        if (player && typeof player.destroy === 'function') {
+            player.destroy();
+        }
+        // Clear the video container
+        document.getElementById('videoUrl').innerHTML = '';
     });
 });
 </script>

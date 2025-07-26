@@ -11,6 +11,18 @@ class UserSubscription extends Model
     use HasFactory;
     use SoftDeletes;
 
+    protected $fillable = [
+        'user_id',
+        'investment_plan_id',
+        'earning',
+        'expire_at',
+        'watched_videos'
+    ];
+
+    protected $casts = [
+        'watched_videos' => 'array'
+    ];
+
     public function user(){
         return $this->belongsTo(User::class)->withTrashed();
     }

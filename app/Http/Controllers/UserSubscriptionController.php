@@ -46,6 +46,16 @@ class UserSubscriptionController extends Controller
             return back();
         }
 
+        // Check if user already has an active subscription to any plan
+        $activeSubscription = UserSubscription::where('user_id', $request['user'])
+            ->where('expire_at', '>', date('Y-m-d'))
+            ->first();
+
+        if ($activeSubscription) {
+            Session::flash('error', 'You already have an active subscription. You cannot subscribe to another plan until your current plan expires.');
+            return redirect()->route('plans.index');
+        }
+
         if ($userAccount['net_amount'] >= $investmentPlan['amount']) {
             $expiry = date("Y-m-d", strtotime("+" . $investmentPlan['plan_days']+$investmentPlan['buffer_days'] . " days", strtotime(date("Y-m-d"))));
 

@@ -59,7 +59,7 @@
                             </div>
                         </div>
                         <p class="text-muted mt-3 mb-0 text-left text-md-center text-xl-left">
-                            Deposits pending approcal
+                            Deposits pending approval
                         </p>
                     </div>
                 </a>

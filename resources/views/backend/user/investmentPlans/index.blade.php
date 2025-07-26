@@ -18,6 +18,11 @@
             {{ Session::get('message') }}
         </div>
     @endif
+    @if(Session::has('error'))
+        <div class="alert alert-danger">
+            {{ Session::get('error') }}
+        </div>
+    @endif
     <div class="nav-container">
         <ol class="breadcrumb">
             <li class="breadcrumb-item active"><a href="{{ route($route[0] . '.index') }}">{{ ucfirst($route[0]) }}</a></li>
@@ -37,13 +42,11 @@
                         <th class="text-center">Sr</th>
                         <th class="text-center">Plan</th>
                         <th class="text-center">Amount</th>
-                        <th class="text-center">Daily Profit</th>
-                        <th class="text-center">Total Profit</th>
+                        <th class="text-center">Profit Earned</th>
                         <th class="text-center">Duration</th>
                         <th class="text-center">Subscription Date</th>
-                        {{-- <th class="text-center">Maturity Date</th> --}}
-                        <th class="text-center">Profit Earned</th>
-                        {{-- <th class="text-center">Action</th> --}}
+                        <th class="text-center">Maturity Date</th>
+                        <th class="text-center">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -55,21 +58,15 @@
                             <td class="text-center">{{ $key + 1 }}</td>
                             <td class="text-center">{{ $item['plan']['title'] }}</td>
                             <td class="text-center">{{ $item['plan']['amount'] }}</td>
-                            <td class="text-center">{{ $item['plan']['daily_profit'] }}</td>
-                            <td class="text-center">{{ $item['plan']['total_profit'] }}</td>
-                            <td class="text-center">{{ $item['plan']['plan_days'] }}</td>
-                            <td class="text-center">{{ date('d-M-Y', strtotime($item['created_at'])) }}</td>
-                            {{-- <td class="text-center">{{ date('d-M-Y', strtotime($item['expire_at'])) }}</td> --}}
                             <td class="text-center">{{ $item['earning'] }}</td>
-                            {{-- <td class="text-center">
-                                <form action="{{ route('withdrawToAccount') }}" method="POST">
-                                    @csrf
-                                    <input type="hidden" name="userID" value="{{ $item['user_id'] }}">
-                                    <input type="hidden" name="userSubsID" value="{{ $item['id'] }}">
-                                    <input type="hidden" name="amount" value="{{ $item['earning'] }}">
-                                    <button type="submit" class="btn btn-success">Withdraw to Account</button>
-                                </form>
-                            </td> --}}
+                            <td class="text-center">{{ $item['plan']['plan_days'] }} + {{ $item['plan']['buffer_days'] }} days</td>
+                            <td class="text-center">{{ date('d-M-Y', strtotime($item['created_at'])) }}</td>
+                            <td class="text-center">{{ date('d-M-Y', strtotime($item['expire_at'])) }}</td>
+                            <td class="text-center">
+                                <a href="{{ route('videos.watch') }}" class="btn btn-primary">
+                                    <i class="fa-solid fa-play"></i> Watch Video
+                                </a>
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>

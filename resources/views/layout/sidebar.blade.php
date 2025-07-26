@@ -117,7 +117,7 @@
             <li class="nav-item active">
                 <a class="nav-link" href="{{ route('plans.index') }}">
                     <i class="fa-solid fa-compass-drafting"></i>
-                    <span class="menu-title pl-2">Investment Plans</span>
+                    <span class="menu-title pl-2">Subscribed Plans</span>
                 </a>
             </li>
             <li class="nav-item active">

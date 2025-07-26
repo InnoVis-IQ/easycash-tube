@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Video;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class VideoController extends Controller
 {
@@ -87,5 +88,17 @@ class VideoController extends Controller
         \App\Models\Video::where('id', $id)->update(['status' => 'inactive']);
         \App\Models\Video::where('id', $id)->delete();
         return redirect()->route('videos.index')->with('success', 'Video deleted successfully.');
+    }
+
+    public function watch()
+    {
+        $subscribedPlan = \App\Models\UserSubscription::where('user_id', Auth::user()['id'])
+            ->where('expire_at', '>', date('Y-m-d'))
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        
+        $video = \App\Models\Video::withTrashed()->findOrFail($id);
+        return view('backend.user.videos.watch', compact('video'));
     }
 }

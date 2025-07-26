@@ -17,7 +17,7 @@ class InvestmentPlanController extends Controller
     {
         if (Auth::user()['role'] == "USER") {
             return view('backend.user.investmentPlans.index')->with([
-                'data' => UserSubscription::withTrashed()->where('user_id',Auth::user()['id'])->get(),
+                'data' => UserSubscription::withTrashed()->where('user_id',Auth::user()['id'])->where('expire_at', '>', date('Y-m-d'))->get(),
             ]);
         } else {
             return view('backend.admin.investmentPlans.index')->with([

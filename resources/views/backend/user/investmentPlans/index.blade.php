@@ -13,6 +13,11 @@
     @php
         $route = explode('.', Route::currentRouteName());
     @endphp
+    @if(Session::has('message'))
+        <div class="alert alert-success">
+            {{ Session::get('message') }}
+        </div>
+    @endif
     <div class="nav-container">
         <ol class="breadcrumb">
             <li class="breadcrumb-item active"><a href="{{ route($route[0] . '.index') }}">{{ ucfirst($route[0]) }}</a></li>

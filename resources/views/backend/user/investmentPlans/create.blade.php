@@ -7,6 +7,23 @@
     @php
         $route = explode('.', Route::currentRouteName());
     @endphp
+    @if(Session::has('message'))
+        <div class="alert alert-success">
+            {{ Session::get('message') }}
+            
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    @endif
+    @if(Session::has('error'))
+        <div class="alert alert-danger">
+            {{ Session::get('error') }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    @endif
     <div class="nav-container">
         <ol class="breadcrumb">
             <li class="breadcrumb-item active"><a href="{{ route($route[0].'.index') }}">{{ ucfirst($route[0]) }}</a></li>

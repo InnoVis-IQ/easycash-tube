@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
-use Session;
+use Illuminate\Support\Facades\Session;
 
 use App\Models\UserSubscription;
 use App\Models\InvestmentPlan;
@@ -37,10 +37,17 @@ class UserSubscriptionController extends Controller
     public function store(StoreUserSubscriptionRequest $request)
     {
         $userAccount = UserAccount::where('user_id', $request['user'])->first();
-        $investmentPlan = InvestmentPlan::find($request['invest']);
+        $investmentPlan = InvestmentPlan::where('id', $request['invest'])->where('status', 'active')->first();
+        
+        // Check if user has already subscribed to this plan
+        $existingSubscription = UserSubscription::where('user_id', $request['user'])->where('investment_plan_id', $request['invest'])->first();
+        if ($existingSubscription) {
+            Session::flash('error', 'You have already subscribed to this plan.');
+            return back();
+        }
 
         if ($userAccount['net_amount'] >= $investmentPlan['amount']) {
-            $expiry = date("Y-m-d", strtotime("+" . $investmentPlan['plan_days'] . " days", strtotime(date("Y-m-d"))));
+            $expiry = date("Y-m-d", strtotime("+" . $investmentPlan['plan_days']+$investmentPlan['buffer_days'] . " days", strtotime(date("Y-m-d"))));
 
             $data = new UserSubscription;
             $data['user_id'] = $request['user'];
@@ -51,13 +58,13 @@ class UserSubscriptionController extends Controller
             UserAccount::where('user_id', $request['user'])->decrement('net_amount', $investmentPlan['amount']);
 
             // 15% referral bonus
-            $isReferred = User::where('id', Auth::user()['id'])->where('bonus_given', 0)->first();
-            // dd(round(0.15*$investmentPlan['amount']));
-            if ($isReferred) {
-                $referredBy = User::where('referral_code', $isReferred['referred_by'])->first('id');
-                UserAccount::where('user_id', $referredBy['id'])->increment('net_amount', round(0.15 * $investmentPlan['amount']));
-                User::where('id', Auth::user()['id'])->update(['bonus_given' => round(0.15 * $investmentPlan['amount'])]);
-            }
+            // $isReferred = User::where('id', Auth::user()['id'])->where('bonus_given', 0)->first();
+            // // dd(round(0.15*$investmentPlan['amount']));
+            // if ($isReferred) {
+            //     $referredBy = User::where('referral_code', $isReferred['referred_by'])->first('id');
+            //     UserAccount::where('user_id', $referredBy['id'])->increment('net_amount', round(0.15 * $investmentPlan['amount']));
+            //     User::where('id', Auth::user()['id'])->update(['bonus_given' => round(0.15 * $investmentPlan['amount'])]);
+            // }
 
             return redirect()->route('plans.index');
         } else {

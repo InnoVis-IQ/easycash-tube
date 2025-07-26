@@ -36,8 +36,12 @@ class WithdrawController extends Controller
             $userAccount = UserAccount::where('user_id',Auth::user()['id'])->first();
             $userWithdraws = Withdraw::where('user_id',Auth::user()['id'])->where('status','requested')->sum('amount');
             $netAmount = $userAccount['net_amount'] - $userWithdraws;
-            $data = [];
-            return view('backend.user.withdraw.index', compact('netAmount','userWithdraws','data'));
+
+            $isEligible = false;
+            $userSubscriptions = UserSubscription::where('user_id',Auth::user()['id'])->where('investment_plan_id', '!=', 1)->where('expire_at', '<', date('Y-m-d'))->get();
+            $isEligible = $userSubscriptions->count() > 0 ? true : false;
+
+            return view('backend.user.withdraw.index', compact('netAmount','userWithdraws','isEligible'));
         }
     }
 

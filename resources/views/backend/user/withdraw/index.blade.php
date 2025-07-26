@@ -82,6 +82,7 @@
             <h4 style="font-weight: bold;">Request Withdrawal</h4>
         </div>
         <div class="card-body">
+            @if($isEligible)
             <form action="{{route('withdraws.store')}}" method="POST" class="form row">
                 @csrf
                 <input type="hidden" name="userID" value="{{Auth::user()['id']}}">
@@ -118,6 +119,15 @@
                     </div>
                 </div>
             </form>
+            @else
+            <div class="alert alert-danger">
+                <h4>You are not eligible to withdraw</h4>
+                <p>You must have a valid subscription to withdraw. <a href="{{ route('plans.index') }}" class="btn btn-primary">Subscribe to a plan</a></p>
+                <p>
+                    Please refer to our <a href="{{ url('/terms-and-conditions') }}" target="_blank">Terms and Conditions</a> for more information about withdrawal eligibility.
+                </p>
+            </div>
+            @endif
         </div>
     </div>
 

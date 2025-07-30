@@ -32,13 +32,32 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::get('/adjustUserAccount/{id}', [Controllers\SuperadminController::class, 'adjustUserAccount'])->name('adjustUserAccount');
     
     Route::resource('users', Controllers\UserController::class)->withTrashed();
+    Route::get('users/export', [Controllers\UserController::class, 'export'])->name('users.export');
     Route::resource('plans', Controllers\InvestmentPlanController::class)->withTrashed();
     Route::resource('bankAccounts', Controllers\BankAccountController::class)->withTrashed();
     Route::resource('deposits', Controllers\DepositController::class)->withTrashed();
     Route::resource('withdraws', Controllers\WithdrawController::class)->withTrashed();
+    Route::get('withdraws/export', [Controllers\WithdrawController::class, 'export'])->name('withdraws.export');
+    Route::post('withdraws/bulk-approve', [Controllers\WithdrawController::class, 'bulkApprove'])->name('withdraws.bulk-approve');
+    Route::post('withdraws/bulk-reject', [Controllers\WithdrawController::class, 'bulkReject'])->name('withdraws.bulk-reject');
     Route::resource('userAccounts', Controllers\UserAccountController::class)->withTrashed();
     Route::resource('userSubscriptions', Controllers\UserSubscriptionController::class)->withTrashed();
     Route::resource('videos', Controllers\VideoController::class);
+    
+    // Admin Settings Routes
+    Route::get('admin/settings', [Controllers\AdminSettingsController::class, 'index'])->name('admin.settings');
+    Route::post('admin/settings/general', [Controllers\AdminSettingsController::class, 'updateGeneral'])->name('admin.settings.general');
+    Route::post('admin/settings/payment', [Controllers\AdminSettingsController::class, 'updatePayment'])->name('admin.settings.payment');
+    Route::post('admin/settings/notifications', [Controllers\AdminSettingsController::class, 'updateNotifications'])->name('admin.settings.notifications');
+    Route::post('admin/settings/announcement', [Controllers\AdminSettingsController::class, 'sendAnnouncement'])->name('admin.settings.announcement');
+    Route::post('admin/settings/clear-cache', [Controllers\AdminSettingsController::class, 'clearCache'])->name('admin.settings.clear-cache');
+    
+    // Notification Routes
+    Route::get('admin/notifications', [Controllers\NotificationController::class, 'index'])->name('admin.notifications');
+    Route::post('admin/notifications/send', [Controllers\NotificationController::class, 'send'])->name('admin.notifications.send');
+    Route::post('admin/notifications/mark-read', [Controllers\NotificationController::class, 'markAsRead'])->name('admin.notifications.mark-read');
+    Route::delete('admin/notifications/{id}', [Controllers\NotificationController::class, 'destroy'])->name('admin.notifications.destroy');
+    Route::get('user/notifications', [Controllers\NotificationController::class, 'getUserNotifications'])->name('user.notifications');
 
 });
 
@@ -59,7 +78,7 @@ Route::get('/theme', function () {
 
 // For Clear cache
 Route::get('/clear-cache', function () {
-    Artisan::call('cache:clear');
+    \Illuminate\Support\Facades\Artisan::call('cache:clear');
     return "Cache is cleared";
 });
 

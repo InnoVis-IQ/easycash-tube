@@ -17,19 +17,50 @@ class WithdrawController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $userAccounts = UserAccount::withTrashed()->get();
         $accountBalance = [];
         foreach ($userAccounts as $userAccount) {
             $accountBalance[$userAccount['user_id']] = $userAccount['net_amount'];
         }
+        
         if(in_array(Auth::user()['role'],['SUPERADMIN','ADMIN'])){
+            $query = Withdraw::withTrashed()->with(['user', 'user_bank']);
+
+            // Filter by status
+            if ($request->has('status') && $request->status) {
+                $query->where('status', $request->status);
+            }
+
+            // Filter by date range
+            if ($request->has('date_from') && $request->date_from) {
+                $query->whereDate('created_at', '>=', $request->date_from);
+            }
+            if ($request->has('date_to') && $request->date_to) {
+                $query->whereDate('created_at', '<=', $request->date_to);
+            }
+
+            // Search by user
+            if ($request->has('search') && $request->search) {
+                $search = $request->search;
+                $query->whereHas('user', function($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('email', 'like', "%{$search}%");
+                });
+            }
+
+            $withdrawals = $query->orderBy('created_at', 'desc')->paginate(20);
+
             return view('backend.admin.withdraw.index')->with([
-                'data' => Withdraw::withTrashed()->orderBy('status')->get(),
+                'data' => $withdrawals,
                 'pending' => Withdraw::where('status','requested')->count(),
                 'accountBalance' => $accountBalance,
-                'banks' => BankAccount::get()
+                'banks' => BankAccount::get(),
+                'status' => $request->status,
+                'date_from' => $request->date_from,
+                'date_to' => $request->date_to,
+                'search' => $request->search
             ]);
         }
         else{
@@ -98,7 +129,7 @@ class WithdrawController extends Controller
      */
     public function show(Withdraw $withdraw)
     {
-        //
+        return view('backend.admin.withdraw.show', compact('withdraw'));
     }
 
     /**
@@ -106,7 +137,8 @@ class WithdrawController extends Controller
      */
     public function edit(Withdraw $withdraw)
     {
-        //
+        $banks = BankAccount::get();
+        return view('backend.admin.withdraw.edit', compact('withdraw', 'banks'));
     }
 
     /**
@@ -120,8 +152,7 @@ class WithdrawController extends Controller
 
         UserAccount::where('user_id',$withdraw['user_id'])->decrement('net_amount', $withdraw['amount']);
 
-        return back();
-
+        return back()->with('success', 'Withdrawal processed successfully');
     }
 
     /**
@@ -129,7 +160,108 @@ class WithdrawController extends Controller
      */
     public function destroy(Withdraw $withdraw)
     {
-        //
+        $withdraw->delete();
+        return back()->with('success', 'Withdrawal deleted successfully');
+    }
+
+    /**
+     * Bulk approve withdrawals
+     */
+    public function bulkApprove(Request $request)
+    {
+        $withdrawalIds = $request->withdrawal_ids;
+        
+        if (!$withdrawalIds) {
+            return back()->with('error', 'No withdrawals selected');
+        }
+
+        $withdrawals = Withdraw::whereIn('id', $withdrawalIds)->where('status', 'requested')->get();
+        
+        foreach ($withdrawals as $withdrawal) {
+            $withdrawal->status = 'transferred';
+            $withdrawal->save();
+            
+            UserAccount::where('user_id', $withdrawal->user_id)->decrement('net_amount', $withdrawal->amount);
+        }
+
+        return back()->with('success', count($withdrawals) . ' withdrawals approved successfully');
+    }
+
+    /**
+     * Bulk reject withdrawals
+     */
+    public function bulkReject(Request $request)
+    {
+        $withdrawalIds = $request->withdrawal_ids;
+        
+        if (!$withdrawalIds) {
+            return back()->with('error', 'No withdrawals selected');
+        }
+
+        $withdrawals = Withdraw::whereIn('id', $withdrawalIds)->where('status', 'requested')->get();
+        
+        foreach ($withdrawals as $withdrawal) {
+            $withdrawal->status = 'rejected';
+            $withdrawal->save();
+        }
+
+        return back()->with('success', count($withdrawals) . ' withdrawals rejected successfully');
+    }
+
+    /**
+     * Export withdrawals to CSV
+     */
+    public function export(Request $request)
+    {
+        $query = Withdraw::withTrashed()->with(['user', 'user_bank']);
+
+        // Apply filters
+        if ($request->has('status') && $request->status) {
+            $query->where('status', $request->status);
+        }
+        if ($request->has('date_from') && $request->date_from) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        if ($request->has('date_to') && $request->date_to) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        $withdrawals = $query->orderBy('created_at', 'desc')->get();
+        
+        $filename = 'withdrawals_' . date('Y-m-d_H-i-s') . '.csv';
+        
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+        
+        $callback = function() use ($withdrawals) {
+            $file = fopen('php://output', 'w');
+            
+            // Add headers
+            fputcsv($file, [
+                'ID', 'User Name', 'User Email', 'Amount', 'Status', 
+                'Bank Account', 'Request Date', 'Processed Date'
+            ]);
+            
+            // Add data
+            foreach ($withdrawals as $withdrawal) {
+                fputcsv($file, [
+                    $withdrawal->id,
+                    $withdrawal->user ? $withdrawal->user->name : 'N/A',
+                    $withdrawal->user ? $withdrawal->user->email : 'N/A',
+                    $withdrawal->amount,
+                    $withdrawal->status,
+                    $withdrawal->user_bank ? $withdrawal->user_bank->account_number : 'N/A',
+                    $withdrawal->created_at->format('Y-m-d H:i:s'),
+                    $withdrawal->updated_at->format('Y-m-d H:i:s')
+                ]);
+            }
+            
+            fclose($file);
+        };
+        
+        return response()->stream($callback, 200, $headers);
     }
 
     public function withdrawToAccount(Request $request){

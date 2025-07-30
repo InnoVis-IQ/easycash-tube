@@ -37,6 +37,11 @@
             top: 50%;
             transform: translateY(-50%);
         }
+
+        .nav-item:hover {
+            color: white !important;
+            background: linear-gradient(270deg, rgb(40, 167, 69) 0%, rgb(0, 123, 255) 100%) !important;
+        }
     </style>
 
     @stack('style')

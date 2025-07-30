@@ -1,16 +1,12 @@
-<nav class="navbar default-layout col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+<nav class="navbar default-layout col-lg-12 col-12 p-0 fixed-top d-flex flex-row" style="background: linear-gradient(135deg, #28a745 0%, #007bff 100%);">
     <div class="text-center navbar-brand-wrapper d-flex align-items-top justify-content-center">
-        <a class="navbar-brand brand-logo text-primary" href="{{ url('/') }}">
+        <a class="navbar-brand brand-logo" href="{{ url('/') }}" style="color: white !important; background: linear-gradient(270deg, rgb(40, 167, 69) 0%, rgb(0, 123, 255) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
             <!--<img src="{{ url('assets/images/logo.svg') }}" alt="logo" />-->
           <b>  EasyCash Tube</b>
         </a>
-        <a class="navbar-brand brand-logo-mini text-primary" href="{{ url('/') }}">
-            <!--<img src="{{ url('assets/images/logo-mini.svg') }}" alt="logo" /> -->
-          <b>  MLP</b>
-        </a>
     </div>
     <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
-        <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+        <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize" style="color: white;">
             <span class="mdi mdi-menu"></span>
         </button>
         {{-- <ul class="navbar-nav navbar-nav-left header-links">
@@ -125,9 +121,9 @@
                 </div>
             </li> --}}
             <li class="nav-item dropdown d-none d-xl-inline-block">
-                <a class="nav-link dropdown-toggle" id="UserDropdown" href="#" data-toggle="dropdown"
-                    aria-expanded="false">
-                    <span class="profile-text d-none d-md-inline-flex">{{ Auth::user()['name'] }}</span>
+                <a class="nav-link dropdown-toggle text-white" id="UserDropdown" href="#" data-toggle="dropdown"
+                    aria-expanded="false" style="color: white !important;">
+                    <span class="profile-text d-none d-md-inline-flex text-white" style="color: white !important;">{{ Auth::user()['name'] }}</span>
                     <img class="img-xs rounded-circle" src="{{ url('assets/images/faces/face0.png') }}"
                         alt="Profile image"> </a>
                 <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
@@ -156,7 +152,7 @@
             </li>
         </ul>
         <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button"
-            data-toggle="offcanvas">
+            data-toggle="offcanvas" style="color: white;">
             <span class="mdi mdi-menu icon-menu"></span>
         </button>
     </div>

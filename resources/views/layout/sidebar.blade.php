@@ -1,4 +1,4 @@
-<nav class="sidebar sidebar-offcanvas dynamic-active-class-disabled" id="sidebar">
+<nav class="sidebar sidebar-offcanvas dynamic-active-class-disabled" id="sidebar" style="background: linear-gradient(180deg, #28a745 0%, #007bff 100%);">
     <ul class="nav">
         <li class="nav-item nav-profile not-navigation-link">
             <div class="nav-link">
@@ -7,11 +7,11 @@
                         <img src="{{ url('assets/images/faces/face0.png') }}" alt="profile image">
                     </div>
                     <div class="text-wrapper">
-                        <p class="profile-name">{{ Auth::user()['name'] }}</p>
+                        <p class="profile-name text-white" style="color: white !important;">{{ Auth::user()['name'] }}</p>
                         <div class="dropdown" data-display="static">
                             <a href="#" class="nav-link d-flex user-switch-dropdown-toggler"
                                 id="UsersettingsDropdown" href="#" data-toggle="dropdown" aria-expanded="false">
-                                <small class="designation text-muted">
+                                <small class="designation text-white" style="color: white !important;">
                                     {{ ucfirst(strtolower(Auth::user()['role'])) }}
                                 </small>
                                 <span class="status-indicator online"></span>
@@ -50,7 +50,7 @@
         </li>
         @if (in_array(strtolower(Auth::user()['role']), ['user']))
             <div class="row">
-                <div class="col-md-10 offset-md-1 text-center mb-2" style="font-weight: bold;">
+                <div class="col-md-10 offset-md-1 text-center mb-2" style="font-weight: bold; color: white;">
                     Account Balance:
                     @php
                         $userAccount = App\Models\UserAccount::where('user_id', Auth::user()['id'])->first();
@@ -60,10 +60,10 @@
             </div>
             <div class="row">
                 <div class="col-md-4 offset-md-1">
-                    <a href="{{ route('deposits.index') }}" class="btn btn-primary">Deposit</a>
+                    <a href="{{ route('deposits.index') }}" class="btn btn-primary" style="background-color: #007bff; border-color: #007bff;">Deposit</a>
                 </div>
                 <div class="col-md-4 offset-md-1">
-                    <a href="{{ route('withdraws.index') }}" class="btn btn-warning">Withdraw</a>
+                    <a href="{{ route('withdraws.index') }}" class="btn btn-warning" style="background-color: #ffc107; border-color: #ffc107; color: #212529;">Withdraw</a>
                 </div>
             </div>
             {{-- <div class="row mt-3">
@@ -73,55 +73,61 @@
                 </div>
             </div> --}}
         @endif
-        <li class="nav-item active">
-            <a class="nav-link" href="{{ route('dashboard') }}">
+        <li class="nav-item active" style="transition: all 0.3s ease;">
+            <a class="nav-link text-white" href="{{ route('dashboard') }}" style="color: white !important; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
                 <i class="fa-solid fa-gauge-high"></i>
                 <span class="menu-title pl-2">Dashboard</span>
             </a>
         </li>
         @if (in_array(strtolower(Auth::user()['role']), ['superadmin', 'admin']))
-            <li class="nav-item active">
-                <a class="nav-link" href="{{ route('users.index') }}">
+            <li class="nav-item active" style="transition: all 0.3s ease;">
+                <a class="nav-link text-white" href="{{ route('users.index') }}" style="color: white !important; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
                     <i class="fa-solid fa-users"></i>
                     <span class="menu-title pl-2">Users</span>
                 </a>
             </li>
         @endif
         @if (in_array(strtolower(Auth::user()['role']), ['superadmin', 'admin']))
-            <li class="nav-item active">
-                <a class="nav-link" href="{{ route('plans.index') }}">
+            <li class="nav-item active" style="transition: all 0.3s ease;">
+                <a class="nav-link text-white" href="{{ route('plans.index') }}" style="color: white !important; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
                     <i class="fa-solid fa-compass-drafting"></i>
                     <span class="menu-title pl-2">Plans</span>
                 </a>
             </li>
-            <li class="nav-item active">
-                <a class="nav-link" href="{{ route('videos.index') }}">
+            <li class="nav-item active" style="transition: all 0.3s ease;">
+                <a class="nav-link text-white" href="{{ route('videos.index') }}" style="color: white !important; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
                     <i class="fa-solid fa-video"></i>
                     <span class="menu-title pl-2">Videos</span>
                 </a>
             </li>
-            <li class="nav-item active">
-                <a class="nav-link" href="{{ route('deposits.index') }}">
+            <li class="nav-item active" style="transition: all 0.3s ease;">
+                <a class="nav-link text-white" href="{{ route('deposits.index') }}" style="color: white !important; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
                     <i class="fa-solid fa-coins"></i>
                     <span class="menu-title pl-2">Deposit Requests</span>
                 </a>
             </li>
-            <li class="nav-item active">
-                <a class="nav-link" href="{{ route('withdraws.index') }}">
+            <li class="nav-item active" style="transition: all 0.3s ease;">
+                <a class="nav-link text-white" href="{{ route('withdraws.index') }}" style="color: white !important; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
                     <i class="fa-solid fa-coins"></i>
                     <span class="menu-title pl-2">Withdraw Requests</span>
                 </a>
             </li>
+            <li class="nav-item active" style="transition: all 0.3s ease;">
+                <a class="nav-link text-white" href="{{ route('admin.settings') }}" style="color: white !important; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
+                    <i class="fa-solid fa-cog"></i>
+                    <span class="menu-title pl-2">Settings</span>
+                </a>
+            </li>
         @endif
         @if (in_array(strtolower(Auth::user()['role']), ['user']))
-            <li class="nav-item active">
-                <a class="nav-link" href="{{ route('plans.index') }}">
+            <li class="nav-item active" style="transition: all 0.3s ease;">
+                <a class="nav-link text-white" href="{{ route('plans.index') }}" style="color: white !important; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
                     <i class="fa-solid fa-compass-drafting"></i>
                     <span class="menu-title pl-2">Subscribed Plans</span>
                 </a>
             </li>
-            <li class="nav-item active">
-                <a class="nav-link" href="{{ route('deposits.index') }}">
+            <li class="nav-item active" style="transition: all 0.3s ease;">
+                <a class="nav-link text-white" href="{{ route('deposits.index') }}" style="color: white !important; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
                     <i class="fa-solid fa-coins"></i>
                     <span class="menu-title pl-2">Deposits</span>
                 </a>
@@ -169,3 +175,37 @@
         navigator.clipboard.writeText(text);
     }
 </script>
+
+<style>
+/* Override hover styles for sidebar nav items with maximum specificity */
+.sidebar .nav .nav-item:not(.nav-profile):hover > .nav-link {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: white !important;
+}
+
+.sidebar .nav .nav-item:not(.nav-profile):hover > .nav-link i,
+.sidebar .nav .nav-item:not(.nav-profile):hover > .nav-link .menu-title {
+    color: white !important;
+}
+
+/* Ensure active state doesn't override hover */
+.sidebar .nav .nav-item.active:not(.nav-profile):hover > .nav-link {
+    background: rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+}
+
+.sidebar .nav .nav-item.active:not(.nav-profile):hover > .nav-link i,
+.sidebar .nav .nav-item.active:not(.nav-profile):hover > .nav-link .menu-title {
+    color: white !important;
+}
+
+/* Override the default hover color rule */
+.sidebar .nav .nav-item .nav-link:hover {
+    color: white !important;
+}
+
+/* Override the sidebar-dark hover rule */
+.sidebar-dark .sidebar .nav .nav-item .nav-link:hover {
+    color: white !important;
+}
+</style>

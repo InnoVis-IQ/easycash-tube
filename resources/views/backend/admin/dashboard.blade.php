@@ -6,11 +6,8 @@
 
 @section('content')
     <div class="row">
-        <div class="col-10">
-            <h5>Dashboard</h5>
-        </div>
-        <div class="col-2">
-            <a href="{{ route('profitCalculation') }}" class="btn btn-primary">Run Today's Profit</a>
+        <div class="col-12">
+            <h5>Admin Dashboard</h5>
         </div>
     </div>
     @if (Session::has('message'))
@@ -18,38 +15,39 @@
             {{ Session::get('message') }}
         </div>
     @endif
+    
+    <!-- Main Statistics Cards -->
     <div class="row">
-        <div class="col-md-6 col-sm-6 grid-margin stretch-card">
+        <div class="col-md-3 col-sm-6 grid-margin stretch-card">
             <div class="card card-statistics">
                 <a href="{{ route('users.index') }}">
                     <div class="card-body">
-                        <div
-                            class="d-flex flex-md-column flex-xl-row flex-wrap justify-content-between align-items-md-center justify-content-xl-between">
+                        <div class="d-flex flex-md-column flex-xl-row flex-wrap justify-content-between align-items-md-center justify-content-xl-between">
                             <div class="float-left">
-                                <i class="fa-solid fa-user-plus fa-2xl" style="color: #3267c3;"></i>
+                                <i class="fa-solid fa-users fa-2xl" style="color: #28a745;"></i>
                             </div>
                             <div class="float-right">
-                                <p class="mb-0 text-right">New Users</p>
+                                <p class="mb-0 text-right">Total Users</p>
                                 <div class="fluid-container">
-                                    <h3 class="font-weight-medium text-right mb-0">{{ $newUsers }}</h3>
+                                    <h3 class="font-weight-medium text-right mb-0">{{ $totalUsers }}</h3>
                                 </div>
                             </div>
                         </div>
                         <p class="text-muted mt-3 mb-0 text-left text-md-center text-xl-left">
-                            No. of new users in past 3 days
+                            Active: {{ $totalActiveUsers }}
                         </p>
                     </div>
                 </a>
             </div>
         </div>
-        <div class="col-md-6 col-sm-6 grid-margin stretch-card">
+        
+        <div class="col-md-3 col-sm-6 grid-margin stretch-card">
             <div class="card card-statistics">
                 <a href="{{ route('deposits.index') }}">
                     <div class="card-body">
-                        <div
-                            class="d-flex flex-md-column flex-xl-row flex-wrap justify-content-between align-items-md-center justify-content-xl-between">
+                        <div class="d-flex flex-md-column flex-xl-row flex-wrap justify-content-between align-items-md-center justify-content-xl-between">
                             <div class="float-left">
-                                <i class="fa-solid fa-hand-holding-dollar fa-2xl" style="color: #048b45;"></i>
+                                <i class="fa-solid fa-hand-holding-dollar fa-2xl" style="color: #007bff;"></i>
                             </div>
                             <div class="float-right">
                                 <p class="mb-0 text-right">Pending Deposits</p>
@@ -59,51 +57,172 @@
                             </div>
                         </div>
                         <p class="text-muted mt-3 mb-0 text-left text-md-center text-xl-left">
-                            Deposits pending approval
+                            Awaiting approval
                         </p>
                     </div>
                 </a>
             </div>
         </div>
-        <div class="col-md-6 col-sm-6 grid-margin stretch-card">
+        
+        <div class="col-md-3 col-sm-6 grid-margin stretch-card">
+            <div class="card card-statistics">
+                <a href="{{ route('withdraws.index') }}">
+                    <div class="card-body">
+                        <div class="d-flex flex-md-column flex-xl-row flex-wrap justify-content-between align-items-md-center justify-content-xl-between">
+                            <div class="float-left">
+                                <i class="fa-solid fa-money-bill-transfer fa-2xl" style="color: #dc3545;"></i>
+                            </div>
+                            <div class="float-right">
+                                <p class="mb-0 text-right">Pending Withdrawals</p>
+                                <div class="fluid-container">
+                                    <h3 class="font-weight-medium text-right mb-0">{{ $pendingWithdrawals }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-muted mt-3 mb-0 text-left text-md-center text-xl-left">
+                            Total: {{ $totalWithdrawals }} | Completed: {{ $completedWithdrawals }}
+                        </p>
+                    </div>
+                </a>
+            </div>
+        </div>
+        
+        <div class="col-md-3 col-sm-6 grid-margin stretch-card">
             <div class="card card-statistics">
                 <div class="card-body">
-                    <div
-                        class="d-flex flex-md-column flex-xl-row flex-wrap justify-content-between align-items-md-center justify-content-xl-between">
+                    <div class="d-flex flex-md-column flex-xl-row flex-wrap justify-content-between align-items-md-center justify-content-xl-between">
                         <div class="float-left">
-                            <i class="fa-solid fa-money-check-dollar fa-2xl" style="color: #f0b7e1;"></i>
+                            <i class="fa-solid fa-money-check-dollar fa-2xl" style="color: #28a745;"></i>
                         </div>
                         <div class="float-right">
-                            <p class="mb-0 text-right">Ongoing Subscriptions</p>
+                            <p class="mb-0 text-right">Active Subscriptions</p>
                             <div class="fluid-container">
                                 <h3 class="font-weight-medium text-right mb-0">{{ $activeSubscriptions }}</h3>
                             </div>
                         </div>
                     </div>
                     <p class="text-muted mt-3 mb-0 text-left text-md-center text-xl-left">
-                        No. of on going Subscriptions
+                        Total Invested: ₨{{ number_format($totalInvestedAmount) }}
                     </p>
                 </div>
             </div>
         </div>
-        <div class="col-md-6 col-sm-6 grid-margin stretch-card">
-            <div class="card card-statistics">
+    </div>
+
+    <!-- Earnings and Financial Summary -->
+    <div class="row">
+        <div class="col-md-6 grid-margin stretch-card">
+            <div class="card">
                 <div class="card-body">
-                    <div
-                        class="d-flex flex-md-column flex-xl-row flex-wrap justify-content-between align-items-md-center justify-content-xl-between">
-                        <div class="float-left">
-                            <i class="fa-solid fa-money-bill-transfer fa-2xl" style="color: #7de811;"></i>
+                    <h4 class="card-title">Financial Summary</h4>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="text-center">
+                                <h5 style="color: #007bff;">₨{{ number_format($totalInvestedAmount) }}</h5>
+                                <p class="text-muted">Total Invested</p>
+                            </div>
                         </div>
-                        <div class="float-right">
-                            <p class="mb-0 text-right">Invsted Amount</p>
-                            <div class="fluid-container">
-                                <h3 class="font-weight-medium text-right mb-0">{{ $investedAmount }}</h3>
+                        <div class="col-6">
+                            <div class="text-center">
+                                <h5 style="color: #28a745;">₨{{ number_format($totalEarnings) }}</h5>
+                                <p class="text-muted">Total Earnings</p>
                             </div>
                         </div>
                     </div>
-                    <p class="text-muted mt-3 mb-0 text-left text-md-center text-xl-left">
-                        Amount invested in ongoing plans
-                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Plan Distribution</h4>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Plan</th>
+                                    <th>Active Users</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($planBreakdown as $plan)
+                                <tr>
+                                    <td>{{ $plan['plan_name'] }}</td>
+                                    <td><span class="badge" style="background-color: #28a745;">{{ $plan['active_count'] }}</span></td>
+                                    <td>₨{{ number_format($plan['amount']) }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activities -->
+    <div class="row">
+        <div class="col-md-4 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Recent Users</h4>
+                    <div class="list-wrapper">
+                        @foreach($recentUsers as $user)
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h6 class="mb-0">{{ $user->name }}</h6>
+                                <small class="text-muted">{{ $user->email }}</small>
+                            </div>
+                            <small class="text-muted">{{ $user->created_at->diffForHumans() }}</small>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Recent Withdrawals</h4>
+                    <div class="list-wrapper">
+                        @foreach($recentWithdrawals as $withdrawal)
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h6 class="mb-0">{{ $withdrawal->user->name ?? 'N/A' }}</h6>
+                                <small class="text-muted">₨{{ number_format($withdrawal->amount) }}</small>
+                            </div>
+                            <span class="badge badge-{{ $withdrawal->status == 'requested' ? 'warning' : ($withdrawal->status == 'transferred' ? 'success' : 'secondary') }}" 
+                                  style="background-color: {{ $withdrawal->status == 'requested' ? '#ffc107' : ($withdrawal->status == 'transferred' ? '#28a745' : '#6c757d') }};">
+                                {{ ucfirst($withdrawal->status) }}
+                            </span>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Recent Deposits</h4>
+                    <div class="list-wrapper">
+                        @foreach($recentDeposits as $deposit)
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h6 class="mb-0">{{ $deposit->user->name ?? 'N/A' }}</h6>
+                                <small class="text-muted">₨{{ number_format($deposit->amount) }}</small>
+                            </div>
+                            <span class="badge badge-{{ $deposit->status == 'deposited' ? 'warning' : ($deposit->status == 'completed' ? 'success' : 'secondary') }}"
+                                  style="background-color: {{ $deposit->status == 'deposited' ? '#ffc107' : ($deposit->status == 'completed' ? '#28a745' : '#6c757d') }};">
+                                {{ ucfirst($deposit->status) }}
+                            </span>
+                        </div>
+                        @endforeach
+                    </div>
                 </div>
             </div>
         </div>

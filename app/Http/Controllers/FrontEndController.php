@@ -10,7 +10,7 @@ class FrontEndController extends Controller
     public function index(){
         // return redirect()->route('login');
         return view('frontend.web.index')->with([
-            'data' => InvestmentPlan::limit(3)->get(),
+            'plans' => InvestmentPlan::limit(3)->get(),
         ]);
     }
 }

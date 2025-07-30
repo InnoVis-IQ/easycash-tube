@@ -1,531 +1,530 @@
 <!doctype html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<meta name="author" content="ThemeStarz">
-
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:400,500,600">
-    <link rel="stylesheet" href="{{asset('web/assets/bootstrap/css/bootstrap.min.css')}}" type="text/css">
-    <link rel="stylesheet" href="{{asset('web/assets/font-awesome/css/fontawesome-all.min.css')}}">
-    <link rel="stylesheet" href="{{asset('web/assets/css/magnific-popup.css')}}">
-    <link rel="stylesheet" href="{{asset('web/assets/css/owl.carousel.min.css')}}">
-    <link rel="stylesheet" href="{{asset('web/assets/css/style.css')}}">
-	<title>EasyCash Tube</title>
-
+    <meta name="author" content="Easycash Tube">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <title>Easycash Tube - Watch. Earn. Repeat.</title>
+    
+    <style>
+        :root {
+            --primary-color: #28a745;
+            --secondary-color: #007bff;
+            --dark-color: #212529;
+            --light-color: #f8f9fa;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-color) !important;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 120px 0 80px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .section-padding {
+            padding: 80px 0;
+        }
+        
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 2rem;
+        }
+        
+        .plan-card {
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .plan-card:hover {
+            border-color: var(--primary-color);
+        }
+        
+        .plan-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 20px;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .btn-primary-custom {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary-custom:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+            color: white;
+        }
+        
+        .btn-outline-secondary-custom {
+            color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .btn-outline-secondary-custom:hover {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .faq-item {
+            border: 1px solid #dee2e6;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+        
+        .faq-header {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .faq-header:hover {
+            background: #e9ecef;
+        }
+        
+        .faq-body {
+            padding: 20px;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .footer {
+            background: var(--dark-color);
+            color: white;
+            padding: 40px 0 20px;
+        }
+        
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            margin: 0 5px;
+            transition: transform 0.3s ease;
+        }
+        
+        .social-icon:hover {
+            transform: scale(1.1);
+            color: white;
+        }
+        
+        .check-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .check-list li {
+            padding: 8px 0;
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .check-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+    </style>
 </head>
-<body data-spy="scroll" data-target=".navbar">
-    <div class="ts-page-wrapper" id="page-top">
-
-        <!--*********************************************************************************************************-->
-        <!--************ HERO ***************************************************************************************-->
-        <!--*********************************************************************************************************-->
-        <header id="ts-hero" class="ts-full-screen ts-separate-bg-element">
-            <!--NAVIGATION ******************************************************************************************-->
-            <nav class="navbar navbar-expand-lg navbar-dark fixed-top ts-separate-bg-element" data-bg-color="#141a3a">
-                <div class="container">
-                    <a class="navbar-brand" href="#page-top">
-                        Easy Cash Tube<br>
-                        <small>Watch. Earn. Repeat</small>
-                    </a>
-                    <!--end navbar-brand-->
-                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <!--end navbar-toggler-->
-                    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-                        <div class="navbar-nav ml-auto text-center">
-                            <a class="nav-item nav-link active ts-scroll" href="#page-top">Home <span class="sr-only">(current)</span></a>
-                            <a class="nav-item nav-link ts-scroll" href="#overview">Overview</a>
-                            <a class="nav-item nav-link ts-scroll" href="#how-it-works">How It Works</a>
-                            <a class="nav-item nav-link ts-scroll" href="#about-us">About Us</a>
-                             <a class="nav-item nav-link ts-scroll" href="#pricing">Packages</a>
-                             <a class="nav-item nav-link ts-scroll mr-2" href="#form-contact">Contact</a>
-                            <a class="nav-item nav-link ts-scroll btn btn-primary btn-sm m-1 px-3" href="{{route('login')}}">Login</a>
-                            <a class="nav-item nav-link ts-scroll btn btn-info btn-sm m-1 px-3" href="{{route('register')}}">Register</a>
-
-                            {{-- <a class="ts-scroll btn btn-primary btn-sm m-1 px-3 ts-width__auto" href="#">Invest Now</a> --}}
-                        </div>
-                        <!--end navbar-nav-->
-                    </div>
-                    <!--end collapse-->
-                </div>
-                <!--end container-->
-            </nav>
-            <!--end navbar-->
-
-            <!--HERO CONTENT ****************************************************************************************-->
-
-            <div class="container align-self-center align-items-center">
-                <div class="row align-items-center">
-                    <div class="col-sm-7 col-md-7  d-sm-block">
-                        <h1 data-animate="ts-fadeInUp">Earn Daily Just by Watching Videos!</h1>
-                        <div data-animate="ts-fadeInUp" data-delay=".1s">
-                            <p class="w-75 text-white mb-5 ts-opacity__50">Join Easycash Tube and get paid every day — earn upto 20% daily on your selected plan by watching just 1 video per day.</p>
-                        </div>
-                        <a href="{{route('login')}}" class="btn btn-outline-light btn-lg ts-scroll mr-4" data-animate="ts-fadeInUp" data-delay=".2s">
-                            Get Started <i class="fa fa-arrow-right small ml-3 ts-opacity__50"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="ts-background" data-bg-color="#001135" data-bg-parallax="scroll" data-bg-parallax-speed="3">
-                <div class="ts-video-bg ts-opacity__50 ts-parallax-element">
-                    <img src="{{asset('web/assets/img/download.jpg')}}" allowfullscreen></img>
-                </div>
-                <!--end ts-video-->
-            </div>
-            <!--end ts-background-->
-
-        </header>
-        <!--end #hero-->
-
-        <!--*********************************************************************************************************-->
-        <!--************ CONTENT ************************************************************************************-->
-        <!--*********************************************************************************************************-->
-        <main id="ts-content">
-            <!--OVERVIEW ********************************************************************************************-->
-            <section id="overview" class="">
-                <div class="container">
-                    <div class="ts-block pr-3 pb-2">
-                        <div class="ts-title mb-1">
-                            <h2>Overview</h2>
-                        </div>
-                        <!--end ts-title-->
-                        <p>
-                            Easycash Tube is a video-based earning platform where users earn upto 20% daily by watching 1 video per day for 5 days. The more you invest, the more you earn
-                        </p>
-                    </div>
-                </div>
-                <!--end container-->
-
-            </section>
-            <!--END OVERVIEW ****************************************************************************************-->
-                
-            <!--HOW IT WORKS ****************************************************************************************-->
-            <section id="how-it-works" class="ts-block ts-xs-text-center pb-5">
-                <div class="container">
-                    <div class="ts-title mb-3">
-                        <h2>How It Works</h2>
-                    </div>
-                    <!--end ts-title-->
-                    <div class="row">
-                        <div class="col-sm-6 col-md-4 col-lg-3">
-                            <div class="ts-item" data-animate="ts-fadeInUp">
-                                <div class="ts-item-content text-center">
-                                    <div class="ts-item-header">
-                                        <figure class="icon">
-                                            <span class="step" data-animate="ts-zoomIn">1</span>
-                                            <div class="ts-circle__md" data-bg-color="#ebf1fe">
-                                                <img src="{{asset('web/assets/img/a.png')}}" alt="">
-                                            </div>
-                                        </figure>
-                                        <!--end icon-->
-                                    </div>
-                                    <!--end ts-item-header-->
-                                    <div class="ts-item-body">
-                                        <h4>Choose Your Plan</h4>
-                                        <p>
-                                            Start from as low as Rs. 500
-                                        </p>
-                                    </div>
-                                    <!--end ts-item-body-->
-                                </div>
-                                <!--end ts-item-content-->
-                            </div>
-                            <!--end ts-item-->
-                        </div>
-                        <!--end col-xl-4-->
-                        <div class="col-sm-6 col-md-4 col-lg-3">
-                            <div class="ts-item" data-animate="ts-fadeInUp" data-delay="0.1s">
-                                <div class="ts-item-content text-center">
-                                    <div class="ts-item-header">
-                                        <figure class="icon">
-                                            <span class="step" data-animate="ts-zoomIn">2</span>
-                                            <div class="ts-circle__md" data-bg-color="#ebf1fe">
-                                                <img src="{{asset('web/assets/img/b.png')}}" alt="">
-                                            </div>
-                                        </figure>
-                                        <!--end icon-->
-                                    </div>
-                                    <!--end ts-item-header-->
-                                    <div class="ts-item-body">
-                                        <h4>Watch Videos</h4>
-                                        <p>
-                                            Watch 1 video per day for 5 days a week.
-                                        </p>
-                                    </div>
-                                    <!--end ts-item-body-->
-                                </div>
-                                <!--end ts-item-content-->
-                            </div>
-                            <!--end ts-item-->
-                        </div>
-                        <!--end col-xl-4-->
-                        <div class="col-sm-6 col-md-4 col-lg-3">
-                            <div class="ts-item" data-animate="ts-fadeInUp" data-delay="0.2s">
-                                <div class="ts-item-content text-center">
-                                    <div class="ts-item-header">
-                                        <figure class="icon">
-                                            <span class="step" data-animate="ts-zoomIn">3</span>
-                                            <div class="ts-circle__md" data-bg-color="#ebf1fe">
-                                                <img src="{{asset('web/assets/img/c.png')}}" alt="">
-                                            </div>
-                                        </figure>
-                                        <!--end icon-->
-                                    </div>
-                                    <!--end ts-item-header-->
-                                    <div class="ts-item-body">
-                                        <h4>Earn Daily</h4>
-                                        <p>
-                                            Earn 10% of your plan amount daily. Total Return in 5 Days: 50%
-                                        </p>
-                                    </div>
-                                    <!--end ts-item-body-->
-                                </div>
-                                <!--end ts-item-content-->
-                            </div>
-                            <!--end ts-item-->
-                        </div>
-                        <!--end col-xl-4-->
-                        <div class="col-sm-6 col-md-4 col-lg-3">
-                            <div class="ts-item" data-animate="ts-fadeInUp" data-delay="0.2s">
-                                <div class="ts-item-content text-center">
-                                    <div class="ts-item-header">
-                                        <figure class="icon">
-                                            <span class="step" data-animate="ts-zoomIn">4</span>
-                                            <div class="ts-circle__md" data-bg-color="#ebf1fe">
-                                                <img src="{{asset('web/assets/img/c.png')}}" alt="">
-                                            </div>
-                                        </figure>
-                                        <!--end icon-->
-                                    </div>
-                                    <!--end ts-item-header-->
-                                    <div class="ts-item-body">
-                                        <h4>Withdraw</h4>
-                                        <p>
-                                            Withdraw earnings via Easypaisa, JazzCash, or NayaPay
-                                        </p>
-                                    </div>
-                                    <!--end ts-item-body-->
-                                </div>
-                                <!--end ts-item-content-->
-                            </div>
-                            <!--end ts-item-->
-                        </div>
-                        <!--end col-xl-4-->
-                    </div>
-                    <!--end row-->
-
-                    <ul>
-                        <li>✅ Plan is valid for 7 days (5 active earning days + 2 buffer days)</li>
-                        <li>✅ Watch. Earn. Repeat.</li>
-                    </ul>
-
-                    <br>
-                    
-                    <h4 class="mb-2">Why Choose Easycash Tube</h4>
-                    <ul>
-                        <li>✅ Simple and fast income method</li>
-                        <li>✅ No technical skills needed</li>
-                        <li>✅ Watch anywhere, anytime</li>
-                        <li>✅ Reliable payments via Easypaisa, JazzCash, or NayaPay</li>
-                        <li>✅ Reinvest anytime after 5 days</li>
-                    </ul>
-
-                    <br>
-                    
-                    <h4 class="mb-2">Start Earning Today!</h4>
-                    <p>
-                        Whether you're a student, job holder, or freelancer — Easycash Tube gives you a smart way to earn extra income daily by just watching videos.
-                        <br><br>
-                        🎯 Watch. Earn. Repeat.
-                    </p>
-
-                    <div class="d-flex gap-2 mt-4">
-                        <a href="{{ route('register') }}" class="btn btn-outline-primary mr-2">Join Now</a>
-                        <a href="{{ route('login') }}" class="btn btn-primary">Login</a>
-                    </div>
-                </div>
-                <!--end container-->
-            </section>
-            <!--END HOW IT WORKS ************************************************************************************-->
-
-            <hr>
-
-            <!--PARTNERS ********************************************************************************************-->
-            <!-- <section id="partners" class="ts-block py-4">
-                container
-                <div class="container">
-                    block of logos
-                    <div class="d-block d-md-flex justify-content-between align-items-center text-center ts-partners py-3">
-                        <a href="#">
-                            <img src="{{asset('web/assets/img/logo-01.png')}}" alt="">
-                        </a>
-                        <a href="#">
-                            <img src="{{asset('web/assets/img/logo-02.png')}}" alt="">
-                        </a>
-                        <a href="#">
-                            <img src="{{asset('web/assets/img/logo-03.png')}}" alt="">
-                        </a>
-                        <a href="#">
-                            <img src="{{asset('web/assets/img/logo-04.png')}}" alt="">
-                        </a>
-                        <a href="#">
-                            <img src="{{asset('web/assets/img/logo-05.png')}}" alt="">
-                        </a>
-                    </div>
-                    end logos
-                </div>
-                end container
-            </section> -->
-            <!--END PARTNERS ****************************************************************************************-->
-
-            <!--ABOUT US ********************************************************************************************-->
-            <section id="about-us">
-                <div class="container">
-                    <div class="ts-block pr-3">
-                        <div class="ts-title mb-3">
-                            <h2>About Us</h2>
-                        </div>
-                        <!--end ts-title-->
-                        <p>
-                            Easycash Tube is a smart earning platform where you can Watch. Earn. Repeat.
-                            <br>
-                            We give users in Pakistan the opportunity to earn daily income by watching videos without any hustle. Our goal is to make online earning simple, safe, and accessible for everyone.
-                        </p>
-                        <h4 class="mb-2">What We Offer:</h4>
-                        <ul>
-                            <li>✅ Daily returns up to 10% for 5 days on investment plans</li>
-                            <li>✅ Exclusive Buy & Sell profit model with up to 20% return after 24 hours</li>
-                            <li>✅ Easy withdrawals via Easypaisa, JazzCash, and NayaPay</li>
-                            <li>✅ A trusted and growing community of digital earners</li>
-                            <li>✅ At Easycash Tube, we believe in transparency, flexibility, and financial freedom for all.</li>
-                        </ul>
-                    </div>
-                </div>
-                <!--end container-->
-
-                <div class="ts-background d-none d-sm-block" data-bg-color="#fafafa" data-bg-parallax1="scroll" data-bg-parallax-speed="3">
-                    <div class="owl-carousel w-50 ts-push-left__100 h-100 ts-parallax-element1" data-owl-loop="1" data-owl-nav-container="#carousel-external-control">
-                        <div class="ts-background-image" data-bg-image="assets/img/about.png')}}"></div>
-                        <!-- <div class="ts-background-image" data-bg-image="assets/img/about1.jpg"></div> -->
-                    </div>
-                    <!--end owl-carousel-->
-                </div>
-                <!--end ts-background-->
-
-            </section>
-            <!--END ABOUT US ****************************************************************************************-->
-
-            <!--NUMBERS *********************************************************************************************-->
-            <!-- <section id="numbers" class="ts-block ts-background-is-dark ts-separate-bg-element py-5 ts-xs-text-center" data-bg-image="assets/img/bg-mountain.jpg" data-bg-image-opacity=".1" data-bg-color="#0e1e3d" data-bg-parallax="scroll" data-bg-parallax-speed="3">
-                <div class="container">
-                    <div class="ts-promo-numbers py-5">
-                        <div class="row">
-                            <div class="col-sm-6 col-md-3">
-                                <div class="ts-promo-number">
-                                    <h2 class="ts-opacity__50">140+</h2>
-                                    <h5 class="mb-0">Happy Clients</h5>
-                                </div>
-                                end ts-promo-number
-                            </div>
-                            end col-sm-3
-                            <div class="col-sm-6 col-md-3">
-                                <div class="ts-promo-number">
-                                    <h2 class="ts-opacity__50">280+</h2>
-                                    <h5 class="mb-0">Cases Done</h5>
-                                </div>
-                                end ts-promo-number
-                            </div>
-                            end col-sm-3
-                            <div class="col-sm-6 col-md-3">
-                                <div class="ts-promo-number">
-                                    <h2 class="ts-opacity__50">24+</h2>
-                                    <h5 class="mb-0">Years Experience</h5>
-                                </div>
-                                end ts-promo-number
-                            </div>
-                            end col-sm-3
-                            <div class="col-sm-6 col-md-3">
-                                <div class="ts-promo-number">
-                                    <h2 class="ts-opacity__50">18</h2>
-                                    <h5 class="mb-0">Branches Worldwide</h5>
-                                </div>
-                                end ts-promo-number
-                            </div>
-                            end col-sm-3
-                        </div>
-                        end row
-                    </div>
-                    end ts-promo-numbers
-                </div>
-                end container
-            </section> -->
-            <!--END NUMBERS *****************************************************************************************-->
-
-
-
-
-            <!--PRICING *********************************************************************************************-->
-            <section id="pricing" class="ts-block" data-bg-color="#f7f7f7">
-                <div class="container">
-                    <div class="ts-title text-center">
-                        <h2>Packages</h2>
-                    </div>
-                    <!--end ts-title-->
-                    <div class="row no-gutters ts-cards-same-height">
-                        <!--Price Box-->
-                        @foreach($data as $plan)
-                        <div class="col-sm-4 col-lg-4 px-2">
-                            <div class="card text-center ts-price-box" data-animate="ts-fadeInUp">
-                                <div class="card-header p-0">
-                                    <h5 class="mb-0 py-3 text-white" data-bg-color="#1b3874">{{$plan['title']}}</h5>
-                                    <div class="ts-title py-5 mb-0">
-                                        <h3 class="mb-0 font-weight-normal">
-                                            {{$plan['amount']}} PKR
-                                        </h3>
-                                    </div>
-                                </div>
-                                <!--end card-header-->
-                                <div class="card-body p-0">
-                                    <ul class="list-unstyled ts-list-divided">
-                                        <li>{{$plan['plan_days']}} days plan duration</li>
-                                        <li>{{$plan['daily_profit']}} PKR daily profit</li>
-                                        <li>{{$plan['total_profit']}} PKR total profit</li>
-                                        <li>Withdraw any time</li>
-                                    </ul>
-                                    <!--end list-->
-                                </div>
-                                <!--end card-body-->
-                                <div class="card-footer bg-transparent pt-0 ts-border-none">
-                                    <a href="{{route('login')}}" class="btn btn-outline-dark ts-btn-border-muted">Invest Now</a>
-                                </div>
-                            </div>
-                            <!--end card-->
-                        </div>
-                        <!--end price-box col-md-4-->
-                        @endforeach
-                    </div>
-                    <!--end row-->
-                    <div class="row no-gutters ts-cards-same-height pt-5" style="text-align: center;" data-animate="ts-fadeInUp">
-                        Please <a href="{{route('login')}}" class="px-1"> login </a> to see all the investment plans
-                    </div>
-                </div>
-                <!--end container-->
-            </section>
-            <!--END PRICING *****************************************************************************************-->
-
-
-
-
-
-
-
-        <!--*********************************************************************************************************-->
-        <!--************ FOOTER *************************************************************************************-->
-        <!--*********************************************************************************************************-->
-        <footer id="ts-footer">
-
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="#home">
+                <i class="fas fa-play-circle me-2"></i>
+                Easycash Tube
+                <small class="d-block" style="font-size: 0.7rem; color: #6c757d;">Watch. Earn. Repeat.</small>
+            </a>
             
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#plans">Plans</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#faq">FAQ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Contact</a>
+                    </li>
+                    <li class="nav-item ms-2">
+                        <a href="{{ route('register') }}" class="btn btn-primary-custom btn-sm">Get Started</a>
+                    </li>
+                    <li class="nav-item ms-2">
+                        <a href="{{ route('login') }}" class="btn btn-outline-secondary-custom btn-sm">Login to Dashboard</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-            <section id="contact" class="ts-separate-bg-element" data-bg-image="assets/img/bg-hand-mobile.jpg" data-bg-image-opacity=".1" data-bg-color="#12264f">
-                <div class="container">
-                    <div class="ts-box mb-0 p-5 ts-mt__n-10" data-animate="ts-fadeInUp">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <h3>Contact Us</h3>
-                                <address>
-                                    <figure>
-                                        Lahore, Pakistan.
-                                    </figure>
-                                    <br>
-                                    <figure>
-                                        <div class="font-weight-bold">Email:</div>
-                                        <a href="#">office@easycash-tube.com</a>
-                                    </figure>
-                                    <figure>
-                                        <div class="font-weight-bold">Phone:</div>
-                                        +923435560939
-                                    </figure>
-
-
-                                </address>
-                                <!--end address-->
-                            </div>
-                            <!--end col-md-4-->
-                            <div class="col-md-8">
-                                <h3>Contact Form</h3>
-                                <form id="form-contact" method="post" class="clearfix ts-form ts-form-email ts-inputs__transparent" data-php-path="assets/php/email.php">
-                                    <div class="row">
-                                        <div class="col-md-6 col-sm-6">
-                                            <div class="form-group">
-                                                <label for="form-contact-name">Your Name *</label>
-                                                <input type="text" class="form-control" id="form-contact-name" name="name" placeholder="Your Name" required>
-                                            </div>
-                                            <!--end form-group -->
-                                        </div>
-                                        <!--end col-md-6 col-sm-6 -->
-                                        <div class="col-md-6 col-sm-6">
-                                            <div class="form-group">
-                                                <label for="form-contact-email">Your Email *</label>
-                                                <input type="email" class="form-control" id="form-contact-email" name="email" placeholder="Your Email" required>
-                                            </div>
-                                            <!--end form-group -->
-                                        </div>
-                                        <!--end col-md-6 col-sm-6 -->
-                                    </div>
-                                    <!--end row -->
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="form-group">
-                                                <label for="form-contact-message">Your Message *</label>
-                                                <textarea class="form-control" id="form-contact-message" rows="5" name="message" placeholder="Your Message" required></textarea>
-                                            </div>
-                                            <!--end form-group -->
-                                        </div>
-                                        <!--end col-md-12 -->
-                                    </div>
-                                    <!--end row -->
-                                    <div class="form-group clearfix">
-                                        <button type="submit" class="btn btn-primary float-right" id="form-contact-submit">Send a Message</button>
-                                    </div>
-                                    <!--end form-group -->
-                                    <div class="form-contact-status"></div>
-                                </form>
-                                <!--end form-contact -->
-                            </div>
-                        </div>
-                        <!--end row-->
-                    </div>
-                    <!--end ts-box-->
-                    <div class="text-center text-white py-4">
-                        <small>© 2023 EasyCash Tube, All Rights Reserved</small>
+    <!-- Hero Section -->
+    <section id="home" class="hero-section">
+        <div class="container">
+            <div class="row align-items-center hero-content">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-4">Earn Daily Just by Watching Videos!</h1>
+                    <p class="lead mb-4">Join Easycash Tube and get paid every day — earn up to 20% daily on your selected plan by watching just 1 video per day.</p>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <a href="{{ route('register') }}" class="btn btn-light btn-lg px-4">Join Now</a>
+                        <a href="{{ route('login') }}" class="btn btn-outline-light btn-lg px-4">Login</a>
                     </div>
                 </div>
-                <!--end container-->
-            </section>
+                <div class="col-lg-6 text-center">
+                    <i class="fas fa-play-circle" style="font-size: 8rem; opacity: 0.3;"></i>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        </footer>
-        <!--end #footer-->
+    <!-- How It Works Section -->
+    <section class="section-padding bg-light">
+        <div class="container">
+            <div class="row text-center mb-5">
+                <div class="col-12">
+                    <h2 class="fw-bold mb-3">How It Works</h2>
+                    <p class="lead text-muted">Simple steps to start earning today</p>
+                </div>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="card card-hover h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">1. Choose Your Plan</h5>
+                            <p class="text-muted">Starting from Rs. 500</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="card card-hover h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon">
+                                <i class="fas fa-play"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">2. Watch 1 Video Daily</h5>
+                            <p class="text-muted">Takes a few minutes</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="card card-hover h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon">
+                                <i class="fas fa-coins"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">3. Earn Instantly</h5>
+                            <p class="text-muted">Up to 20% return added daily</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="card card-hover h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">4. Withdraw Easily</h5>
+                            <p class="text-muted">Easypaisa, JazzCash, or NayaPay</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    </div>
-    <!--end page-->
+    <!-- Investment Plans Section -->
+    <section id="plans" class="section-padding">
+        <div class="container">
+            <div class="row text-center mb-5">
+                <div class="col-12">
+                    <h2 class="fw-bold mb-3">Investment Plans</h2>
+                    <p class="lead text-muted">Choose the plan that fits your investment goals</p>
+                </div>
+            </div>
+            
+            <div class="row g-4">
+                @foreach($plans as $plan)
+                <div class="col-md-6 col-lg-4">
+                    <div class="card plan-card h-100 shadow-sm">
+                        <div class="plan-header text-center">
+                            <h4 class="mb-0">{{ $plan->title }}</h4>
+                        </div>
+                        <div class="card-body text-center p-4">
+                            <h3 class="text-primary fw-bold mb-3">Rs. {{ number_format($plan->amount) }}</h3>
+                            <ul class="list-unstyled mb-4">
+                                <li class="mb-2"><strong>Daily:</strong> Rs. {{ number_format($plan->daily_profit) }}</li>
+                                <li class="mb-2"><strong>Total:</strong> Rs. {{ number_format($plan->total_profit) }}</li>
+                                <li class="mb-2"><strong>Duration:</strong> {{ $plan->plan_days }} Days</li>
+                            </ul>
+                            <small class="text-muted d-block mb-3">Only once per user</small>
+                            <a href="{{ route('login') }}" class="btn btn-primary-custom w-100">Invest Now</a>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-12 text-end">
+                    <a href="{{ route('login') }}" class="btn btn-outline-secondary-custom">
+                        View All <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
 
-	<script src="{{asset('web/assets/js/custom.hero.js')}}"></script>
-	<script src="{{asset('web/assets/js/jquery-3.3.1.min.js')}}"></script>
-	<script src="{{asset('web/assets/js/popper.min.js')}}"></script>
-	<script src="{{asset('web/assets/bootstrap/js/bootstrap.min.js')}}"></script>
-    <script src="{{asset('web/assets/js/imagesloaded.pkgd.min.js')}}"></script>
-    <script src="https://maps.google.com/maps/api/js?key=AIzaSyBEDfNcQRmKQEyulDN8nGWjLYPm8s4YB58"></script>
-	<script src="{{asset('web/assets/js/isInViewport.jquery.js')}}"></script>
-	<script src="{{asset('web/assets/js/jquery.magnific-popup.min.js')}}"></script>
-	<script src="{{asset('web/assets/js/owl.carousel.min.js')}}"></script>
-	<script src="{{asset('web/assets/js/scrolla.jquery.min.js')}}"></script>
-	<script src="{{asset('web/assets/js/jquery.validate.min.js')}}"></script>
-	<script src="{{asset('web/assets/js/jquery-validate.bootstrap-tooltip.min.js')}}"></script>
-    <script src="{{asset('web/assets/js/custom.js')}}"></script>
+    <!-- Why Choose Us Section -->
+    <section class="section-padding bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6">
+                    <h2 class="fw-bold mb-4">Why Choose Us</h2>
+                    <ul class="check-list">
+                        <li>Simple and fast income method</li>
+                        <li>No technical skills needed</li>
+                        <li>Watch anywhere, anytime</li>
+                        <li>Reliable payments via Easypaisa, JazzCash, or NayaPay</li>
+                        <li>Reinvest anytime after 5 days</li>
+                    </ul>
+                </div>
+                <div class="col-lg-6 text-center">
+                    <i class="fas fa-star" style="font-size: 8rem; color: var(--primary-color); opacity: 0.3;"></i>
+                </div>
+            </div>
+        </div>
+    </section>
 
+    <!-- FAQ Section -->
+    <section id="faq" class="section-padding">
+        <div class="container">
+            <div class="row text-center mb-5">
+                <div class="col-12">
+                    <h2 class="fw-bold mb-3">Frequently Asked Questions</h2>
+                    <p class="lead text-muted">Everything you need to know about Easycash Tube</p>
+                </div>
+            </div>
+            
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="accordion" id="faqAccordion">
+                        <div class="faq-item">
+                            <div class="faq-header" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                <h5 class="mb-0 fw-bold">What is Easycash Tube?</h5>
+                            </div>
+                            <div id="faq1" class="collapse faq-body" data-bs-parent="#faqAccordion">
+                                <p>Easycash Tube is a video-based earning platform where users can earn daily income by watching videos. It's a simple and legitimate way to make money online.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <div class="faq-header" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                <h5 class="mb-0 fw-bold">How do I earn from it?</h5>
+                            </div>
+                            <div id="faq2" class="collapse faq-body" data-bs-parent="#faqAccordion">
+                                <p>Choose an investment plan, watch 1 video daily for 5 days, and earn up to 20% daily returns on your investment. The process is simple and takes only a few minutes each day.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <div class="faq-header" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                <h5 class="mb-0 fw-bold">What plans are available?</h5>
+                            </div>
+                            <div id="faq3" class="collapse faq-body" data-bs-parent="#faqAccordion">
+                                <p>We offer 5 different plans: Starter (Rs. 500), Bronze (Rs. 2,000), Silver (Rs. 6,000), Gold (Rs. 12,000), and Diamond (Rs. 25,000). Each plan can only be used once per user.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <div class="faq-header" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                <h5 class="mb-0 fw-bold">How long does a plan last?</h5>
+                            </div>
+                            <div id="faq4" class="collapse faq-body" data-bs-parent="#faqAccordion">
+                                <p>Each plan lasts for 5 days of active earning. You need to watch 1 video daily for 5 consecutive days to complete the plan and receive your total returns.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <div class="faq-header" data-bs-toggle="collapse" data-bs-target="#faq5">
+                                <h5 class="mb-0 fw-bold">What payment methods are supported?</h5>
+                            </div>
+                            <div id="faq5" class="collapse faq-body" data-bs-parent="#faqAccordion">
+                                <p>We support withdrawals through Easypaisa, JazzCash, and NayaPay. These are the most popular and secure payment methods in Pakistan.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <div class="faq-header" data-bs-toggle="collapse" data-bs-target="#faq6">
+                                <h5 class="mb-0 fw-bold">Is it legit?</h5>
+                            </div>
+                            <div id="faq6" class="collapse faq-body" data-bs-parent="#faqAccordion">
+                                <p>Yes, Easycash Tube is a legitimate platform. We have thousands of satisfied users who earn daily. Our transparent business model and secure payment system ensure a safe earning experience.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Us Section -->
+    <section id="about" class="section-padding bg-light">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h2 class="fw-bold mb-4">About Us</h2>
+                    <p class="lead mb-4">Easycash Tube is a smart earning platform where you Watch. Earn. Repeat. We offer users in Pakistan a simple, secure way to earn daily income online just by watching videos.</p>
+                    <p>Our mission is to provide a legitimate and accessible way for people to earn extra income without requiring any special skills or technical knowledge. With our transparent business model and reliable payment system, we've helped thousands of users achieve their financial goals.</p>
+                </div>
+                <div class="col-lg-6 text-center">
+                    <i class="fas fa-users" style="font-size: 8rem; color: var(--secondary-color); opacity: 0.3;"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact" class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <h5 class="mb-3">Easycash Tube</h5>
+                    <p class="mb-3">Watch. Earn. Repeat.</p>
+                    <p class="small text-muted">Your trusted partner for online earning in Pakistan.</p>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <h6 class="mb-3">Quick Links</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none">Terms & Conditions</a></li>
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none">Privacy Policy</a></li>
+                        <li class="mb-2"><a href="#contact" class="text-muted text-decoration-none">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <h6 class="mb-3">Contact Info</h6>
+                    <p class="small text-muted mb-2">
+                        <i class="fas fa-envelope me-2"></i>
+                        office@easycash-tube.com
+                    </p>
+                    <p class="small text-muted mb-3">
+                        <i class="fas fa-phone me-2"></i>
+                        +923435560939
+                    </p>
+                    <div class="d-flex gap-2">
+                        <a href="https://wa.me/923435560939" class="social-icon" target="_blank">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                        <a href="mailto:office@easycash-tube.com" class="social-icon">
+                            <i class="fas fa-envelope"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="small text-muted mb-0">© 2025 Easycash Tube. All Rights Reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Smooth Scrolling -->
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 </html>

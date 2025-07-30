@@ -16,8 +16,12 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        // Get user's login history (last 10 logins)
+        $loginHistory = collect(); // Placeholder for login history
+        
         return view('profile.edit', [
             'user' => $request->user(),
+            'loginHistory' => $loginHistory,
         ]);
     }
 

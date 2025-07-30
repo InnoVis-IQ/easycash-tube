@@ -19,7 +19,7 @@ class Withdraw extends Model
         return $this->belongsTo(BankAccount::class,'bank_account_id')->withTrashed();
     }
 
-    public function user_bank(){
+    public function userBankAccount(){
         return $this->belongsTo(UserBankAccount::class,'user_bank_account_id')->withTrashed();
     }
 

@@ -105,22 +105,41 @@ class DashboardController extends Controller
             return redirect()->route('plans.create');
         }
         else{
-            $pendingDeposits = Models\Deposit::where('user_id',Auth::user()['id'])->where('status','deposited')->count();
-            $activeSubscriptions = Models\UserSubscription::where('user_id',Auth::user()['id'])->where('expire_at','>',date('Y-m-d'))->count();
+            $userId = Auth::user()['id'];
+            $pendingDeposits = Models\Deposit::where('user_id',$userId)->where('status','deposited')->count();
+            $activeSubscriptions = Models\UserSubscription::where('user_id',$userId)->where('expire_at','>',date('Y-m-d'))->count();
 
-            $subscriptions = Models\UserSubscription::where('user_id',Auth::user()['id'])->where('expire_at','>',date('Y-m-d'))->get();
+            $subscriptions = Models\UserSubscription::where('user_id',$userId)->where('expire_at','>',date('Y-m-d'))->get();
             $investedAmount = 0;
             $upcomingIncome = 0;
+            $earningsToday = 0;
+            $daysWatched = 0;
+            $totalPlanDays = 0;
             foreach ($subscriptions as $key => $value) {
                 $investmentPlan = Models\InvestmentPlan::find($value['investment_plan_id']);
                 $investedAmount += $investmentPlan['amount'];
-
                 if($value['expire_at'] <= date('Y-m-d',strtotime('+30 days',strtotime(date('Y-m-d'))))){
                     $upcomingIncome += $investmentPlan['amount'];
                 }
+                // Earnings today: check if updated today (assuming daily profit is credited once per day)
+                if ($value->updated_at && $value->updated_at->isToday()) {
+                    $earningsToday += $investmentPlan['daily_profit'];
+                }
+                // Days watched: count watched_videos array
+                if (is_array($value->watched_videos)) {
+                    $daysWatched += count($value->watched_videos);
+                } elseif ($value->watched_videos) {
+                    $decoded = json_decode($value->watched_videos, true);
+                    if (is_array($decoded)) {
+                        $daysWatched += count($decoded);
+                    }
+                }
+                $totalPlanDays += $investmentPlan['plan_days'];
             }
+            // Wallet balance
+            $walletBalance = optional(Models\UserAccount::where('user_id', $userId)->first())->net_amount ?? 0;
             $message = "0";
-            return view('backend.user.dashboard',compact('message','pendingDeposits','activeSubscriptions', 'subscriptions','investedAmount','upcomingIncome'));
+            return view('backend.user.dashboard',compact('message','pendingDeposits','activeSubscriptions', 'subscriptions','investedAmount','upcomingIncome','walletBalance','earningsToday','daysWatched','totalPlanDays'));
         }
     }
 }

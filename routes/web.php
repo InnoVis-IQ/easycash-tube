@@ -27,6 +27,19 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::get('videos/watch', [Controllers\VideoController::class, 'watch'])->name('videos.watch');
     Route::post('videos/mark-watched', [Controllers\VideoController::class, 'markAsWatched'])->name('videos.mark-watched');
     
+    Route::get('/wallet', [Controllers\UserAccountController::class, 'wallet'])->name('wallet.index');
+    
+    // Profile Routes
+    Route::get('/profile', [Controllers\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [Controllers\ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [Controllers\ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // Support Routes
+    Route::get('/support', [Controllers\SupportController::class, 'index'])->name('support.index');
+    Route::post('/support', [Controllers\SupportController::class, 'store'])->name('support.store');
+    Route::get('/support/history', [Controllers\SupportController::class, 'history'])->name('support.history');
+    Route::get('/support/{id}', [Controllers\SupportController::class, 'show'])->name('support.show');
+    
     Route::get('/approveUser/{id}', [Controllers\UserController::class, 'approveUser'])->name('approveUser');
     Route::post('/withdrawToAccount', [Controllers\WithdrawController::class, 'withdrawToAccount'])->name('withdrawToAccount');
     Route::get('/adjustUserAccount/{id}', [Controllers\SuperadminController::class, 'adjustUserAccount'])->name('adjustUserAccount');

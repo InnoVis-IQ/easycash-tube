@@ -26,44 +26,54 @@
 
 @section('content')
 <div class="container mt-4">
-    <h2>Available Videos</h2>
-    <div class="row">
-        @php
-            $unWatched = $videos->whereNotIn('id', $watchedVideos);
-        @endphp
-        @forelse($unWatched as $video)
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 video-card"
-                     data-title="{{ $video->title }}"
-                     data-url="{{ $video->video_url }}"
-                     data-video-id="{{ $video->id }}"
-                     style="cursor:pointer;">
-                    @if($video->video_thumbnail)
-                        <img src="{{ asset($video->video_thumbnail) }}" class="card-img-top" alt="Thumbnail">
-                    @else
-                        <div class="d-flex justify-content-center align-items-center" style="height:200px;background:#f5f5f5;">
-                            <img src="{{ asset('assets/images/product_images/watch.jpeg') }}" alt="Plan Icon" style="height:80px;">
-                        </div>
-                    @endif
-                    <div class="card-body">
-                        <h5 class="card-title">{{ $video->title }}</h5>
-                        <p class="card-text">{{ $video->description }}</p>
-                        @if(in_array($video->id, $watchedVideos))
-                            <span class="badge bg-success">Watched</span>
+    <h2>Watch & Earn</h2>
+    <div class="mb-4">
+        <h5>Daily Progress</h5>
+        <div class="progress" style="height: 25px;">
+            <div class="progress-bar bg-info" role="progressbar" style="width: {{ $totalPlanDays > 0 ? round(($daysWatched/$totalPlanDays)*100) : 0 }}%" aria-valuenow="{{ $daysWatched }}" aria-valuemin="0" aria-valuemax="{{ $totalPlanDays }}">
+                {{ $daysWatched }} / {{ $totalPlanDays }} days
+            </div>
+        </div>
+    </div>
+    @if($watchedToday)
+        <div class="alert alert-success">
+            You have already watched your video for today. Come back tomorrow for the next one!
+        </div>
+    @else
+        <h3>Available Videos</h3>
+        <div class="row">
+            @php
+                $unWatched = $videos->whereNotIn('id', $watchedVideos);
+            @endphp
+            @forelse($unWatched as $video)
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 video-card"
+                         data-title="{{ $video->title }}"
+                         data-url="{{ $video->video_url }}"
+                         data-video-id="{{ $video->id }}"
+                         style="cursor:pointer;">
+                        @if($video->video_thumbnail)
+                            <img src="{{ asset($video->video_thumbnail) }}" class="card-img-top" alt="Thumbnail">
                         @else
-                            <span class="badge bg-secondary">Not Watched</span>
+                            <div class="d-flex justify-content-center align-items-center" style="height:200px;background:#f5f5f5;">
+                                <img src="{{ asset('assets/images/product_images/watch.jpeg') }}" alt="Plan Icon" style="height:80px;">
+                            </div>
                         @endif
+                        <div class="card-body">
+                            <h5 class="card-title">{{ $video->title }}</h5>
+                            <p class="card-text">{{ $video->description }}</p>
+                            <span class="badge bg-secondary">Not Watched</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-        @empty
-            <div class="col-12">
-                <p>No videos available for your plan.</p>
-            </div>
-        @endforelse
-    </div>
-
-    <h2 class="mt-5">Watched Videos</h2>
+            @empty
+                <div class="col-12">
+                    <p>No videos available for your plan.</p>
+                </div>
+            @endforelse
+        </div>
+    @endif
+    <h3 class="mt-5">Watched Videos</h3>
     <div class="row">
         @php
             $watched = $videos->whereIn('id', $watchedVideos);

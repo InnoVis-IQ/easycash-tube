@@ -120,16 +120,59 @@
             </li>
         @endif
         @if (in_array(strtolower(Auth::user()['role']), ['user']))
+            <!-- Watch & Earn -->
+            <li class="nav-item active" style="transition: all 0.3s ease;">
+                <a class="nav-link text-white" href="{{ route('videos.watch') }}" style="color: white !important; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
+                    <i class="fa-solid fa-play-circle"></i>
+                    <span class="menu-title pl-2">Watch & Earn</span>
+                </a>
+            </li>
+            
+            <!-- Wallet & Earnings -->
+            <li class="nav-item active" style="transition: all 0.3s ease;">
+                <a class="nav-link text-white" href="{{ route('wallet.index') }}" style="color: white !important; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
+                    <i class="fa-solid fa-wallet"></i>
+                    <span class="menu-title pl-2">Wallet & Earnings</span>
+                </a>
+            </li>
+            
+            <!-- Investment Plans -->
             <li class="nav-item active" style="transition: all 0.3s ease;">
                 <a class="nav-link text-white" href="{{ route('plans.index') }}" style="color: white !important; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
                     <i class="fa-solid fa-compass-drafting"></i>
-                    <span class="menu-title pl-2">Subscribed Plans</span>
+                    <span class="menu-title pl-2">Investment Plans</span>
                 </a>
             </li>
+            
+            <!-- Deposits -->
             <li class="nav-item active" style="transition: all 0.3s ease;">
                 <a class="nav-link text-white" href="{{ route('deposits.index') }}" style="color: white !important; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
-                    <i class="fa-solid fa-coins"></i>
+                    <i class="fa-solid fa-arrow-down"></i>
                     <span class="menu-title pl-2">Deposits</span>
+                </a>
+            </li>
+            
+            <!-- Withdrawals -->
+            <li class="nav-item active" style="transition: all 0.3s ease;">
+                <a class="nav-link text-white" href="{{ route('withdraws.index') }}" style="color: white !important; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
+                    <i class="fa-solid fa-arrow-up"></i>
+                    <span class="menu-title pl-2">Withdrawals</span>
+                </a>
+            </li>
+            
+            <!-- Support & Help -->
+            <li class="nav-item active" style="transition: all 0.3s ease;">
+                <a class="nav-link text-white" href="{{ route('support.index') }}" style="color: white !important; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
+                    <i class="fa-solid fa-headset"></i>
+                    <span class="menu-title pl-2">Support & Help</span>
+                </a>
+            </li>
+            
+            <!-- Account Settings -->
+            <li class="nav-item active" style="transition: all 0.3s ease;">
+                <a class="nav-link text-white" href="{{ route('profile.edit') }}" style="color: white !important; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
+                    <i class="fa-solid fa-user-cog"></i>
+                    <span class="menu-title pl-2">Account Settings</span>
                 </a>
             </li>
         @endif

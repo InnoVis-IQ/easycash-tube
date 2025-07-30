@@ -5,6 +5,34 @@
 @endpush
 
 @section('content')
+    <div class="mb-4">
+        <h3>Welcome, {{ Auth::user()->name }}!</h3>
+        <p>Your current plan and account summary are below.</p>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <div class="card card-body text-center">
+                <h5>Wallet Balance</h5>
+                <h3>{{ $walletBalance }} PKR</h3>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-body text-center">
+                <h5>Earnings Today</h5>
+                <h3>{{ $earningsToday }} PKR</h3>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-body text-center">
+                <h5>Days Watched</h5>
+                <div class="progress" style="height: 25px;">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ $totalPlanDays > 0 ? round(($daysWatched/$totalPlanDays)*100) : 0 }}%" aria-valuenow="{{ $daysWatched }}" aria-valuemin="0" aria-valuemax="{{ $totalPlanDays }}">
+                        {{ $daysWatched }} / {{ $totalPlanDays }} days
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="card mb-3">
         <div class="card-header">
             Current Plans

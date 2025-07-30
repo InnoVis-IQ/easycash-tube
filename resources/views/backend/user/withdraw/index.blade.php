@@ -15,8 +15,6 @@
     <div class="nav-container">
         <ol class="breadcrumb">
             <li class="breadcrumb-item active"><a href="{{ route($route[0] . '.index') }}">{{ ucfirst($route[0]) }}</a></li>
-            {{-- <a href="{{ route($route[0] . '.create') }}" class="btn btn-sm btn-primary breadcrumb-button"><i
-                    class="fa-solid fa-circle-plus"></i> Add</a> --}}
         </ol>
     </div>
 
@@ -77,6 +75,22 @@
         </div>
     </div>
 
+    <!-- Withdrawal Rules Reminder -->
+    <div class="card mb-3">
+        <div class="card-header bg-info text-white">
+            <h5><i class="fas fa-info-circle"></i> Withdrawal Rules</h5>
+        </div>
+        <div class="card-body">
+            <ul class="list-unstyled mb-0">
+                <li><i class="fas fa-check text-success"></i> Minimum withdrawal amount: Rs. 500</li>
+                <li><i class="fas fa-check text-success"></i> Maximum withdrawal amount: Rs. 50,000</li>
+                <li><i class="fas fa-check text-success"></i> You must have an active subscription to withdraw</li>
+                <li><i class="fas fa-check text-success"></i> Withdrawal requests are processed within 24-48 hours</li>
+                <li><i class="fas fa-check text-success"></i> Supported payment methods: Easypaisa, JazzCash, NayaPay</li>
+            </ul>
+        </div>
+    </div>
+
     <div class="card mb-3">
         <div class="card-header">
             <h4 style="font-weight: bold;">Request Withdrawal</h4>
@@ -89,27 +103,41 @@
                 <div class="col-md-8 offset-md-2">
                     <div class="form-group row">
                         <div class="col-md-5">
-                            <label>EasyPaisa Account Number</label>
+                            <label>Payment Method</label>
                         </div>
                         <div class="col-md-7">
-                            <input type="text" name="acc_number" placeholder="03001234567" class="form-control">
+                            <select name="payment_method" class="form-control" required>
+                                <option value="">Select Payment Method</option>
+                                <option value="easypaisa">Easypaisa</option>
+                                <option value="jazzcash">JazzCash</option>
+                                <option value="nayapay">NayaPay</option>
+                            </select>
                         </div>
                     </div>
                     <div class="form-group row">
                         <div class="col-md-5">
-                            <label>EasyPaisa Account Title</label>
+                            <label>Account Number</label>
                         </div>
                         <div class="col-md-7">
-                            <input type="text" name="acc_title" placeholder="MUHAMMAD AHMED" class="form-control">
+                            <input type="text" name="acc_number" placeholder="03001234567" class="form-control" required>
                         </div>
                     </div>
                     <div class="form-group row">
                         <div class="col-md-5">
-                            <label>Amount</label>
+                            <label>Account Title</label>
                         </div>
                         <div class="col-md-7">
-                            <input type="number" name="amount" max="{{ $netAmount }}" placeholder="500"
-                                class="form-control">
+                            <input type="text" name="acc_title" placeholder="MUHAMMAD AHMED" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-5">
+                            <label>Amount (PKR)</label>
+                        </div>
+                        <div class="col-md-7">
+                            <input type="number" name="amount" min="500" max="{{ $netAmount }}" placeholder="500"
+                                class="form-control" required>
+                            <small class="text-muted">Minimum: Rs. 500, Maximum: Rs. {{ $netAmount }}</small>
                         </div>
                     </div>
                     <div class="form-group">
@@ -136,8 +164,50 @@
             <h4 style="font-weight: bold;">Withdrawal History</h4>
         </div>
         <div class="card-body">
-            [Coming Soon]]
-            </table>
+            @if($withdrawalHistory->count() > 0)
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Payment Method</th>
+                                <th>Account Number</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($withdrawalHistory as $withdrawal)
+                                <tr>
+                                    <td>{{ $withdrawal->created_at->format('M d, Y H:i') }}</td>
+                                    <td>{{ $withdrawal->amount }} PKR</td>
+                                    <td>
+                                        @if($withdrawal->user_bank)
+                                            {{ ucfirst($withdrawal->user_bank->account_title ?? 'N/A') }}
+                                        @else
+                                            N/A
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($withdrawal->user_bank)
+                                            {{ $withdrawal->user_bank->account_number ?? 'N/A' }}
+                                        @else
+                                            N/A
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ $withdrawal->status == 'transferred' ? 'success' : ($withdrawal->status == 'requested' ? 'warning' : 'secondary') }}">
+                                            {{ ucfirst($withdrawal->status) }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @else
+                <p class="text-muted text-center">No withdrawal history found.</p>
+            @endif
         </div>
     </div>
 @endsection

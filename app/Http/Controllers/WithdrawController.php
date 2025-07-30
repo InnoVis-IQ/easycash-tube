@@ -72,7 +72,13 @@ class WithdrawController extends Controller
             $userSubscriptions = UserSubscription::where('user_id',Auth::user()['id'])->where('investment_plan_id', '!=', 1)->where('expire_at', '<', date('Y-m-d'))->get();
             $isEligible = $userSubscriptions->count() > 0 ? true : false;
 
-            return view('backend.user.withdraw.index', compact('netAmount','userWithdraws','isEligible'));
+            // Get user's withdrawal history
+            $withdrawalHistory = Withdraw::where('user_id', Auth::user()['id'])
+                ->with('userBankAccount')
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            return view('backend.user.withdraw.index', compact('netAmount','userWithdraws','isEligible','withdrawalHistory'));
         }
     }
 
@@ -97,6 +103,9 @@ class WithdrawController extends Controller
             $newAccount['user_id'] = $request['userID'];
             $newAccount['account_title'] = $request['acc_title'];
             $newAccount['account_number'] = $request['acc_number'];
+            // Store payment method in account_title for now (since we don't have a separate field)
+            $paymentMethod = $request['payment_method'] ?? 'easypaisa';
+            $newAccount['account_title'] = $request['acc_title'] . ' (' . ucfirst($paymentMethod) . ')';
             $newAccount->save();
 
             $userBankAccountID = $newAccount->id;
@@ -109,13 +118,23 @@ class WithdrawController extends Controller
         $userWithdraws = Withdraw::where('user_id',Auth::user()['id'])->where('status','requested')->sum('amount');
         $netAmount = $userAccount['net_amount'] - $userWithdraws;
 
-        if($netAmount >= $request['amount']){
+        // Validate minimum and maximum amounts
+        $amount = $request['amount'];
+        if ($amount < 500) {
+            return back()->with(['message' => 'Minimum withdrawal amount is Rs. 500']);
+        }
+        if ($amount > 50000) {
+            return back()->with(['message' => 'Maximum withdrawal amount is Rs. 50,000']);
+        }
 
+        if($netAmount >= $amount){
             $withdrawRequest = new Withdraw;
             $withdrawRequest['user_id'] = $request['userID'];
-            $withdrawRequest['amount'] = $request['amount'];
+            $withdrawRequest['amount'] = $amount;
             $withdrawRequest['user_bank_account_id'] = $userBankAccountID;
             $withdrawRequest->save();
+            
+            $message = "Withdrawal request submitted successfully!";
         }
         else{
             $message = "Insufficient Balance";

@@ -20,7 +20,10 @@ class UserSubscription extends Model
     ];
 
     protected $casts = [
-        'watched_videos' => 'array'
+        'watched_videos' => 'array',
+        'expire_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime'
     ];
 
     public function user(){

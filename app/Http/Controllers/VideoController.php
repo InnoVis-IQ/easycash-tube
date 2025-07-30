@@ -105,20 +105,34 @@ class VideoController extends Controller
         $watchedVideos = $subscribedPlan['watched_videos'];
         $watchedVideos = is_array($watchedVideos) ? $watchedVideos : (json_decode($watchedVideos, true) ?: []);
 
-        // Get all videos for the user's subscribed plan that are active and not expired
-        $videos = \App\Models\Video::where('plan_id', $subscribedPlan->investment_plan_id)
-            ->where('status', 'active')
-            ->where(function($query) {
-                $query->whereNull('expiry_date')
-                      ->orWhere('expiry_date', '>', now());
-            })
-            ->get();
-
-        if (!$videos) {
-            return redirect()->route('plans.index')->with('error', 'No new videos available for your plan.');
+        // Check if user has watched a video today
+        $watchedToday = false;
+        if (!empty($watchedVideos)) {
+            // Assume watched_videos is an array of video IDs with timestamps in pivot or another field
+            // If not, fallback to checking updated_at
+            $lastWatched = $subscribedPlan->updated_at;
+            if ($lastWatched && $lastWatched->isToday()) {
+                $watchedToday = true;
+            }
         }
 
-        return view('backend.user.videos.watch', compact('videos','watchedVideos'));
+        // Get all videos for the user's subscribed plan that are active and not expired
+        $videos = collect();
+        if (!$watchedToday) {
+            $videos = \App\Models\Video::where('plan_id', $subscribedPlan->investment_plan_id)
+                ->where('status', 'active')
+                ->where(function($query) {
+                    $query->whereNull('expiry_date')
+                          ->orWhere('expiry_date', '>', now());
+                })
+                ->get();
+        }
+
+        // Progress bar: days watched / plan days
+        $daysWatched = is_array($watchedVideos) ? count($watchedVideos) : 0;
+        $totalPlanDays = $subscribedPlan->plan ? $subscribedPlan->plan->plan_days : 0;
+
+        return view('backend.user.videos.watch', compact('videos','watchedVideos','watchedToday','daysWatched','totalPlanDays'));
     }
 
     /**

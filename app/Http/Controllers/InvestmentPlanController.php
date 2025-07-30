@@ -16,8 +16,30 @@ class InvestmentPlanController extends Controller
     public function index()
     {
         if (Auth::user()['role'] == "USER") {
+            // Get all available plans
+            $allPlans = InvestmentPlan::where('status', 'active')->get();
+            
+            // Get user's current subscriptions
+            $userSubscriptions = UserSubscription::where('user_id', Auth::user()['id'])
+                ->where('expire_at', '>', date('Y-m-d'))
+                ->get();
+            
+            // Get user's wallet balance
+            $userAccount = \App\Models\UserAccount::where('user_id', Auth::user()['id'])->first();
+            $walletBalance = $userAccount ? $userAccount->net_amount : 0;
+            
+            // Mark plans as purchased or available
+            $purchasedPlanIds = $userSubscriptions->pluck('investment_plan_id')->toArray();
+            
+            foreach ($allPlans as $plan) {
+                $plan->is_purchased = in_array($plan->id, $purchasedPlanIds);
+                $plan->can_upgrade = !$plan->is_purchased && $walletBalance >= $plan->amount;
+            }
+            
             return view('backend.user.investmentPlans.index')->with([
-                'data' => UserSubscription::withTrashed()->where('user_id',Auth::user()['id'])->where('expire_at', '>', date('Y-m-d'))->get(),
+                'allPlans' => $allPlans,
+                'userSubscriptions' => $userSubscriptions,
+                'walletBalance' => $walletBalance,
             ]);
         } else {
             return view('backend.admin.investmentPlans.index')->with([

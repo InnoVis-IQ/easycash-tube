@@ -68,9 +68,22 @@ class WithdrawController extends Controller
             $userWithdraws = Withdraw::where('user_id',Auth::user()['id'])->where('status','requested')->sum('amount');
             $netAmount = $userAccount['net_amount'] - $userWithdraws;
 
-            $isEligible = false;
-            $userSubscriptions = UserSubscription::where('user_id',Auth::user()['id'])->where('investment_plan_id', '!=', 1)->where('expire_at', '<', date('Y-m-d'))->get();
-            $isEligible = $userSubscriptions->count() > 0 ? true : false;
+            // Check for previous completed plans (withdrawals only available on previous plans)
+            $previousPlans = UserSubscription::where('user_id',Auth::user()['id'])
+                ->where('investment_plan_id', '!=', 1)
+                ->where('expire_at', '<', date('Y-m-d'))
+                ->whereRaw('JSON_LENGTH(watched_videos) >= 5')
+                ->orderBy('created_at', 'desc')
+                ->get();
+            
+            $isEligible = $previousPlans->count() > 0;
+            $eligibilityMessage = '';
+            
+            if (!$isEligible) {
+                $eligibilityMessage = 'Withdrawals are only available after completing a plan. Please complete your current plan first.';
+            } elseif ($netAmount < 500) {
+                $eligibilityMessage = 'Minimum withdrawal amount is Rs. 500. Your current balance is Rs. ' . $netAmount;
+            }
 
             // Get user's withdrawal history
             $withdrawalHistory = Withdraw::where('user_id', Auth::user()['id'])
@@ -78,7 +91,14 @@ class WithdrawController extends Controller
                 ->orderBy('created_at', 'desc')
                 ->get();
 
-            return view('backend.user.withdraw.index', compact('netAmount','userWithdraws','isEligible','withdrawalHistory'));
+            return view('backend.user.withdraw.index', compact(
+                'netAmount',
+                'userWithdraws',
+                'isEligible',
+                'withdrawalHistory',
+                'eligibilityMessage',
+                'previousPlans'
+            ));
         }
     }
 

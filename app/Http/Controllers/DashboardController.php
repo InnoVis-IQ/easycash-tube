@@ -136,10 +136,155 @@ class DashboardController extends Controller
                 }
                 $totalPlanDays += $investmentPlan['plan_days'];
             }
+            
             // Wallet balance
             $walletBalance = optional(Models\UserAccount::where('user_id', $userId)->first())->net_amount ?? 0;
+            
+            // Calculate user level and progress
+            $userLevel = $this->calculateUserLevel($userId, $daysWatched);
+            $levelProgress = $this->calculateLevelProgress($userId, $userLevel);
+            
+            // Calculate watched videos progress for current subscription (5 days requirement)
+            $watchedVideosProgress = $this->calculateWatchedVideosProgress($userId);
+            
+            // Get referral count
+            $referralCount = Models\User::where('referred_by', Auth::user()->referral_code)->count();
+            
+            // Get task completion count (placeholder - implement based on your task system)
+            $taskCount = 9; // This should be calculated based on actual task completion
+            
+            // Get total clicks (video watches)
+            $totalClicks = $daysWatched;
+            
+            // Calculate total deposits
+            $totalDeposits = Models\Deposit::where('user_id', $userId)->where('status', 'approved')->sum('amount');
+            
+            // Calculate total earned (from subscriptions)
+            $totalEarned = Models\UserSubscription::where('user_id', $userId)->sum('earning');
+            
+            // Calculate today's reward (daily video reward)
+            $todayReward = 0;
+            $currentSubscription = Models\UserSubscription::where('user_id', $userId)
+                ->where('expire_at', '>', date('Y-m-d'))
+                ->orderBy('created_at', 'desc')
+                ->first();
+            if ($currentSubscription) {
+                $today = date('Y-m-d');
+                $watchedVideos = $currentSubscription->watched_videos;
+                $watchedVideos = is_array($watchedVideos) ? $watchedVideos : (json_decode($watchedVideos, true) ?: []);
+                
+                // Check if user watched video today
+                if (in_array($today, $watchedVideos)) {
+                    $todayReward = $currentSubscription->plan ? $currentSubscription->plan->daily_profit : 0;
+                }
+            }
+            
+            // Calculate total withdrawals
+            $totalWithdrawals = Models\Withdraw::where('user_id', $userId)->where('status', 'approved')->sum('amount');
+            
             $message = "0";
-            return view('backend.user.dashboard',compact('message','pendingDeposits','activeSubscriptions', 'subscriptions','investedAmount','upcomingIncome','walletBalance','earningsToday','daysWatched','totalPlanDays'));
+            return view('backend.user.dashboard',compact(
+                'message',
+                'pendingDeposits',
+                'activeSubscriptions', 
+                'subscriptions',
+                'investedAmount',
+                'upcomingIncome',
+                'walletBalance',
+                'earningsToday',
+                'daysWatched',
+                'totalPlanDays',
+                'userLevel',
+                'levelProgress',
+                'watchedVideosProgress',
+                'referralCount',
+                'taskCount',
+                'totalClicks',
+                'totalDeposits',
+                'totalEarned',
+                'todayReward',
+                'totalWithdrawals'
+            ));
         }
+    }
+    
+    /**
+     * Calculate user level based on activities
+     */
+    private function calculateUserLevel($userId, $daysWatched) {
+        // Simple level calculation based on days watched
+        if ($daysWatched >= 50) return 5;
+        if ($daysWatched >= 35) return 4;
+        if ($daysWatched >= 25) return 3;
+        if ($daysWatched >= 15) return 2;
+        return 1;
+    }
+    
+    /**
+     * Calculate level progress percentage
+     */
+    private function calculateLevelProgress($userId, $currentLevel) {
+        $user = Models\User::find($userId);
+        $daysWatched = 0;
+        
+        // Get total days watched from subscriptions
+        $subscriptions = Models\UserSubscription::where('user_id', $userId)->get();
+        foreach ($subscriptions as $subscription) {
+            if (is_array($subscription->watched_videos)) {
+                $daysWatched += count($subscription->watched_videos);
+            } elseif ($subscription->watched_videos) {
+                $decoded = json_decode($subscription->watched_videos, true);
+                if (is_array($decoded)) {
+                    $daysWatched += count($decoded);
+                }
+            }
+        }
+        
+        // Calculate progress based on current level requirements
+        $levelRequirements = [
+            1 => 0,
+            2 => 15,
+            3 => 25,
+            4 => 35,
+            5 => 50
+        ];
+        
+        $currentRequirement = $levelRequirements[$currentLevel] ?? 0;
+        $nextRequirement = $levelRequirements[$currentLevel + 1] ?? $currentRequirement + 10;
+        
+        if ($currentLevel >= 5) {
+            return 100; // Max level reached
+        }
+        
+        $progress = (($daysWatched - $currentRequirement) / ($nextRequirement - $currentRequirement)) * 100;
+        return max(0, min(100, $progress));
+    }
+    
+    /**
+     * Calculate watched videos progress for current subscription (5 days requirement)
+     */
+    private function calculateWatchedVideosProgress($userId) {
+        // Get the user's current active subscription
+        $currentSubscription = Models\UserSubscription::where('user_id', $userId)
+            ->where('expire_at', '>', date('Y-m-d'))
+            ->orderBy('created_at', 'desc')
+            ->first();
+            
+        if (!$currentSubscription) {
+            return 0; // No active subscription
+        }
+        
+        // Get watched videos for this subscription
+        $watchedVideos = $currentSubscription->watched_videos;
+        $watchedVideos = is_array($watchedVideos) ? $watchedVideos : (json_decode($watchedVideos, true) ?: []);
+        
+        // Count unique days watched (in case there are multiple videos per day)
+        $uniqueDaysWatched = count(array_unique($watchedVideos));
+        
+        // Calculate progress based on 5 days requirement
+        $requiredDays = 5;
+        $progress = ($uniqueDaysWatched / $requiredDays) * 100;
+        
+        return min(100, $progress); // Cap at 100%
     }
 }

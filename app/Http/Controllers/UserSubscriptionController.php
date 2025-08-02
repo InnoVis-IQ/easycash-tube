@@ -65,7 +65,7 @@ class UserSubscriptionController extends Controller
             $data['expire_at'] = $expiry;
             $data->save();
 
-            UserAccount::where('user_id', $request['user'])->decrement('net_amount', $investmentPlan['amount']);
+            // UserAccount::where('user_id', $request['user'])->decrement('net_amount', $investmentPlan['amount']);
 
             // 15% referral bonus
             // $isReferred = User::where('id', Auth::user()['id'])->where('bonus_given', 0)->first();

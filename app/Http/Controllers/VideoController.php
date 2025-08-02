@@ -107,13 +107,13 @@ class VideoController extends Controller
 
         // Check if user has watched a video today
         $watchedToday = false;
+        $dailyRewardClaimed = false;
+        
         if (!empty($watchedVideos)) {
-            // Assume watched_videos is an array of video IDs with timestamps in pivot or another field
-            // If not, fallback to checking updated_at
-            $lastWatched = $subscribedPlan->updated_at;
-            if ($lastWatched && $lastWatched->isToday()) {
-                $watchedToday = true;
-            }
+            // Check if user has watched a video today
+            $today = date('Y-m-d');
+            $watchedToday = $this->hasWatchedVideoToday($subscribedPlan, $today);
+            $dailyRewardClaimed = $this->hasClaimedDailyReward($subscribedPlan, $today);
         }
 
         // Get all videos for the user's subscribed plan that are active and not expired
@@ -132,7 +132,18 @@ class VideoController extends Controller
         $daysWatched = is_array($watchedVideos) ? count($watchedVideos) : 0;
         $totalPlanDays = $subscribedPlan->plan ? $subscribedPlan->plan->plan_days : 0;
 
-        return view('backend.user.videos.watch', compact('videos','watchedVideos','watchedToday','daysWatched','totalPlanDays'));
+        // Calculate daily reward amount
+        $dailyRewardAmount = $this->calculateDailyReward($subscribedPlan);
+
+        return view('backend.user.videos.watch', compact(
+            'videos',
+            'watchedVideos',
+            'watchedToday',
+            'daysWatched',
+            'totalPlanDays',
+            'dailyRewardClaimed',
+            'dailyRewardAmount'
+        ));
     }
 
     /**
@@ -164,6 +175,16 @@ class VideoController extends Controller
 
         Log::info('Found subscription:', $subscribedPlan->toArray());
 
+        // Check if user has already watched a video today
+        $today = date('Y-m-d');
+        if ($this->hasWatchedVideoToday($subscribedPlan, $today)) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'You have already watched a video today.',
+                'video_id' => $videoId
+            ]);
+        }
+
         // Get current watched videos
         $watchedVideos = $subscribedPlan->watched_videos;
         $watchedVideos = is_array($watchedVideos) ? $watchedVideos : (json_decode($watchedVideos, true) ?: []);
@@ -176,17 +197,38 @@ class VideoController extends Controller
             
             Log::info('Adding video to watched list. New list:', $watchedVideos);
             
-            // Update the subscription with new watched videos
+            // Calculate daily reward
+            $dailyRewardAmount = $this->calculateDailyReward($subscribedPlan);
+            
+            // Update the subscription with new watched videos and daily reward
             $result = $subscribedPlan->update([
-                'watched_videos' => $watchedVideos
+                'watched_videos' => $watchedVideos,
+                'earning' => $subscribedPlan->earning + $dailyRewardAmount,
+                'daily_reward_claimed' => $today
             ]);
+
+            // Update user's wallet balance
+            $userAccount = \App\Models\UserAccount::where('user_id', $userId)->first();
+            if ($userAccount) {
+                $userAccount->update([
+                    'net_amount' => $userAccount->net_amount + $dailyRewardAmount
+                ]);
+            } else {
+                \App\Models\UserAccount::create([
+                    'user_id' => $userId,
+                    'net_amount' => $dailyRewardAmount,
+                    'total_earned' => $dailyRewardAmount,
+                    'total_withdrawn' => 0
+                ]);
+            }
 
             Log::info('Update result:', ['success' => $result]);
 
             return response()->json([
                 'success' => true, 
-                'message' => 'Video marked as watched successfully.',
-                'video_id' => $videoId
+                'message' => 'Video watched successfully! Daily reward of Rs' . $dailyRewardAmount . ' added to your wallet.',
+                'video_id' => $videoId,
+                'daily_reward' => $dailyRewardAmount
             ]);
         }
 
@@ -197,5 +239,41 @@ class VideoController extends Controller
             'message' => 'Video was already marked as watched.',
             'video_id' => $videoId
         ]);
+    }
+
+    /**
+     * Check if user has watched a video today
+     */
+    private function hasWatchedVideoToday($subscription, $today) {
+        // Check if daily reward was claimed today
+        if ($subscription->daily_reward_claimed == $today) {
+            return true;
+        }
+        
+        // Fallback: check if subscription was updated today
+        return $subscription->updated_at && $subscription->updated_at->format('Y-m-d') == $today;
+    }
+
+    /**
+     * Check if user has claimed daily reward today
+     */
+    private function hasClaimedDailyReward($subscription, $today) {
+        return $subscription->daily_reward_claimed == $today;
+    }
+
+    /**
+     * Calculate daily reward amount based on subscription
+     */
+    private function calculateDailyReward($subscription) {
+        // Base daily reward amount
+        $baseReward = 50; // Rs50 base reward
+        
+        // Add bonus based on plan level
+        $planBonus = 0;
+        if ($subscription->plan) {
+            $planBonus = $subscription->plan->daily_profit * 0.1; // 10% of daily profit as bonus
+        }
+        
+        return $baseReward + $planBonus;
     }
 }

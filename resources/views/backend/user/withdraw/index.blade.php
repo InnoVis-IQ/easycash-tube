@@ -9,14 +9,20 @@
 @endpush
 
 @section('content')
-    @php
-        $route = explode('.', Route::currentRouteName());
-    @endphp
-    <div class="nav-container">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item active"><a href="{{ route($route[0] . '.index') }}">{{ ucfirst($route[0]) }}</a></li>
-        </ol>
-    </div>
+<div class="container-fluid px-2">
+    @if(isset($message) && $message != '0')
+        <div class="alert alert-info">
+            {{ $message }}
+        </div>
+    @endif
+
+    <!-- Eligibility Status -->
+    @if(isset($eligibilityMessage) && $eligibilityMessage)
+        <div class="alert alert-warning">
+            <i class="fa-solid fa-exclamation-triangle me-2"></i>
+            <strong>Withdrawal Eligibility:</strong> {{ $eligibilityMessage }}
+        </div>
+    @endif
 
     <div class="row">
         <div class="col-md-3 offset-md-1 stretch-card mb-3">
@@ -64,7 +70,7 @@
                             <i class="fa-solid fa-coins fa-2xl"></i>
                         </div>
                         <div class="float-right">
-                            <p class="mb-0 text-right">Account Balance after approval</p>
+                            <p class="mb-0 text-right">Available for Withdrawal</p>
                             <div class="fluid-container">
                                 <h3 class="font-weight-medium text-right mb-0">{{ $netAmount }} PKR</h3>
                             </div>
@@ -75,6 +81,27 @@
         </div>
     </div>
 
+    <!-- Previous Plans Status -->
+    @if(isset($previousPlans) && $previousPlans->count() > 0)
+        <div class="card mb-3">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-check-circle"></i> Completed Plans</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    @foreach($previousPlans as $plan)
+                        <div class="col-md-4 mb-2">
+                            <div class="border rounded p-3">
+                                <strong>{{ $plan->plan->title ?? 'Plan' }}</strong><br>
+                                <small class="text-muted">Completed on {{ $plan->expire_at->format('M d, Y') }}</small>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    @endif
+
     <!-- Withdrawal Rules Reminder -->
     <div class="card mb-3">
         <div class="card-header bg-info text-white">
@@ -82,9 +109,7 @@
         </div>
         <div class="card-body">
             <ul class="list-unstyled mb-0">
-                <li><i class="fas fa-check text-success"></i> Minimum withdrawal amount: Rs. 500</li>
-                <li><i class="fas fa-check text-success"></i> Maximum withdrawal amount: Rs. 50,000</li>
-                <li><i class="fas fa-check text-success"></i> You must have an active subscription to withdraw</li>
+                <li><i class="fas fa-check text-success"></i> Withdrawals only available after completing a plan</li>
                 <li><i class="fas fa-check text-success"></i> Withdrawal requests are processed within 24-48 hours</li>
                 <li><i class="fas fa-check text-success"></i> Supported payment methods: Easypaisa, JazzCash, NayaPay</li>
             </ul>
@@ -149,10 +174,15 @@
             </form>
             @else
             <div class="alert alert-danger">
-                <h4>You are not eligible to withdraw</h4>
-                <p>You must have a valid subscription to withdraw. <a href="{{ route('plans.index') }}" class="btn btn-primary">Subscribe to a plan</a></p>
+                <h4><i class="fa-solid fa-lock me-2"></i>Withdrawals Not Available</h4>
+                <p>Withdrawals are only available after completing a plan. You need to finish your current plan before you can withdraw earnings.</p>
                 <p>
-                    Please refer to our <a href="{{ url('/terms-and-conditions') }}" target="_blank">Terms and Conditions</a> for more information about withdrawal eligibility.
+                    <a href="{{ route('plans.index') }}" class="btn btn-primary">
+                        <i class="fa-solid fa-compass-drafting me-2"></i>View Plans
+                    </a>
+                    <a href="{{ route('videos.watch') }}" class="btn btn-success">
+                        <i class="fa-solid fa-play me-2"></i>Watch Videos
+                    </a>
                 </p>
             </div>
             @endif
@@ -210,6 +240,62 @@
             @endif
         </div>
     </div>
+</div>
+
+
+
+<style>
+/* Mobile specific styles */
+@media (max-width: 768px) {
+    .container-fluid {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    
+    .card-body {
+        padding: 0.75rem;
+    }
+    
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+    
+
+    
+    .card-header {
+        padding: 0.75rem;
+    }
+    
+    .form-control-sm {
+        font-size: 0.875rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .col-12 {
+        margin-bottom: 0.5rem;
+    }
+    
+    .table-responsive {
+        font-size: 0.75rem;
+    }
+    
+    .btn-sm {
+        font-size: 0.75rem;
+        padding: 0.2rem 0.4rem;
+    }
+    
+    .form-control-sm {
+        font-size: 0.75rem;
+    }
+}
+</style>
+
 @endsection
 
 @push('plugin-scripts')

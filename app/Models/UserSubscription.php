@@ -16,14 +16,16 @@ class UserSubscription extends Model
         'investment_plan_id',
         'earning',
         'expire_at',
-        'watched_videos'
+        'watched_videos',
+        'daily_reward_claimed'
     ];
 
     protected $casts = [
         'watched_videos' => 'array',
         'expire_at' => 'datetime',
         'created_at' => 'datetime',
-        'updated_at' => 'datetime'
+        'updated_at' => 'datetime',
+        'daily_reward_claimed' => 'date'
     ];
 
     public function user(){

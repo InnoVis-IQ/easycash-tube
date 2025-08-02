@@ -5,43 +5,37 @@
 @endpush
 
 @section('content')
-    @php
-        $route = explode('.', Route::currentRouteName());
-    @endphp
+<div class="container-fluid px-2">
     @if(Session::has('message'))
         <div class="alert alert-success">
+            <i class="fa-solid fa-check-circle me-2"></i>
             {{ Session::get('message') }}
         </div>
     @endif
     @if(Session::has('error'))
         <div class="alert alert-danger">
+            <i class="fa-solid fa-exclamation-triangle me-2"></i>
             {{ Session::get('error') }}
         </div>
     @endif
-    
-    <div class="nav-container">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item active"><a href="{{ route($route[0] . '.index') }}">{{ ucfirst($route[0]) }}</a></li>
-        </ol>
-    </div>
 
     <!-- Wallet Balance -->
     <div class="row mb-4">
         <div class="col-md-4">
             <div class="card card-body text-center">
-                <h5>Wallet Balance</h5>
+                <h5><i class="fa-solid fa-wallet me-2"></i>Wallet Balance</h5>
                 <h3>{{ $walletBalance }} PKR</h3>
             </div>
         </div>
         <div class="col-md-4">
             <div class="card card-body text-center">
-                <h5>Active Plans</h5>
+                <h5><i class="fa-solid fa-play-circle me-2"></i>Active Plans</h5>
                 <h3>{{ $userSubscriptions->count() }}</h3>
             </div>
         </div>
         <div class="col-md-4">
             <div class="card card-body text-center">
-                <h5>Available Plans</h5>
+                <h5><i class="fa-solid fa-compass-drafting me-2"></i>Available Plans</h5>
                 <h3>{{ $allPlans->count() }}</h3>
             </div>
         </div>
@@ -50,7 +44,7 @@
     <!-- Available Plans -->
     <div class="card mb-4">
         <div class="card-header">
-            <h4 style="font-weight: bold;">Available Investment Plans</h4>
+            <h4 style="font-weight: bold;"><i class="fa-solid fa-compass-drafting me-2"></i>Available Investment Plans</h4>
         </div>
         <div class="card-body">
             <div class="row">
@@ -70,19 +64,19 @@
                             <div class="card-body">
                                 <div class="row mb-2">
                                     <div class="col-6">Price:</div>
-                                    <div class="col-6 text-right">{{ $plan->amount }} PKR</div>
+                                    <div class="col-6 text-end">{{ $plan->amount }} PKR</div>
                                 </div>
                                 <div class="row mb-2">
                                     <div class="col-6">Daily Return:</div>
-                                    <div class="col-6 text-right">{{ $plan->daily_profit }} PKR</div>
+                                    <div class="col-6 text-end">{{ $plan->daily_profit }} PKR</div>
                                 </div>
                                 <div class="row mb-2">
                                     <div class="col-6">Total Return:</div>
-                                    <div class="col-6 text-right">{{ $plan->total_profit }} PKR</div>
+                                    <div class="col-6 text-end">{{ $plan->total_profit }} PKR</div>
                                 </div>
                                 <div class="row mb-2">
                                     <div class="col-6">Duration:</div>
-                                    <div class="col-6 text-right">{{ $plan->plan_days }} days</div>
+                                    <div class="col-6 text-end">{{ $plan->plan_days }} days</div>
                                 </div>
                                 @if($plan->description)
                                     <div class="row mb-3">
@@ -122,7 +116,7 @@
     @if($userSubscriptions->count() > 0)
         <div class="card">
             <div class="card-header">
-                <h4 style="font-weight: bold;">My Active Subscriptions</h4>
+                <h4 style="font-weight: bold;"><i class="fa-solid fa-play-circle me-2"></i>My Active Subscriptions</h4>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -160,6 +154,54 @@
             </div>
         </div>
     @endif
+</div>
+
+
+
+<style>
+/* Mobile specific styles */
+@media (max-width: 768px) {
+    .container-fluid {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    
+    .card-body {
+        padding: 0.75rem;
+    }
+    
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+    
+
+    
+    .card-header {
+        padding: 0.75rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .col-12 {
+        margin-bottom: 0.5rem;
+    }
+    
+    .table-responsive {
+        font-size: 0.75rem;
+    }
+    
+    .btn-sm {
+        font-size: 0.75rem;
+        padding: 0.2rem 0.4rem;
+    }
+}
+</style>
+
 @endsection
 
 @push('plugin-scripts')

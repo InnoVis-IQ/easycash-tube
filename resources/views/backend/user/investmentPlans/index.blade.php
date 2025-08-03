@@ -52,6 +52,11 @@
                     <div class="col-md-4 mb-4">
                         <div class="card h-100 {{ $plan->is_purchased ? 'border-success' : '' }}">
                             <div class="card-header text-center">
+                                @if($plan->description)
+                                <span class="badge bg-danger me-1 text-white text-start" style="font-size: 0.8em;">
+                                    <i class="fa-solid fa-fire text-white me-1"></i> {{ $plan->description }}
+                                </span>
+                                @endif
                                 <h5 class="mb-0">{{ $plan->title }}</h5>
                                 @if($plan->is_purchased)
                                     <span class="badge bg-success">Already Purchased</span>

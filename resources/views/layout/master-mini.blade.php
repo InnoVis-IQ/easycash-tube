@@ -12,6 +12,9 @@
 
     <link rel="shortcut icon" href="{{ asset('/favicon.ico') }}">
 
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
     <!-- plugin css -->
     {!! Html::style('assets/plugins/@mdi/font/css/materialdesignicons.min.css') !!}
     {!! Html::style('assets/plugins/perfect-scrollbar/perfect-scrollbar.css') !!}
@@ -36,6 +39,9 @@
         </div>
     </div>
 
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
     <!-- base js -->
     {!! Html::script('js/app.js') !!}
     <!-- end base js -->

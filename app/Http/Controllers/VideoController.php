@@ -132,8 +132,7 @@ class VideoController extends Controller
         $daysWatched = is_array($watchedVideos) ? count($watchedVideos) : 0;
         $totalPlanDays = $subscribedPlan->plan ? $subscribedPlan->plan->plan_days : 0;
 
-        // Calculate daily reward amount
-        $dailyRewardAmount = $this->calculateDailyReward($subscribedPlan);
+        $dailyRewardAmount = $subscribedPlan->plan->daily_profit;
 
         return view('backend.user.videos.watch', compact(
             'videos',

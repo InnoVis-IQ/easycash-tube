@@ -26,7 +26,7 @@ class WithdrawController extends Controller
         }
         
         if(in_array(Auth::user()['role'],['SUPERADMIN','ADMIN'])){
-            $query = Withdraw::withTrashed()->with(['user', 'user_bank']);
+            $query = Withdraw::withTrashed()->with(['user', 'bank', 'userBankAccount']);
 
             // Filter by status
             if ($request->has('status') && $request->status) {

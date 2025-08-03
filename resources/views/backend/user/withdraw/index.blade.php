@@ -110,6 +110,7 @@
         <div class="card-body">
             <ul class="list-unstyled mb-0">
                 <li><i class="fas fa-check text-success"></i> Withdrawals only available after completing a plan</li>
+                <li><i class="fas fa-check text-success"></i> Withdrawals can only be made for the previously completed plans (except starter plan)</li>
                 <li><i class="fas fa-check text-success"></i> Withdrawal requests are processed within 24-48 hours</li>
                 <li><i class="fas fa-check text-success"></i> Supported payment methods: Easypaisa, JazzCash, NayaPay</li>
             </ul>

@@ -124,12 +124,12 @@
                 @else
                     <div class="alert alert-info mb-0">
                         <i class="fa-solid fa-play-circle me-2"></i>
-                        Click on any video below to start watching and earn Rs{{ $dailyRewardAmount }}!
+                        Click on any video below to start watching and earn Rs {{ $dailyRewardAmount }}!
                     </div>
                 @endif
             </div>
             <div class="col-12 col-md-4 text-center">
-                <div class="reward-amount">Rs{{ $dailyRewardAmount }}</div>
+                <div class="reward-amount">Rs {{ $dailyRewardAmount }}</div>
                 <small>Daily Reward</small>
             </div>
         </div>

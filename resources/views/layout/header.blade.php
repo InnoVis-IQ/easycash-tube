@@ -19,9 +19,21 @@
                         <img class="img-xs rounded-circle" src="{{ url('assets/images/faces/face0.png') }}" alt="Profile image">
                     </a>
                     <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
+                        <a class="dropdown-item" href="{{ route('password.change') }}">
+                            <i class="dropdown-item-icon mdi mdi-account-key text-primary"></i>
+                            Change Password
+                        </a>
+                        <a class="dropdown-item" href="{{ route('support.index') }}">
+                            <i class="dropdown-item-icon mdi mdi-help-circle text-primary"></i>
+                            Support & Help
+                        </a>
+                        <div class="dropdown-divider"></div>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <input type="submit" name="logout" value="Logout" class="btn btn-link dropdown-item">
+                            <button type="submit" class="dropdown-item">
+                                <i class="dropdown-item-icon mdi mdi-logout text-primary"></i>
+                                Logout
+                            </button>
                         </form>
                     </div>
                 </li>

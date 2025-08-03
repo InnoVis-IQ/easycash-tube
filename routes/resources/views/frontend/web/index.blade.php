@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="{{asset('web/assets/css/magnific-popup.css')}}">
     <link rel="stylesheet" href="{{asset('web/assets/css/owl.carousel.min.css')}}">
     <link rel="stylesheet" href="{{asset('web/assets/css/style.css')}}">
-	<title>EasyCash Tube</title>
+	<title>EasyPay Tube</title>
 
 </head>
 <body data-spy="scroll" data-target=".navbar">
@@ -25,7 +25,7 @@
             <nav class="navbar navbar-expand-lg navbar-dark fixed-top ts-separate-bg-element" data-bg-color="#141a3a">
                 <div class="container">
                     <a class="navbar-brand" href="#page-top">
-                        EasyCash Tube
+                        EasyPay Tube
                     </a>
                     <!--end navbar-brand-->
                     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
@@ -135,7 +135,7 @@
                                     <div class="ts-item-body">
                                         <h4>We're Global</h4>
                                         <p>
-                                           EasyCash Tube is global company which is working in many countries
+                                           EasyPay Tube is global company which is working in many countries
                                         </p>
                                     </div>
                                     <!--end ts-item-body-->
@@ -161,7 +161,7 @@
                                     <div class="ts-item-body">
                                         <h4>Profitable</h4>
                                         <p>
-                                            EasyCash Tube is profitable where you get your profit on daily basis in 5 days a week.
+                                            EasyPay Tube is profitable where you get your profit on daily basis in 5 days a week.
                                         </p>
                                     </div>
                                     <!--end ts-item-body-->
@@ -187,7 +187,7 @@
                                     <div class="ts-item-body">
                                         <h4>We're Secure</h4>
                                         <p>
-                                            EasyCash Tube is secure company where you can not loose your money
+                                            EasyPay Tube is secure company where you can not loose your money
                                         </p>
                                     </div>
                                     <!--end ts-item-body-->
@@ -531,7 +531,7 @@ With years of experience in the industry, we have developed a deep understanding
                     </div>
                     <!--end ts-box-->
                     <div class="text-center text-white py-4">
-                        <small>© 2023 EasyCash Tube, All Rights Reserved</small>
+                        <small>© 2023 EasyPay Tube, All Rights Reserved</small>
                     </div>
                 </div>
                 <!--end container-->

@@ -149,7 +149,7 @@
                 <!-- Footer Links -->
                 <div class="text-center mt-4">
                     <p class="text-muted mb-0" style="font-size: 0.8rem; color: rgba(255, 255, 255, 0.6);">
-                        © 2024 EasyCash Tube. All rights reserved.
+                        © 2024 EasyPay Tube. All rights reserved.
                     </p>
                 </div>
             </div>
@@ -230,7 +230,7 @@
                 <div class="modal-body" style="padding: 30px;">
                     <div class="terms-content" style="line-height: 1.6; color: #333;">
                         <h2>1. Acceptance of Terms</h2>
-                        <p>By accessing or using the Easycash Tube website and services, you agree to be bound by these
+                        <p>By accessing or using the EasyPay Tube website and services, you agree to be bound by these
                             Terms and Conditions and our Privacy Policy. These Terms govern your access to and use of the
                             website, mobile apps, and all associated services. If you do not agree with any part of these
                             Terms, please refrain from using our services.</p>
@@ -248,7 +248,7 @@
                             <li>Earnings are based on your selected plan and activity.</li>
                             <li>For example, a 7-day plan requires watching videos for at least 5 days to earn up to 10%
                                 daily (up to 20% depending on the plan).</li>
-                            <li>Earnings may fluctuate and are not guaranteed. Easycash Tube does not promise fixed returns.
+                            <li>Earnings may fluctuate and are not guaranteed. EasyPay Tube does not promise fixed returns.
                             </li>
                             <li>Bonuses and promotions may be offered from time to time at the company’s discretion.</li>
                         </ul>
@@ -260,7 +260,7 @@
                             <li>It is your responsibility to maintain the confidentiality of your account and login
                                 credentials.</li>
                             <li>You agree to notify us immediately of any unauthorized use of your account.</li>
-                            <li>Easycash Tube is not liable for any loss or damage from your failure to protect your
+                            <li>EasyPay Tube is not liable for any loss or damage from your failure to protect your
                                 account.</li>
                         </ul>
 
@@ -277,7 +277,7 @@
 
                         <h2>6. Content & Copyright</h2>
                         <ul>
-                            <li>All videos, logos, text, graphics, and content on Easycash Tube are protected by copyright
+                            <li>All videos, logos, text, graphics, and content on EasyPay Tube are protected by copyright
                                 and intellectual property laws.</li>
                             <li>Users may not reproduce, modify, or redistribute any content without written permission.
                             </li>
@@ -304,7 +304,7 @@
                             <li>Processing times are typically within 24 hours, but delays may occur due to verification,
                                 public holidays, or banking issues.</li>
                             <li>Users are solely responsible for the accuracy of their withdrawal information.</li>
-                            <li>Easycash Tube will not be liable for failed transactions due to incorrect details.</li>
+                            <li>EasyPay Tube will not be liable for failed transactions due to incorrect details.</li>
                         </ul>
 
                         <p>If a user starts with the Rs. 500 Basic Plan, withdrawals are not allowed.</p>
@@ -317,7 +317,7 @@
 
                         <h2>9. Disclaimers</h2>
                         <ul>
-                            <li>The Easycash Tube platform is provided 'as is' and 'as available.'</li>
+                            <li>The EasyPay Tube platform is provided 'as is' and 'as available.'</li>
                             <li>We do not guarantee that the service will be uninterrupted, error-free, or secure.</li>
                             <li>We are not responsible for any delays, losses, or damages due to server issues, third-party
                                 services, or user negligence.</li>
@@ -326,7 +326,7 @@
                         <h2>10. Limitation of Liability</h2>
                         <p>To the fullest extent permitted by law:</p>
                         <ul>
-                            <li>Easycash Tube shall not be liable for any indirect, incidental, special, or consequential
+                            <li>EasyPay Tube shall not be liable for any indirect, incidental, special, or consequential
                                 damages.</li>
                             <li>This includes, but is not limited to, loss of profits, data, or goodwill arising from your
                                 use of the platform.</li>
@@ -343,7 +343,7 @@
                         <h2>12. Contact Us</h2>
                         <p>For any questions, feedback, or disputes regarding these Terms, please contact us via:</p>
                         <ul>
-                            <li>Email: <a href="mailto:support@EasycashTube.com">support@EasycashTube.com</a></li>
+                            <li>Email: <a href="mailto:easypaytube@gmail.com">easypaytube@gmail.com</a></li>
                             <li>Phone: (+44 7413 710427)</li>
                             <li>WhatsApp and Live Chat available on the website</li>
                         </ul>

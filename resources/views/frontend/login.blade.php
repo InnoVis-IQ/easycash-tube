@@ -89,7 +89,7 @@
                     <li><a href="#" class="text-decoration-none" style="color: rgba(255, 255, 255, 0.8); font-size: 0.85rem;">Help Center</a></li>
                 </ul>
                 <p class="text-muted mb-0" style="font-size: 0.8rem; color: rgba(255, 255, 255, 0.6);">
-                    © 2024 EasyCash Tube. All rights reserved.
+                    © 2024 EasyPay Tube. All rights reserved.
                 </p>
             </div>
         </div>

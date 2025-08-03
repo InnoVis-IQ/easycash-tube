@@ -10,6 +10,26 @@
         height: 600px;
         min-height: 400px !important;
     }
+    
+    /* Disable video seeking controls */
+    .custom-video-modal iframe {
+        pointer-events: auto;
+    }
+    
+    /* Add warning overlay */
+    .video-warning-overlay {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        background: rgba(255, 193, 7, 0.9);
+        color: #000;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        z-index: 1000;
+        text-align: center;
+    }
     .custom-video-modal .modal-content {
         border-radius: 10px;
     }
@@ -237,6 +257,10 @@
       </div>
       <div class="modal-body">
         <div id="videoUrl" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;"></div>
+        <div class="video-warning-overlay">
+            <i class="fa-solid fa-exclamation-triangle me-1"></i>
+            <strong>Important:</strong> Please watch the entire video without skipping to earn your daily reward.
+        </div>
       </div>
     </div>
   </div>
@@ -255,6 +279,11 @@ firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 var player;
 var currentVideoId;
 var currentVideoCard;
+var lastPlayTime = 0;
+var isSeeking = false;
+var seekAttempts = 0;
+var totalWatchTime = 0;
+var videoStartTime = 0;
 
 function onYouTubeIframeAPIReady() {
     // This function will be called when the YouTube API is ready
@@ -274,6 +303,13 @@ function createYouTubePlayer(videoUrl, videoId, videoCard) {
 
     currentVideoId = videoId;
     currentVideoCard = videoCard;
+    
+    // Reset tracking variables for new video
+    lastPlayTime = 0;
+    isSeeking = false;
+    seekAttempts = 0;
+    totalWatchTime = 0;
+    videoStartTime = 0;
 
     // Create YouTube player
     player = new YT.Player('videoUrl', {
@@ -285,7 +321,9 @@ function createYouTubePlayer(videoUrl, videoId, videoCard) {
             'controls': 1,
             'rel': 0,
             'showinfo': 0,
-            'modestbranding': 1
+            'modestbranding': 1,
+            'disablekb': 1, // Disable keyboard controls
+            'fs': 0 // Disable fullscreen button
         },
         events: {
             'onReady': onPlayerReady,
@@ -304,19 +342,133 @@ function extractVideoId(url) {
 
 function onPlayerReady(event) {
     console.log('YouTube player is ready');
+    
+    // Disable right-click context menu on the video player
+    var iframe = document.getElementById('videoUrl');
+    if (iframe && iframe.querySelector('iframe')) {
+        var youtubeIframe = iframe.querySelector('iframe');
+        youtubeIframe.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            return false;
+        });
+    }
 }
 
 function onPlayerStateChange(event) {
     console.log('Player state changed:', event.data);
+    
     // Check if video has ended (state 0 = ended)
     if (event.data === YT.PlayerState.ENDED) {
         console.log('Video ended, marking as watched for video ID:', currentVideoId);
         markVideoAsWatched(currentVideoId, currentVideoCard);
     }
+    
+    // Monitor for seeking attempts
+    if (event.data === YT.PlayerState.PLAYING) {
+        if (videoStartTime === 0) {
+            videoStartTime = Date.now();
+        }
+        startProgressMonitoring();
+    }
+    
+    // Track pause time
+    if (event.data === YT.PlayerState.PAUSED) {
+        // Don't count pause time towards total watch time
+    }
+}
+
+function startProgressMonitoring() {
+    if (!player) return;
+    
+    setInterval(function() {
+        if (player && player.getCurrentTime) {
+            var currentTime = player.getCurrentTime();
+            
+            // Check if user tried to seek forward
+            if (currentTime > lastPlayTime + 5) { // Allow 5 seconds forward tolerance
+                console.log('Seek attempt detected! Current time:', currentTime, 'Last time:', lastPlayTime);
+                seekAttempts++;
+                
+                // Reset to last valid position
+                player.seekTo(lastPlayTime, true);
+                
+                // Show warning after first attempt
+                if (seekAttempts === 1) {
+                    showSeekWarning();
+                }
+                
+                // After multiple attempts, consider invalidating the watch
+                if (seekAttempts >= 3) {
+                    showSeekError();
+                    return;
+                }
+            } else {
+                // Update last play time if it's a reasonable progression
+                if (currentTime >= lastPlayTime) {
+                    lastPlayTime = currentTime;
+                    totalWatchTime = currentTime;
+                }
+            }
+        }
+    }, 1000); // Check every second
+}
+
+function showSeekWarning() {
+    var notification = document.createElement('div');
+    notification.className = 'alert alert-warning position-fixed';
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px; max-width: 90vw;';
+    notification.innerHTML = `
+        <i class="fa-solid fa-exclamation-triangle me-2"></i>
+        <strong>Warning!</strong><br>
+        <small>Please watch the video without skipping. Skipping may invalidate your reward.</small>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 4000);
+}
+
+function showSeekError() {
+    var notification = document.createElement('div');
+    notification.className = 'alert alert-danger position-fixed';
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px; max-width: 90vw;';
+    notification.innerHTML = `
+        <i class="fa-solid fa-ban me-2"></i>
+        <strong>Video Skipping Detected!</strong><br>
+        <small>Multiple skip attempts detected. This video may not count for your daily reward.</small>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 5000);
 }
 
 function markVideoAsWatched(videoId, videoCard) {
     console.log('Attempting to mark video as watched:', videoId);
+    
+    // Validate watch time before marking as watched
+    if (player && player.getDuration) {
+        var videoDuration = player.getDuration();
+        var watchPercentage = (totalWatchTime / videoDuration) * 100;
+        
+        console.log('Video duration:', videoDuration, 'Watch time:', totalWatchTime, 'Percentage:', watchPercentage);
+        
+        // Require at least 80% of the video to be watched
+        if (watchPercentage < 80) {
+            showErrorNotification('You must watch at least 80% of the video to earn your reward. Please watch the complete video.');
+            return;
+        }
+        
+        // Check for excessive seeking
+        if (seekAttempts >= 3) {
+            showErrorNotification('Too many skip attempts detected. Please watch the video without skipping to earn your reward.');
+            return;
+        }
+    }
     
     // Get CSRF token
     var csrfToken = document.querySelector('meta[name="_token"]').getAttribute('content');
@@ -330,7 +482,9 @@ function markVideoAsWatched(videoId, videoCard) {
             'X-CSRF-TOKEN': csrfToken
         },
         body: JSON.stringify({
-            video_id: videoId
+            video_id: videoId,
+            watch_time: totalWatchTime,
+            seek_attempts: seekAttempts
         })
     })
     .then(response => {

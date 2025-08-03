@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="author" content="Easycash Tube">
+    <meta name="author" content="EasyPay Tube">
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -12,7 +12,7 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <title>Easycash Tube - Watch. Earn. Repeat.</title>
+    <title>EasyPay Tube - Watch. Earn. Repeat.</title>
     
     <style>
         :root {
@@ -194,7 +194,7 @@
         <div class="container">
             <a class="navbar-brand" href="#home">
                 <i class="fas fa-play-circle me-2"></i>
-                Easycash Tube
+                EasyPay Tube
                 <small class="d-block" style="font-size: 0.7rem; color: #6c757d;">Watch. Earn. Repeat.</small>
             </a>
             
@@ -236,7 +236,7 @@
             <div class="row align-items-center hero-content">
                 <div class="col-lg-6">
                     <h1 class="display-4 fw-bold mb-4">Earn Daily Just by Watching Videos!</h1>
-                    <p class="lead mb-4">Join Easycash Tube and get paid every day — earn up to 20% daily on your selected plan by watching just 1 video per day.</p>
+                    <p class="lead mb-4">Join EasyPay Tube and get paid every day — earn up to 20% daily on your selected plan by watching just 1 video per day.</p>
                     <div class="d-flex gap-3 flex-wrap">
                         <a href="{{ route('register') }}" class="btn btn-light btn-lg px-4">Join Now</a>
                         <a href="{{ route('login') }}" class="btn btn-outline-light btn-lg px-4">Login</a>
@@ -380,7 +380,7 @@
             <div class="row text-center mb-5">
                 <div class="col-12">
                     <h2 class="fw-bold mb-3">Our Growing Community</h2>
-                    <p class="lead">Join thousands of satisfied users who trust Easycash Tube</p>
+                    <p class="lead">Join thousands of satisfied users who trust EasyPay Tube</p>
                 </div>
             </div>
             
@@ -419,7 +419,7 @@
             <div class="row text-center mb-5">
                 <div class="col-12">
                     <h2 class="fw-bold mb-3">Frequently Asked Questions</h2>
-                    <p class="lead text-muted">Everything you need to know about Easycash Tube</p>
+                    <p class="lead text-muted">Everything you need to know about EasyPay Tube</p>
                 </div>
             </div>
             
@@ -428,10 +428,10 @@
                     <div class="accordion" id="faqAccordion">
                         <div class="faq-item">
                             <div class="faq-header" data-bs-toggle="collapse" data-bs-target="#faq1">
-                                <h5 class="mb-0 fw-bold">What is Easycash Tube?</h5>
+                                <h5 class="mb-0 fw-bold">What is EasyPay Tube?</h5>
                             </div>
                             <div id="faq1" class="collapse faq-body" data-bs-parent="#faqAccordion">
-                                <p>Easycash Tube is a video-based earning platform where users can earn daily income by watching videos. It's a simple and legitimate way to make money online.</p>
+                                <p>EasyPay Tube is a video-based earning platform where users can earn daily income by watching videos. It's a simple and legitimate way to make money online.</p>
                             </div>
                         </div>
                         
@@ -476,7 +476,7 @@
                                 <h5 class="mb-0 fw-bold">Is it legit?</h5>
                             </div>
                             <div id="faq6" class="collapse faq-body" data-bs-parent="#faqAccordion">
-                                <p>Yes, Easycash Tube is a legitimate platform. We have thousands of satisfied users who earn daily. Our transparent business model and secure payment system ensure a safe earning experience.</p>
+                                <p>Yes, EasyPay Tube is a legitimate platform. We have thousands of satisfied users who earn daily. Our transparent business model and secure payment system ensure a safe earning experience.</p>
                             </div>
                         </div>
                     </div>
@@ -491,7 +491,7 @@
             <div class="row align-items-center">
                 <div class="col-lg-6">
                     <h2 class="fw-bold mb-4">About Us</h2>
-                    <p class="lead mb-4">Easycash Tube is a smart earning platform where you Watch. Earn. Repeat. We offer users in Pakistan a simple, secure way to earn daily income online just by watching videos.</p>
+                    <p class="lead mb-4">EasyPay Tube is a smart earning platform where you Watch. Earn. Repeat. We offer users in Pakistan a simple, secure way to earn daily income online just by watching videos.</p>
                     <p>Our mission is to provide a legitimate and accessible way for people to earn extra income without requiring any special skills or technical knowledge. With our transparent business model and reliable payment system, we've helped thousands of users achieve their financial goals.</p>
                 </div>
                 <div class="col-lg-6 text-center">
@@ -506,7 +506,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-4 mb-4">
-                    <h5 class="mb-3">Easycash Tube</h5>
+                    <h5 class="mb-3">EasyPay Tube</h5>
                     <p class="mb-3">Watch. Earn. Repeat.</p>
                     <p class="small text-muted">Your trusted partner for online earning in Pakistan.</p>
                 </div>
@@ -522,7 +522,7 @@
                     <h6 class="mb-3">Contact Info</h6>
                     <p class="small text-muted mb-2">
                         <i class="fas fa-envelope me-2"></i>
-                        office@easycash-tube.com
+                        easypaytube@gmail.com
                     </p>
                     <p class="small text-muted mb-3">
                         <i class="fas fa-phone me-2"></i>
@@ -532,7 +532,7 @@
                         <a href="https://wa.me/923435560939" class="social-icon" target="_blank">
                             <i class="fab fa-whatsapp"></i>
                         </a>
-                        <a href="mailto:office@easycash-tube.com" class="social-icon">
+                        <a href="mailto:easypaytube@gmail.com" class="social-icon">
                             <i class="fas fa-envelope"></i>
                         </a>
                     </div>
@@ -541,7 +541,7 @@
             <hr class="my-4">
             <div class="row">
                 <div class="col-12 text-center">
-                    <p class="small text-muted mb-0">© 2025 Easycash Tube. All Rights Reserved.</p>
+                    <p class="small text-muted mb-0">© 2025 EasyPay Tube. All Rights Reserved.</p>
                 </div>
             </div>
         </div>

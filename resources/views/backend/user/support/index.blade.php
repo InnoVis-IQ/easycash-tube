@@ -41,7 +41,7 @@
                 <div class="card-body">
                     <i class="fas fa-envelope fa-2x text-info mb-3"></i>
                     <h5>Email Support</h5>
-                    <p class="mb-0">support@easycashtube.com</p>
+                    <p class="mb-0">easypaytube@gmail.com</p>
                 </div>
             </div>
         </div>

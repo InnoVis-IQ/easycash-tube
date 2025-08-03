@@ -7,9 +7,30 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class PasswordController extends Controller
 {
+    
+    public function create(){
+        $user = User::where('email', Auth::user()->email)->first();
+        
+        return view('auth.change-password', compact('user'));
+    }
+
+    public function store(Request $request){
+        $request->validate([
+            'current_password' => ['required', 'current_password'],
+            'password' => ['required', 'confirmed'],
+        ]);
+
+        $request->user()->update([
+            'password' => Hash::make($request->password),
+        ]);
+
+        return redirect()->route('dashboard')->with('success', 'Password updated successfully');
+    }
     /**
      * Update the user's password.
      */

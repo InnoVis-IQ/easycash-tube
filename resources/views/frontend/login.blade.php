@@ -43,11 +43,11 @@
                     <div class="form-group mb-4">
                         <label class="label mb-2" style="color: #555; font-weight: 600; font-size: 0.9rem;">Password</label>
                         <div class="input-group" style="border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);">
-                            <input type="password" name="password" class="form-control" placeholder="Enter your password" 
+                            <input type="password" name="password" id="password-field" class="form-control" placeholder="Enter your password" 
                                    style="border: none; padding: 15px 20px; font-size: 0.95rem; background: #f8f9fa;">
                             <div class="input-group-append">
-                                <span class="input-group-text" style="border: none; background: #f8f9fa; color: #6c757d;">
-                                    <i class="mdi mdi-lock-outline"></i>
+                                <span class="input-group-text password-toggle" style="border: none; background: #f8f9fa; color: #6c757d; cursor: pointer; transition: color 0.3s ease;" onclick="togglePassword()">
+                                    <i class="mdi mdi-eye-outline" id="password-icon"></i>
                                 </span>
                             </div>
                         </div>
@@ -146,5 +146,26 @@
     box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25) !important;
     border-color: #28a745 !important;
 }
+
+.password-toggle:hover {
+    color: #28a745 !important;
+}
 </style>
+
+<script>
+function togglePassword() {
+    const passwordField = document.getElementById('password-field');
+    const passwordIcon = document.getElementById('password-icon');
+    
+    if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        passwordIcon.classList.remove('mdi-eye-outline');
+        passwordIcon.classList.add('mdi-eye-off-outline');
+    } else {
+        passwordField.type = 'password';
+        passwordIcon.classList.remove('mdi-eye-off-outline');
+        passwordIcon.classList.add('mdi-eye-outline');
+    }
+}
+</script>
 @endsection

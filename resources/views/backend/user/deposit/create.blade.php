@@ -21,6 +21,21 @@
         <div class="col-lg-4 offset-lg-4 grid-margin stretch-card">
             <div class="card card-statistics">
                 <div class="card-header" style="font-weight: bold;">
+                    <strong>Accound details:</strong>
+                </div>
+                <div class="card-body">
+                    <p>Bank: {{ $banks[0]['bank_name'] }}</p>
+                    <p>Account Number: {{ $banks[0]['account_number'] }}</p>
+                    <p>Account Title: {{ $banks[0]['account_title'] }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-4 offset-lg-4 grid-margin stretch-card">
+            <div class="card card-statistics">
+                <div class="card-header" style="font-weight: bold;">
                     Please upload deposit slip
                 </div>
                 <div class="card-body">

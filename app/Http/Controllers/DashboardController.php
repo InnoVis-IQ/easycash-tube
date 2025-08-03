@@ -107,9 +107,15 @@ class DashboardController extends Controller
         Session::put('UserSessionVars',[]);
 
         if(!Models\UserSubscription::where('user_id',Auth::user()['id'])->count()){
-            return redirect()->route('plans.create');
+            $allPlans = Models\InvestmentPlan::withTrashed()->get();
+            
+            return view('backend.user.dashboard')->with([
+                'subscription_status' => 'no',
+                'allPlans' => $allPlans,
+            ]);
         }
         else{
+            $subscription_status = 'yes';
             $userId = Auth::user()['id'];
             $pendingDeposits = Models\Deposit::where('user_id',$userId)->where('status','deposited')->count();
             $activeSubscriptions = Models\UserSubscription::where('user_id',$userId)->where('expire_at','>',date('Y-m-d'))->count();
@@ -193,6 +199,7 @@ class DashboardController extends Controller
             $message = "0";
             return view('backend.user.dashboard',compact(
                 'message',
+                'subscription_status',
                 'pendingDeposits',
                 'activeSubscriptions', 
                 'subscriptions',

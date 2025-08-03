@@ -28,7 +28,7 @@
                         <th>Plan</th>
                         <th>Title</th>
                         <th>Description</th>
-                        <th>Video URL</th>
+                        <th>Video (Views)</th>
                         <th>Video Thumbnail</th>
                         <th>Expiry Date</th>
                         <th>Status</th>
@@ -42,7 +42,7 @@
                             <td class="{{$item['deleted_at'] ? 'bg-secondary' : ''}}">{{ $item->plan->title }}</td>
                             <td class="{{$item['deleted_at'] ? 'bg-secondary' : ''}}">{{ $item->title }}</td>
                             <td class="{{$item['deleted_at'] ? 'bg-secondary' : ''}}">{{ $item->description }}</td>
-                            <td class="{{$item['deleted_at'] ? 'bg-secondary' : ''}}"><a href="{{ $item->video_url }}" target="_blank">View</a></td>
+                            <td class="{{$item['deleted_at'] ? 'bg-secondary' : ''}}"><a href="{{ $item->video_url }}" target="_blank">View</a> ({{ $videoWatchCounts[$item->id] ?? 0 }})</td>
                             <td class="{{$item['deleted_at'] ? 'bg-secondary' : ''}}">
                                 @if($item->video_thumbnail)
                                     <img src="{{ $item->video_thumbnail }}" alt="Thumbnail" style="max-width: 80px; max-height: 50px;">

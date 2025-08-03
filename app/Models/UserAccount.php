@@ -10,4 +10,9 @@ class UserAccount extends Model
 {
     use HasFactory;
     use SoftDeletes;
+
+    protected $fillable = [
+        'user_id',
+        'net_amount',
+    ];
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Video;
+use App\Models\UserSubscription;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -15,7 +16,25 @@ class VideoController extends Controller
     public function index()
     {
         $data = \App\Models\Video::withTrashed()->get();
-        return view('backend.admin.videos.index', compact('data'));
+        
+        // Get all user subscriptions with watched videos
+        $userSubscriptions = \App\Models\UserSubscription::whereNotNull('watched_videos')->get();
+        
+        // Count each video watched
+        $videoWatchCounts = [];
+        foreach ($userSubscriptions as $subscription) {
+            $watchedVideos = $subscription->watched_videos;
+            if (is_array($watchedVideos)) {
+                foreach ($watchedVideos as $videoId) {
+                    if (!isset($videoWatchCounts[$videoId])) {
+                        $videoWatchCounts[$videoId] = 0;
+                    }
+                    $videoWatchCounts[$videoId]++;
+                }
+            }
+        }
+        
+        return view('backend.admin.videos.index', compact('data', 'videoWatchCounts'));
     }
 
     /**
@@ -248,9 +267,7 @@ class VideoController extends Controller
         if ($subscription->daily_reward_claimed == $today) {
             return true;
         }
-        
-        // Fallback: check if subscription was updated today
-        return $subscription->updated_at && $subscription->updated_at->format('Y-m-d') == $today;
+        return false;
     }
 
     /**
@@ -274,5 +291,28 @@ class VideoController extends Controller
         }
         
         return $baseReward + $planBonus;
+    }
+
+    /**
+     * Get video watch counts for all videos
+     */
+    public function getVideoWatchCounts()
+    {
+        $userSubscriptions = UserSubscription::whereNotNull('watched_videos')->get();
+        
+        $videoWatchCounts = [];
+        foreach ($userSubscriptions as $subscription) {
+            $watchedVideos = $subscription->watched_videos;
+            if (is_array($watchedVideos)) {
+                foreach ($watchedVideos as $videoId) {
+                    if (!isset($videoWatchCounts[$videoId])) {
+                        $videoWatchCounts[$videoId] = 0;
+                    }
+                    $videoWatchCounts[$videoId]++;
+                }
+            }
+        }
+        
+        return $videoWatchCounts;
     }
 }

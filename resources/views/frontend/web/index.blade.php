@@ -374,6 +374,45 @@
         </div>
     </section>
 
+    <!-- Statistics Section -->
+    <section class="section-padding text-white" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);">
+        <div class="container">
+            <div class="row text-center mb-5">
+                <div class="col-12">
+                    <h2 class="fw-bold mb-3">Our Growing Community</h2>
+                    <p class="lead">Join thousands of satisfied users who trust Easycash Tube</p>
+                </div>
+            </div>
+            
+            <div class="row g-4 text-center">
+                <div class="col-md-3 col-6">
+                    <div class="stat-item">
+                        <h3 class="display-4 fw-bold mb-2">15,847</h3>
+                        <p class="mb-0">Total Users</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-item">
+                        <h3 class="display-4 fw-bold mb-2">Rs 2.4M</h3>
+                        <p class="mb-0">Total Paid Out</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-item">
+                        <h3 class="display-4 fw-bold mb-2">98.5%</h3>
+                        <p class="mb-0">Success Rate</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-item">
+                        <h3 class="display-4 fw-bold mb-2">4.9★</h3>
+                        <p class="mb-0">User Rating</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- FAQ Section -->
     <section id="faq" class="section-padding">
         <div class="container">

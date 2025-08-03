@@ -6,6 +6,45 @@
 
 @section('content')
 <div class="container-fluid px-2">
+    
+    <!-- Notification Banners -->
+    @if($announcements && count($announcements) > 0)
+    <div class="row mb-3">
+        <div class="col-12">
+            @foreach($announcements as $announcement)
+                <div class="alert alert-{{ $announcement->type }} alert-dismissible fade show shadow-sm" role="alert" style="border-left: 4px solid {{ $announcement->type == 'info' ? '#17a2b8' : ($announcement->type == 'warning' ? '#ffc107' : ($announcement->type == 'success' ? '#28a745' : '#dc3545')) }};">
+                    <div class="d-flex align-items-start">
+                        <div class="me-3 mt-1">
+                            @if($announcement->type == 'info')
+                                <i class="fa-solid fa-info-circle fa-lg text-info"></i>
+                            @elseif($announcement->type == 'warning')
+                                <i class="fa-solid fa-exclamation-triangle fa-lg text-warning"></i>
+                            @elseif($announcement->type == 'success')
+                                <i class="fa-solid fa-check-circle fa-lg text-success"></i>
+                            @elseif($announcement->type == 'danger')
+                                <i class="fa-solid fa-times-circle fa-lg text-danger"></i>
+                            @endif
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="alert-heading mb-1 fw-bold">{{ $announcement->title }}</h6>
+                                    <p class="mb-1">{{ $announcement->message }}</p>
+                                    <small class="text-muted">
+                                        <i class="fa-solid fa-clock me-1"></i>
+                                        Posted on {{ $announcement->created_at->format('M d, Y \a\t g:i A') }}
+                                    </small>
+                                </div>
+                                <button type="button" class="btn-close ms-2" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+    @endif
+    
     <!-- User Progress and Level Card -->
     <div class="row mb-3">
         <div class="col-12 col-lg-8 mb-3">
@@ -165,9 +204,44 @@ function copyReferralLink() {
         copyBtn.classList.add('btn-light');
     }, 2000);
 }
+
+// Auto-dismiss notifications after 10 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(function(alert) {
+        setTimeout(function() {
+            if (alert && alert.parentNode) {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }
+        }, 10000); // 10 seconds
+    });
+});
 </script>
 
 <style>
+.alert {
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.alert-dismissible .btn-close {
+    padding: 0.75rem 1rem;
+}
+
+.alert-heading {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.alert p {
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.alert small {
+    font-size: 0.8rem;
+}
 </style>
 @endsection
 

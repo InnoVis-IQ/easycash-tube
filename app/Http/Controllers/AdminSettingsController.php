@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Announcement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -109,17 +110,16 @@ class AdminSettingsController extends Controller
             'user_ids' => 'required_if:target_users,specific|array',
         ]);
 
-        // Store announcement in database or cache
-        $announcement = [
+        // Store announcement in database
+        Announcement::create([
             'title' => $request->announcement_title,
             'message' => $request->announcement_message,
             'type' => $request->announcement_type,
             'target_users' => $request->target_users,
             'user_ids' => $request->user_ids,
-            'created_at' => now(),
-        ];
-
-        Cache::put('site_announcement', $announcement, now()->addDays(7));
+            'is_active' => true,
+            'expires_at' => now()->addDays(1),
+        ]);
 
         return back()->with('success', 'Announcement sent successfully');
     }

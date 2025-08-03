@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Models;
+use App\Models\Announcement;
 
 class DashboardController extends Controller
 {
@@ -77,6 +78,9 @@ class DashboardController extends Controller
         $recentWithdrawals = Models\Withdraw::with('user')->orderBy('created_at', 'desc')->take(5)->get();
         $recentDeposits = Models\Deposit::with('user')->orderBy('created_at', 'desc')->take(5)->get();
         
+        // Get active announcements
+        $announcements = $this->getActiveAnnouncements();
+        
         $message = "0";
 
         return view('backend.admin.dashboard',compact(
@@ -94,7 +98,8 @@ class DashboardController extends Controller
             'totalEarnings',
             'recentUsers',
             'recentWithdrawals',
-            'recentDeposits'
+            'recentDeposits',
+            'announcements'
         ));
     }
     
@@ -182,6 +187,9 @@ class DashboardController extends Controller
             // Calculate total withdrawals
             $totalWithdrawals = Models\Withdraw::where('user_id', $userId)->where('status', 'approved')->sum('amount');
             
+            // Get active announcements
+            $announcements = $this->getActiveAnnouncements();
+            
             $message = "0";
             return view('backend.user.dashboard',compact(
                 'message',
@@ -203,7 +211,8 @@ class DashboardController extends Controller
                 'totalDeposits',
                 'totalEarned',
                 'todayReward',
-                'totalWithdrawals'
+                'totalWithdrawals',
+                'announcements'
             ));
         }
     }
@@ -286,5 +295,14 @@ class DashboardController extends Controller
         $progress = ($uniqueDaysWatched / $requiredDays) * 100;
         
         return min(100, $progress); // Cap at 100%
+    }
+    
+    /**
+     * Get active announcements for the current user
+     */
+    private function getActiveAnnouncements() {
+        $user = Auth::user();
+
+        return Announcement::where('target_users','all')->where('is_active',true)->where('expires_at','>',now())->get();
     }
 }

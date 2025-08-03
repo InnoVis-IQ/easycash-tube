@@ -16,6 +16,37 @@
         </div>
     @endif
     
+    <!-- Announcements Section -->
+    @if($announcements && count($announcements) > 0)
+    <div class="row mb-3">
+        <div class="col-12">
+            @foreach($announcements as $announcement)
+                <div class="alert alert-{{ $announcement->type }} alert-dismissible fade show" role="alert">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            @if($announcement->type == 'info')
+                                <i class="fa-solid fa-info-circle fa-lg text-info"></i>
+                            @elseif($announcement->type == 'warning')
+                                <i class="fa-solid fa-exclamation-triangle fa-lg text-warning"></i>
+                            @elseif($announcement->type == 'success')
+                                <i class="fa-solid fa-check-circle fa-lg text-success"></i>
+                            @elseif($announcement->type == 'danger')
+                                <i class="fa-solid fa-times-circle fa-lg text-danger"></i>
+                            @endif
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="alert-heading mb-1">{{ $announcement->title }}</h6>
+                            <p class="mb-0">{{ $announcement->message }}</p>
+                            <small class="text-muted">Posted on {{ $announcement->created_at->format('M d, Y') }}</small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endforeach
+        </div>
+    </div>
+    @endif
+    
     <!-- Main Statistics Cards -->
     <div class="row">
         <div class="col-md-3 col-sm-6 grid-margin stretch-card">

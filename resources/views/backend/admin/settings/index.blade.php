@@ -26,40 +26,40 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title">Site Configuration</h4>
+                    <h4 class="card-title">Settings</h4>
                 </div>
                 <div class="card-body">
                     <ul class="nav nav-tabs" id="settingsTabs" role="tablist">
-                        <li class="nav-item">
+                        {{-- <li class="nav-item">
                             <a class="nav-link active" id="general-tab" data-toggle="tab" href="#general" role="tab">
                                 <i class="fa-solid fa-cog"></i> General Settings
                             </a>
-                        </li>
-                        <li class="nav-item">
+                        </li> --}}
+                        {{-- <li class="nav-item">
                             <a class="nav-link" id="payment-tab" data-toggle="tab" href="#payment" role="tab">
                                 <i class="fa-solid fa-credit-card"></i> Payment Settings
                             </a>
-                        </li>
-                        <li class="nav-item">
+                        </li> --}}
+                        {{-- <li class="nav-item">
                             <a class="nav-link" id="notifications-tab" data-toggle="tab" href="#notifications" role="tab">
                                 <i class="fa-solid fa-bell"></i> Notifications
                             </a>
-                        </li>
+                        </li> --}}
                         <li class="nav-item">
                             <a class="nav-link" id="announcements-tab" data-toggle="tab" href="#announcements" role="tab">
                                 <i class="fa-solid fa-bullhorn"></i> Announcements
                             </a>
                         </li>
-                        <li class="nav-item">
+                        {{-- <li class="nav-item">
                             <a class="nav-link" id="system-tab" data-toggle="tab" href="#system" role="tab">
                                 <i class="fa-solid fa-tools"></i> System
                             </a>
-                        </li>
+                        </li> --}}
                     </ul>
 
                     <div class="tab-content mt-4" id="settingsTabsContent">
                         <!-- General Settings -->
-                        <div class="tab-pane fade show active" id="general" role="tabpanel">
+                        <div class="tab-pane fade" id="general" role="tabpanel">
                             <form method="POST" action="{{ route('admin.settings.general') }}">
                                 @csrf
                                 <div class="row">
@@ -204,7 +204,7 @@
                         </div>
 
                         <!-- Announcements -->
-                        <div class="tab-pane fade" id="announcements" role="tabpanel">
+                        <div class="tab-pane fade show active" id="announcements" role="tabpanel">
                             <form method="POST" action="{{ route('admin.settings.announcement') }}">
                                 @csrf
                                 <div class="row">

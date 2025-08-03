@@ -16,10 +16,17 @@
               </a>
           </div>
           <div style="width: 20%; display: inline;">
+            @if(Auth::user()->role == 'user')
               <a href="{{ route('videos.watch') }}" class="btn btn-link text-decoration-none p-2">
                   <i class="fa-solid fa-play fa-lg"></i>
                   <div class="small">Videos</div>
               </a>
+            @else
+              <a href="{{ route('videos.index') }}" class="btn btn-link text-decoration-none p-2">
+                  <i class="fa-solid fa-video fa-lg"></i>
+                  <div class="small">Videos</div>
+              </a>
+            @endif
           </div>
           <div style="width: 20%; display: inline;">
               <a href="{{ route('withdraws.index') }}" class="btn btn-link text-decoration-none p-2">

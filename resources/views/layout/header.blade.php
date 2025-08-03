@@ -23,10 +23,17 @@
                             <i class="dropdown-item-icon mdi mdi-account-key text-primary"></i>
                             Change Password
                         </a>
+                        @if(Auth::user()->role == 'user')
                         <a class="dropdown-item" href="{{ route('support.index') }}">
                             <i class="dropdown-item-icon mdi mdi-help-circle text-primary"></i>
                             Support & Help
                         </a>
+                        @else
+                        <a class="dropdown-item" href="{{ route('admin.settings') }}">
+                            <i class="dropdown-item-icon mdi mdi-settings text-primary"></i>
+                            Settings
+                        </a>
+                        @endif
                         <div class="dropdown-divider"></div>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf

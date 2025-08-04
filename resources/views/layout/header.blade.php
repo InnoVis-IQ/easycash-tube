@@ -23,7 +23,7 @@
                             <i class="dropdown-item-icon mdi mdi-account-key text-primary"></i>
                             Change Password
                         </a>
-                        @if(Auth::user()->role == 'user')
+                        @if(Auth::user()->role == 'USER')
                         <a class="dropdown-item" href="{{ route('support.index') }}">
                             <i class="dropdown-item-icon mdi mdi-help-circle text-primary"></i>
                             Support & Help

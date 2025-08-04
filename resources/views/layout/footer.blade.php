@@ -16,7 +16,7 @@
               </a>
           </div>
           <div style="width: 20%; display: inline;">
-            @if(Auth::user()->role == 'user')
+            @if(Auth::user()->role == 'USER')
               <a href="{{ route('videos.watch') }}" class="btn btn-link text-decoration-none p-2">
                   <i class="fa-solid fa-play fa-lg"></i>
                   <div class="small">Videos</div>

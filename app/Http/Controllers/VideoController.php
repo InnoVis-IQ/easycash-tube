@@ -239,7 +239,7 @@ class VideoController extends Controller
             Log::info('Adding video to watched list. New list:', $watchedVideos);
             
             // Calculate daily reward
-            $dailyRewardAmount = $this->calculateDailyReward($subscribedPlan);
+            $dailyRewardAmount = $subscribedPlan->plan->daily_profit;
             
             // Update the subscription with new watched videos and daily reward
             $result = $subscribedPlan->update([
@@ -298,22 +298,6 @@ class VideoController extends Controller
      */
     private function hasClaimedDailyReward($subscription, $today) {
         return $subscription->daily_reward_claimed == $today;
-    }
-
-    /**
-     * Calculate daily reward amount based on subscription
-     */
-    private function calculateDailyReward($subscription) {
-        // Base daily reward amount
-        $baseReward = 50; // Rs50 base reward
-        
-        // Add bonus based on plan level
-        $planBonus = 0;
-        if ($subscription->plan) {
-            $planBonus = $subscription->plan->daily_profit * 0.1; // 10% of daily profit as bonus
-        }
-        
-        return $baseReward + $planBonus;
     }
 
     /**

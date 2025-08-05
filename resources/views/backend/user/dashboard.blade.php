@@ -4,6 +4,96 @@
     {{-- {!! Html::style('/assets/plugins/plugin.css') !!} --}}
 @endpush
 
+@push('style')
+<style>
+    .custom-video-modal {
+        max-width: 900px;
+    }
+    .custom-video-modal .modal-content,
+    .custom-video-modal .modal-body {
+        height: 600px;
+        min-height: 400px !important;
+    }
+    
+    /* Disable video seeking controls */
+    .custom-video-modal iframe {
+        pointer-events: auto;
+    }
+    
+    /* Add warning overlay */
+    .video-warning-overlay {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        background: rgba(255, 193, 7, 0.9);
+        color: #000;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        z-index: 1000;
+        text-align: center;
+    }
+    .custom-video-modal .modal-content {
+        border-radius: 10px;
+    }
+    .custom-video-modal .modal-header {
+        border-bottom: none;
+    }
+    .custom-video-modal .modal-footer {
+    }
+    #videoUrl {
+        height: 100% !important;
+    }
+    
+    .video-card {
+        transition: transform 0.3s ease;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    
+    .video-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    /* Mobile specific styles */
+    @media (max-width: 768px) {
+        .container-fluid {
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+        
+        .video-card {
+            margin-bottom: 15px;
+        }
+        
+        .card-body {
+            padding: 0.75rem;
+        }
+        
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .col-md-4 {
+            margin-bottom: 15px;
+        }
+        
+        .d-flex.justify-content-center {
+            flex-direction: column;
+        }
+        
+        .d-flex.justify-content-center .btn {
+            margin-bottom: 0.5rem;
+        }
+    }
+</style>
+@endpush
+
 @section('content')
 <div class="container-fluid px-2">
     @if($subscription_status == 'no')
@@ -171,11 +261,39 @@
             </div>
         </div>
         
+        <!-- Invite & Earn Section -->
+        <div class="row mb-3">
+            <div class="col-12 col-lg-4">
+                <div class="card">
+                    <div class="card-body text-center p-3">
+                        <h6 class="mb-2">Bonus Video</h6>
+                        <p class="text-muted small mb-2">Completely watch to earn bonus</p>
+                        <div class="card h-100 video-card"
+                            data-title="Bonus Video"
+                            data-url="https://www.youtube.com/watch?v=HHjSdy9l7Kc"
+                            data-video-id="dQw4w9WgXcQ"
+                            style="cursor:pointer;">
+
+                            <div class="d-flex justify-content-center align-items-center" style="height:200px;background:#f5f5f5;">
+                                <img src="{{ asset('assets/images/product_images/watch.jpeg') }}" alt="Plan Icon" style="height:80px;">
+                            </div>
+
+                            <div class="card-body p-3">
+                                <h6 class="card-title small">Bonus Video</h6>
+                                <p class="card-text small">Completely watch to earn bonus</p>
+                                <span class="badge bg-warning small">Click to Watch</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- Current Plans Section -->
         @if($subscriptions && count($subscriptions) > 0)
         <div class="card mb-3">
             <div class="card-header p-3">
-                <h6 class="mb-0">Current Plans</h6>
+                <h6 class="mb-0">Current Plan</h6>
             </div>
             <div class="card-body p-3">
                 <div class="row">
@@ -216,7 +334,352 @@
     @endif
 </div>
 
+<!-- Video Modal -->
+<div class="modal fade" id="videoModal" tabindex="-1" aria-labelledby="videoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg custom-video-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="videoModalLabel">Video Title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="videoUrl" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;"></div>
+        <div class="video-warning-overlay">
+            <i class="fa-solid fa-exclamation-triangle me-1"></i>
+            <strong>Important:</strong> Please watch the entire video without skipping to earn your bonus reward.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
+// YouTube iframe API
+var tag = document.createElement('script');
+tag.src = "https://www.youtube.com/iframe_api";
+var firstScriptTag = document.getElementsByTagName('script')[0];
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+var player;
+var currentVideoId;
+var currentVideoCard;
+var lastPlayTime = 0;
+var isSeeking = false;
+var seekAttempts = 0;
+var totalWatchTime = 0;
+var videoStartTime = 0;
+
+function onYouTubeIframeAPIReady() {
+    // This function will be called when the YouTube API is ready
+}
+
+function createYouTubePlayer(videoUrl, videoId, videoCard) {
+    console.log('Creating YouTube player for:', videoUrl, 'Video ID:', videoId);
+    
+    // Extract video ID from YouTube URL
+    var videoIdFromUrl = extractVideoId(videoUrl);
+    if (!videoIdFromUrl) {
+        console.error('Invalid YouTube URL:', videoUrl);
+        return;
+    }
+    
+    console.log('Extracted YouTube video ID:', videoIdFromUrl);
+
+    currentVideoId = videoId;
+    currentVideoCard = videoCard;
+    
+    // Reset tracking variables for new video
+    lastPlayTime = 0;
+    isSeeking = false;
+    seekAttempts = 0;
+    totalWatchTime = 0;
+    videoStartTime = 0;
+
+    // Create YouTube player
+    player = new YT.Player('videoUrl', {
+        height: '100%',
+        width: '100%',
+        videoId: videoIdFromUrl,
+        playerVars: {
+            'autoplay': 1,
+            'controls': 1,
+            'rel': 0,
+            'showinfo': 0,
+            'modestbranding': 1,
+            'disablekb': 1, // Disable keyboard controls
+            'fs': 0 // Disable fullscreen button
+        },
+        events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange
+        }
+    });
+    
+    console.log('YouTube player created');
+}
+
+function extractVideoId(url) {
+    var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    var match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+}
+
+function onPlayerReady(event) {
+    console.log('YouTube player is ready');
+    
+    // Disable right-click context menu on the video player
+    var iframe = document.getElementById('videoUrl');
+    if (iframe && iframe.querySelector('iframe')) {
+        var youtubeIframe = iframe.querySelector('iframe');
+        youtubeIframe.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            return false;
+        });
+    }
+}
+
+function onPlayerStateChange(event) {
+    console.log('Player state changed:', event.data);
+    
+    // Check if video has ended (state 0 = ended)
+    if (event.data === YT.PlayerState.ENDED) {
+        console.log('Video ended, marking as watched for video ID:', currentVideoId);
+        markVideoAsWatched(currentVideoId, currentVideoCard);
+    }
+    
+    // Monitor for seeking attempts
+    if (event.data === YT.PlayerState.PLAYING) {
+        if (videoStartTime === 0) {
+            videoStartTime = Date.now();
+        }
+        startProgressMonitoring();
+    }
+    
+    // Track pause time
+    if (event.data === YT.PlayerState.PAUSED) {
+        // Don't count pause time towards total watch time
+    }
+}
+
+function startProgressMonitoring() {
+    if (!player) return;
+    
+    setInterval(function() {
+        if (player && player.getCurrentTime) {
+            var currentTime = player.getCurrentTime();
+            
+            // Check if user tried to seek forward
+            if (currentTime > lastPlayTime + 5) { // Allow 5 seconds forward tolerance
+                console.log('Seek attempt detected! Current time:', currentTime, 'Last time:', lastPlayTime);
+                seekAttempts++;
+                
+                // Reset to last valid position
+                player.seekTo(lastPlayTime, true);
+                
+                // Show warning after first attempt
+                if (seekAttempts === 1) {
+                    showSeekWarning();
+                }
+                
+                // After multiple attempts, consider invalidating the watch
+                if (seekAttempts >= 3) {
+                    showSeekError();
+                    return;
+                }
+            } else {
+                // Update last play time if it's a reasonable progression
+                if (currentTime >= lastPlayTime) {
+                    lastPlayTime = currentTime;
+                    totalWatchTime = currentTime;
+                }
+            }
+        }
+    }, 1000); // Check every second
+}
+
+function showSeekWarning() {
+    var notification = document.createElement('div');
+    notification.className = 'alert alert-warning position-fixed';
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px; max-width: 90vw;';
+    notification.innerHTML = `
+        <i class="fa-solid fa-exclamation-triangle me-2"></i>
+        <strong>Warning!</strong><br>
+        <small>Please watch the video without skipping. Skipping may invalidate your reward.</small>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 4000);
+}
+
+function showSeekError() {
+    var notification = document.createElement('div');
+    notification.className = 'alert alert-danger position-fixed';
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px; max-width: 90vw;';
+    notification.innerHTML = `
+        <i class="fa-solid fa-ban me-2"></i>
+        <strong>Video Skipping Detected!</strong><br>
+        <small>Multiple skip attempts detected. This video may not count for your bonus reward.</small>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 5000);
+}
+
+function markVideoAsWatched(videoId, videoCard) {
+    console.log('Attempting to mark video as watched:', videoId);
+    
+    // Validate watch time before marking as watched
+    if (player && player.getDuration) {
+        var videoDuration = player.getDuration();
+        var watchPercentage = (totalWatchTime / videoDuration) * 100;
+        
+        console.log('Video duration:', videoDuration, 'Watch time:', totalWatchTime, 'Percentage:', watchPercentage);
+        
+        // Require at least 80% of the video to be watched
+        if (watchPercentage < 80) {
+            showErrorNotification('You must watch at least 80% of the video to earn your bonus reward. Please watch the complete video.');
+            return;
+        }
+        
+        // Check for excessive seeking
+        if (seekAttempts >= 3) {
+            showErrorNotification('Too many skip attempts detected. Please watch the video without skipping to earn your bonus reward.');
+            return;
+        }
+    }
+    
+    // Get CSRF token
+    var csrfToken = document.querySelector('meta[name="_token"]').getAttribute('content');
+    console.log('CSRF Token:', csrfToken);
+    
+    // Send AJAX request to mark video as watched
+    fetch('{{ route('dashboard.mark-watched') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken
+        },
+        body: JSON.stringify({
+            video_id: videoId,
+            watch_time: totalWatchTime,
+            video_duration: player && player.getDuration ? player.getDuration() : 0,
+            seek_attempts: seekAttempts
+        })
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        return response.json();
+    })
+    .then(data => {
+        console.log('Response data:', data);
+        if (data.success) {
+            // Update the UI to show video as watched
+            updateVideoCardStatus(videoCard, true);
+            
+            // Show success message with reward amount
+            showRewardNotification(data.bonus_reward);
+            
+            console.log('Video marked as watched:', data.message);
+        } else {
+            console.error('Error marking video as watched:', data.message);
+            showErrorNotification(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Fetch error:', error);
+        showErrorNotification('An error occurred while processing your request.');
+    });
+}
+
+function updateVideoCardStatus(videoCard, isWatched) {
+    if (isWatched) {
+        // Update badge to show watched status
+        var badge = videoCard.querySelector('.badge');
+        if (badge) {
+            badge.className = 'badge bg-success small';
+            badge.textContent = 'Watched';
+        }
+        
+        // Add border-success class to card
+        videoCard.classList.add('border-success');
+    }
+}
+
+function showRewardNotification(rewardAmount) {
+    // Create a custom notification
+    var notification = document.createElement('div');
+    notification.className = 'alert alert-success position-fixed';
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px; max-width: 90vw;';
+    notification.innerHTML = `
+        <i class="fa-solid fa-gift me-2"></i>
+        <strong>Bonus Reward Claimed!</strong><br>
+        <small>You earned Rs${rewardAmount} for watching the bonus video!</small>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Remove notification after 5 seconds
+    setTimeout(() => {
+        notification.remove();
+    }, 5000);
+}
+
+function showErrorNotification(message) {
+    // Create a custom error notification
+    var notification = document.createElement('div');
+    notification.className = 'alert alert-danger position-fixed';
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px; max-width: 90vw;';
+    notification.innerHTML = `
+        <i class="fa-solid fa-exclamation-triangle me-2"></i>
+        <strong>Error!</strong><br>
+        <small>${message}</small>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Remove notification after 5 seconds
+    setTimeout(() => {
+        notification.remove();
+    }, 5000);
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.video-card').forEach(function(card) {
+        card.addEventListener('click', function() {
+            var title = this.getAttribute('data-title');
+            var url = this.getAttribute('data-url');
+            var videoId = this.getAttribute('data-video-id');
+            
+            document.getElementById('videoModalLabel').textContent = title;
+            
+            // Clear previous iframe content
+            var iframe = document.getElementById('videoUrl');
+            iframe.innerHTML = '';
+            
+            // Create YouTube player
+            createYouTubePlayer(url, videoId, this);
+            
+            var videoModal = new bootstrap.Modal(document.getElementById('videoModal'));
+            videoModal.show();
+        });
+    });
+
+    // Clean up player when modal is closed
+    document.getElementById('videoModal').addEventListener('hidden.bs.modal', function () {
+        if (player && typeof player.destroy === 'function') {
+            player.destroy();
+        }
+        // Clear the video container
+        document.getElementById('videoUrl').innerHTML = '';
+    });
+});
+
 function copyReferralLink() {
     const linkInput = document.querySelector('input[readonly]');
     linkInput.select();

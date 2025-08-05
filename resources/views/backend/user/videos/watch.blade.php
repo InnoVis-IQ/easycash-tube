@@ -484,6 +484,7 @@ function markVideoAsWatched(videoId, videoCard) {
         body: JSON.stringify({
             video_id: videoId,
             watch_time: totalWatchTime,
+            video_duration: player && player.getDuration ? player.getDuration() : 0,
             seek_attempts: seekAttempts
         })
     })

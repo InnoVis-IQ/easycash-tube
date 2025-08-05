@@ -172,13 +172,36 @@ class VideoController extends Controller
         Log::info('markAsWatched called with data:', $request->all());
         
         $request->validate([
-            'video_id' => 'required|exists:videos,id'
+            'video_id' => 'required|exists:videos,id',
+            'watch_time' => 'required|numeric',
+            'video_duration' => 'required|numeric',
+            'seek_attempts' => 'required|integer'
         ]);
 
         $videoId = $request->video_id;
         $userId = Auth::user()->id;
 
         Log::info('Processing video_id: ' . $videoId . ' for user_id: ' . $userId);
+
+        // Validate watch time (at least 90% of video duration)
+        $watchPercentage = ($request->watch_time / $request->video_duration) * 100;
+        
+        if ($watchPercentage < 90) {
+            Log::warning('User attempted to claim reward with insufficient watch time. User: ' . $userId . ', Watch percentage: ' . $watchPercentage . '%');
+            return response()->json([
+                'success' => false,
+                'message' => 'You must watch at least 90% of the video to earn your daily reward.'
+            ]);
+        }
+        
+        // Check for excessive seeking
+        if ($request->seek_attempts >= 3) {
+            Log::warning('User attempted to claim reward with excessive skip attempts. User: ' . $userId . ', Skip attempts: ' . $request->seek_attempts);
+            return response()->json([
+                'success' => false,
+                'message' => 'Too many skip attempts detected. Please watch the video without skipping to earn your daily reward.'
+            ]);
+        }
 
         // Get the user's active subscription
         $subscribedPlan = \App\Models\UserSubscription::where('user_id', $userId)

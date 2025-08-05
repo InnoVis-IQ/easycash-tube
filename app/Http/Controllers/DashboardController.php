@@ -200,6 +200,7 @@ class DashboardController extends Controller
             return view('backend.user.dashboard',compact(
                 'message',
                 'subscription_status',
+                'currentSubscription',
                 'pendingDeposits',
                 'activeSubscriptions', 
                 'subscriptions',
@@ -311,5 +312,89 @@ class DashboardController extends Controller
         $user = Auth::user();
 
         return Announcement::where('target_users','all')->where('is_active',true)->where('expires_at','>',now())->get();
+    }
+    
+    /**
+     * Mark bonus video as watched and award bonus reward
+     */
+    public function markVideoAsWatched(Request $request) {
+        try {
+            $request->validate([
+                'video_id' => 'required|string',
+                'watch_time' => 'required|numeric',
+                'seek_attempts' => 'required|integer'
+            ]);
+            
+            $userId = Auth::user()->id;
+            
+            // Check if user has already watched bonus video today
+            $today = date('Y-m-d');
+            $bonusVideoKey = 'bonus_video_' . $today;
+            
+            // Get or create user account
+            $userAccount = Models\UserAccount::where('user_id', $userId)->first();
+            if (!$userAccount) {
+                $userAccount = Models\UserAccount::create([
+                    'user_id' => $userId,
+                    'net_amount' => 0,
+                    'bonus_videos_watched' => []
+                ]);
+            }
+            
+            // Check if bonus video already watched today
+            $bonusVideosWatched = $userAccount->bonus_videos_watched ?? [];
+            if (is_string($bonusVideosWatched)) {
+                $bonusVideosWatched = json_decode($bonusVideosWatched, true) ?: [];
+            }
+            
+            if (in_array($today, $bonusVideosWatched)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You have already watched the bonus video today.'
+                ]);
+            }
+            
+            // Validate watch time (at least 90% of video duration)
+            $watchPercentage = ($request->watch_time / $request->video_duration) * 100;
+            
+            if ($watchPercentage < 90) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You must watch at least 90% of the video to earn the bonus reward.'
+                ]);
+            }
+            
+            // Check for excessive seeking
+            if ($request->seek_attempts >= 3) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Too many skip attempts detected. Please watch the video without skipping.'
+                ]);
+            }
+            
+            // Calculate bonus reward (e.g., 50 PKR)
+            $bonusReward = 50;
+            
+            // Add bonus reward to user's wallet
+            $userAccount->net_amount += $bonusReward;
+            
+            // Mark bonus video as watched for today
+            $bonusVideosWatched[] = $today;
+            $userAccount->bonus_videos_watched = $bonusVideosWatched;
+            
+            $userAccount->save();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Bonus video marked as watched successfully!',
+                'bonus_reward' => $bonusReward
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while processing your request: ' . $e->getMessage()
+            ]);
+        }
     }
 }

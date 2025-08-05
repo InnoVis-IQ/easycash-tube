@@ -14,5 +14,10 @@ class UserAccount extends Model
     protected $fillable = [
         'user_id',
         'net_amount',
+        'bonus_videos_watched',
+    ];
+
+    protected $casts = [
+        'bonus_videos_watched' => 'array',
     ];
 }

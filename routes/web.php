@@ -23,6 +23,7 @@ Route::get('/', [Controllers\FrontEndController::class, 'index'])->name('home');
 
 Route::middleware(['auth','verified'])->group(function () {
     Route::get('/dashboard', [Controllers\DashboardController::class, 'index'])->name('dashboard');
+    Route::post('/dashboard/mark-watched', [Controllers\DashboardController::class, 'markVideoAsWatched'])->name('dashboard.mark-watched');
 
     Route::get('videos/watch', [Controllers\VideoController::class, 'watch'])->name('videos.watch');
     Route::post('videos/mark-watched', [Controllers\VideoController::class, 'markAsWatched'])->name('videos.mark-watched');

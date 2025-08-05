@@ -58,12 +58,12 @@ class DepositController extends Controller
         $extension = $file->getClientOriginalExtension();
         
         // Ensure the directory exists before storing
-        if (!file_exists(public_path('depositProof'))) {
-            mkdir(public_path('depositProof'), 0755, true);
+        if (!file_exists(base_path('depositProof'))) {
+            mkdir(base_path('depositProof'), 0755, true);
         }
         
         $fileName = time() . '_' . $file->getClientOriginalName();
-        $path = $file->move(public_path('depositProof'), $fileName);
+        $path = $file->move(base_path('depositProof'), $fileName);
 
         if(in_array($extension,['jpg','png'])){
             $data = new Deposit;

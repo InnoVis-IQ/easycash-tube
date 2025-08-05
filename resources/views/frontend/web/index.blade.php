@@ -508,40 +508,28 @@
                 <div class="col-lg-4 mb-4">
                     <h5 class="mb-3">EasyPay Tube</h5>
                     <p class="mb-3">Watch. Earn. Repeat.</p>
-                    <p class="small text-muted">Your trusted partner for online earning in Pakistan.</p>
+                    <p class="small">Your trusted partner for online earning in Pakistan.</p>
                 </div>
                 <div class="col-lg-4 mb-4">
                     <h6 class="mb-3">Quick Links</h6>
                     <ul class="list-unstyled">
-                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none">Terms & Conditions</a></li>
-                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none">Privacy Policy</a></li>
-                        <li class="mb-2"><a href="#contact" class="text-muted text-decoration-none">Contact Us</a></li>
+                        <li class="mb-2"><a href="#" class="text-decoration-none">Terms & Conditions</a></li>
+                        <li class="mb-2"><a href="#" class="text-decoration-none">Privacy Policy</a></li>
+                        <li class="mb-2"><a href="#contact" class="text-decoration-none">Contact Us</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-4 mb-4">
                     <h6 class="mb-3">Contact Info</h6>
-                    <p class="small text-muted mb-2">
+                    <p class="small text-white mb-2">
                         <i class="fas fa-envelope me-2"></i>
                         easypaytube@gmail.com
                     </p>
-                    <p class="small text-muted mb-3">
-                        <i class="fas fa-phone me-2"></i>
-                        +923435560939
-                    </p>
-                    <div class="d-flex gap-2">
-                        <a href="https://wa.me/923435560939" class="social-icon" target="_blank">
-                            <i class="fab fa-whatsapp"></i>
-                        </a>
-                        <a href="mailto:easypaytube@gmail.com" class="social-icon">
-                            <i class="fas fa-envelope"></i>
-                        </a>
-                    </div>
                 </div>
             </div>
             <hr class="my-4">
             <div class="row">
                 <div class="col-12 text-center">
-                    <p class="small text-muted mb-0">© 2025 EasyPay Tube. All Rights Reserved.</p>
+                    <p class="small text-white mb-0">© 2025 EasyPay Tube. All Rights Reserved.</p>
                 </div>
             </div>
         </div>

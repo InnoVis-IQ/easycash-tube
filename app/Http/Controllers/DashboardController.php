@@ -372,8 +372,8 @@ class DashboardController extends Controller
                 ]);
             }
             
-            // Calculate bonus reward (e.g., 50 PKR)
-            $bonusReward = 50;
+            // Calculate bonus reward (e.g., 25 PKR)
+            $bonusReward = 25;
             
             // Add bonus reward to user's wallet
             $userAccount->net_amount += $bonusReward;

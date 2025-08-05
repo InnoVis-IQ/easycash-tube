@@ -121,6 +121,7 @@ class VideoController extends Controller
             return redirect()->route('plans.index')->with('error', 'You are not subscribed to any plan.');
         }
 
+        $rewardClaimedDate = date('Y-m-d', strtotime($subscribedPlan->daily_reward_claimed));
         $watchedVideos = $subscribedPlan['watched_videos'];
         $watchedVideos = is_array($watchedVideos) ? $watchedVideos : (json_decode($watchedVideos, true) ?: []);
 
@@ -131,21 +132,19 @@ class VideoController extends Controller
         if (!empty($watchedVideos)) {
             // Check if user has watched a video today
             $today = date('Y-m-d');
-            $watchedToday = $this->hasWatchedVideoToday($subscribedPlan, $today);
-            $dailyRewardClaimed = $this->hasClaimedDailyReward($subscribedPlan, $today);
+            $watchedToday = ($rewardClaimedDate == $today);
+            $dailyRewardClaimed = ($rewardClaimedDate == $today);
         }
 
         // Get all videos for the user's subscribed plan that are active and not expired
         $videos = collect();
-        if (!$watchedToday) {
-            $videos = \App\Models\Video::where('plan_id', $subscribedPlan->investment_plan_id)
-                ->where('status', 'active')
-                ->where(function($query) {
-                    $query->whereNull('expiry_date')
-                          ->orWhere('expiry_date', '>', now());
-                })
-                ->get();
-        }
+        $videos = \App\Models\Video::where('plan_id', $subscribedPlan->investment_plan_id)
+            ->where('status', 'active')
+            ->where(function($query) {
+                $query->whereNull('expiry_date')
+                        ->orWhere('expiry_date', '>', now());
+            })
+            ->get();
 
         // Progress bar: days watched / plan days
         $daysWatched = is_array($watchedVideos) ? count($watchedVideos) : 0;
@@ -280,24 +279,6 @@ class VideoController extends Controller
             'message' => 'Video was already marked as watched.',
             'video_id' => $videoId
         ]);
-    }
-
-    /**
-     * Check if user has watched a video today
-     */
-    private function hasWatchedVideoToday($subscription, $today) {
-        // Check if daily reward was claimed today
-        if ($subscription->daily_reward_claimed == $today) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Check if user has claimed daily reward today
-     */
-    private function hasClaimedDailyReward($subscription, $today) {
-        return $subscription->daily_reward_claimed == $today;
     }
 
     /**

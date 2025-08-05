@@ -168,7 +168,7 @@
         <small class="text-muted">Keep watching to earn more rewards!</small>
     </div>
 
-    @if($watchedToday || $dailyRewardClaimed)
+    @if($watchedToday)
         <div class="alert alert-success">
             <i class="fa-solid fa-check-circle me-2"></i>
             You have already watched your video for today. Come back tomorrow for the next one!

@@ -61,7 +61,7 @@
                                 @if($plan->is_purchased)
                                     <span class="badge bg-success">Already Purchased</span>
                                 @elseif($plan->can_upgrade)
-                                    <span class="badge bg-primary">Available</span>
+                                    <span class="badge bg-success">Available</span>
                                 @else
                                     <span class="badge bg-secondary">Insufficient Balance</span>
                                 @endif

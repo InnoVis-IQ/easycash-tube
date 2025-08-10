@@ -387,13 +387,13 @@
             <div class="row g-4 text-center">
                 <div class="col-md-3 col-6">
                     <div class="stat-item">
-                        <h3 class="display-4 fw-bold mb-2">15,847</h3>
+                        <h3 class="display-4 fw-bold mb-2">70,847</h3>
                         <p class="mb-0">Total Users</p>
                     </div>
                 </div>
                 <div class="col-md-3 col-6">
                     <div class="stat-item">
-                        <h3 class="display-4 fw-bold mb-2">Rs 2.4M</h3>
+                        <h3 class="display-4 fw-bold mb-2">Rs 7.5M</h3>
                         <p class="mb-0">Total Paid Out</p>
                     </div>
                 </div>

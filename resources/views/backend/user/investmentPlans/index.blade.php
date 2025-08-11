@@ -51,7 +51,7 @@
                 @foreach ($allPlans as $plan)
                     <div class="col-md-4 mb-4">
                         <div class="card h-100 {{ $plan->is_purchased ? 'border-success' : '' }}">
-                            <div class="card-header text-center">
+                            <div class="card-header text-center bg-success text-white">
                                 @if($plan->description)
                                 <span class="badge bg-danger me-1 text-white text-start" style="font-size: 0.8em;">
                                     <i class="fa-solid fa-fire text-white me-1"></i> {{ $plan->description }}
@@ -59,11 +59,11 @@
                                 @endif
                                 <h5 class="mb-0">{{ $plan->title }}</h5>
                                 @if($plan->is_purchased)
-                                    <span class="badge bg-success">Already Purchased</span>
+                                    <span class="badge bg-warning text-black">Already Purchased</span>
                                 @elseif($plan->can_upgrade)
-                                    <span class="badge bg-success">Available</span>
+                                    <span class="badge bg-warning text-black">Available</span>
                                 @else
-                                    <span class="badge bg-secondary">Insufficient Balance</span>
+                                    <span class="badge bg-secondary text-black">Insufficient Balance</span>
                                 @endif
                             </div>
                             <div class="card-body">

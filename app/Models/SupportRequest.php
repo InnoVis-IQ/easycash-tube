@@ -15,7 +15,6 @@ class SupportRequest extends Model
         'user_id',
         'subject',
         'message',
-        'priority',
         'category',
         'status',
         'admin_response',

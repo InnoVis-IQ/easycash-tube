@@ -40,6 +40,14 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::post('/support', [Controllers\SupportController::class, 'store'])->name('support.store');
     Route::get('/support/history', [Controllers\SupportController::class, 'history'])->name('support.history');
     Route::get('/support/{id}', [Controllers\SupportController::class, 'show'])->name('support.show');
+    Route::get('/support/{id}/response', [Controllers\SupportController::class, 'viewResponse'])->name('support.response');
+    
+    // Admin Support Routes
+    Route::get('/admin/support', [Controllers\SupportController::class, 'adminIndex'])->name('admin.support.index');
+    Route::get('/admin/support/{id}', [Controllers\SupportController::class, 'adminShow'])->name('admin.support.show');
+    Route::post('/admin/support/{id}/respond', [Controllers\SupportController::class, 'adminRespond'])->name('admin.support.respond');
+    Route::post('/admin/support/{id}/update-status', [Controllers\SupportController::class, 'adminUpdateStatus'])->name('admin.support.update-status');
+    Route::post('/admin/support/{id}/close', [Controllers\SupportController::class, 'adminClose'])->name('admin.support.close');
     
     Route::get('/approveUser/{id}', [Controllers\UserController::class, 'approveUser'])->name('approveUser');
     Route::post('/withdrawToAccount', [Controllers\WithdrawController::class, 'withdrawToAccount'])->name('withdrawToAccount');

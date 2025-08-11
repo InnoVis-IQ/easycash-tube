@@ -23,7 +23,6 @@
                                 <th>Date</th>
                                 <th>Subject</th>
                                 <th>Category</th>
-                                <th>Priority</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
@@ -37,11 +36,6 @@
                                         <span class="badge bg-info">{{ ucfirst($request->category) }}</span>
                                     </td>
                                     <td>
-                                        <span class="badge bg-{{ $request->priority == 'high' ? 'danger' : ($request->priority == 'medium' ? 'warning' : 'success') }}">
-                                            {{ ucfirst($request->priority) }}
-                                        </span>
-                                    </td>
-                                    <td>
                                         <span class="badge bg-{{ $request->status == 'open' ? 'warning' : ($request->status == 'closed' ? 'success' : 'info') }}">
                                             {{ ucfirst($request->status) }}
                                         </span>
@@ -50,6 +44,11 @@
                                         <a href="{{ route('support.show', $request->id) }}" class="btn btn-sm btn-primary">
                                             <i class="fas fa-eye"></i> View
                                         </a>
+                                        @if($request->admin_response)
+                                            <a href="{{ route('support.response', $request->id) }}" class="btn btn-sm btn-success">
+                                                <i class="fas fa-reply"></i> Response
+                                            </a>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach

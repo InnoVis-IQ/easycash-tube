@@ -16,7 +16,7 @@
 
     <!-- Quick Contact -->
     <div class="row mb-4">
-        <div class="col-md-4">
+        {{-- <div class="col-md-4">
             <div class="card text-center">
                 <div class="card-body">
                     <i class="fas fa-phone fa-2x text-primary mb-3"></i>
@@ -35,7 +35,7 @@
                     </a>
                 </div>
             </div>
-        </div>
+        </div> --}}
         <div class="col-md-4">
             <div class="card text-center">
                 <div class="card-body">
@@ -110,22 +110,6 @@
                                 <option value="other" {{ old('category') == 'other' ? 'selected' : '' }}>Other</option>
                             </select>
                             @error('category')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group mb-3">
-                            <label for="priority">Priority *</label>
-                            <select class="form-control @error('priority') is-invalid @enderror" id="priority" name="priority" required>
-                                <option value="">Select Priority</option>
-                                <option value="low" {{ old('priority') == 'low' ? 'selected' : '' }}>Low</option>
-                                <option value="medium" {{ old('priority') == 'medium' ? 'selected' : '' }}>Medium</option>
-                                <option value="high" {{ old('priority') == 'high' ? 'selected' : '' }}>High</option>
-                            </select>
-                            @error('priority')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>

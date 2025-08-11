@@ -118,6 +118,12 @@
                     <span class="menu-title pl-2">Settings</span>
                 </a>
             </li>
+            <li class="nav-item active" style="transition: all 0.3s ease;">
+                <a class="nav-link text-white" href="{{ route('admin.support.index') }}" style="color: white !important; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
+                    <i class="fa-solid fa-cog"></i>
+                    <span class="menu-title pl-2">Support</span>
+                </a>
+            </li>
         @endif
         @if (in_array(strtolower(Auth::user()['role']), ['user']))
             <!-- Watch & Earn -->

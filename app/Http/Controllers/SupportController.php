@@ -28,7 +28,6 @@ class SupportController extends Controller
         $request->validate([
             'subject' => 'required|string|max:255',
             'message' => 'required|string|max:2000',
-            'priority' => 'required|in:low,medium,high',
             'category' => 'required|in:general,technical,payment,withdrawal,other',
         ]);
 
@@ -36,7 +35,6 @@ class SupportController extends Controller
             'user_id' => Auth::user()->id,
             'subject' => $request->subject,
             'message' => $request->message,
-            'priority' => $request->priority,
             'category' => $request->category,
             'status' => 'open',
         ]);
@@ -69,5 +67,93 @@ class SupportController extends Controller
             ->firstOrFail();
 
         return view('backend.user.support.show', compact('supportRequest'));
+    }
+
+    // Admin Functions
+
+    /**
+     * Admin: View all support requests
+     */
+    public function adminIndex()
+    {
+        $supportRequests = SupportRequest::with('user')
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+
+        return view('backend.admin.support.index', compact('supportRequests'));
+    }
+
+    /**
+     * Admin: View a specific support request
+     */
+    public function adminShow($id)
+    {
+        $supportRequest = SupportRequest::with('user')->findOrFail($id);
+
+        return view('backend.admin.support.show', compact('supportRequest'));
+    }
+
+    /**
+     * Admin: Respond to a support request
+     */
+    public function adminRespond(Request $request, $id)
+    {
+        $request->validate([
+            'admin_response' => 'required|string|max:2000',
+        ]);
+
+        $supportRequest = SupportRequest::findOrFail($id);
+        
+        $supportRequest->update([
+            'admin_response' => $request->admin_response,
+            'admin_response_at' => now(),
+            'status' => 'resolved',
+        ]);
+
+        // Optionally send email notification to user
+        // Mail::to($supportRequest->user->email)->send(new SupportResponseNotification($supportRequest));
+
+        return redirect()->route('admin.support.show', $id)
+            ->with('success', 'Response sent successfully.');
+    }
+
+    /**
+     * Admin: Update support request status
+     */
+    public function adminUpdateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:open,in_progress,resolved,closed',
+        ]);
+
+        $supportRequest = SupportRequest::findOrFail($id);
+        $supportRequest->update(['status' => $request->status]);
+
+        return redirect()->route('admin.support.show', $id)
+            ->with('success', 'Status updated successfully.');
+    }
+
+    /**
+     * Admin: Mark support request as closed
+     */
+    public function adminClose($id)
+    {
+        $supportRequest = SupportRequest::findOrFail($id);
+        $supportRequest->update(['status' => 'closed']);
+
+        return redirect()->route('admin.support.index')
+            ->with('success', 'Support request marked as closed.');
+    }
+
+    /**
+     * User: View admin response
+     */
+    public function viewResponse($id)
+    {
+        $supportRequest = SupportRequest::where('id', $id)
+            ->where('user_id', Auth::user()->id)
+            ->firstOrFail();
+
+        return view('backend.user.support.response', compact('supportRequest'));
     }
 } 

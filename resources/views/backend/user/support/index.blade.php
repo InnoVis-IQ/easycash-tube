@@ -58,7 +58,7 @@
                     @foreach($faqs as $index => $faq)
                         <div class="accordion-item faq-modern-item mb-2">
                             <h2 class="accordion-header" id="faq{{ $index }}">
-                                <button class="accordion-button faq-modern-question d-flex align-items-center {{ $index > 0 ? 'collapsed' : '' }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ $index }}" aria-expanded="{{ $index === 0 ? 'true' : 'false' }}" aria-controls="collapse{{ $index }}">
+                                <button class="accordion-button faq-modern-question d-flex align-items-center {{ $index > 0 ? 'collapsed' : '' }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ $index }}" aria-expanded="{{ $index === 0 ? 'true' : 'false' }}" aria-controls="collapse{{ $index }}" style="width: 100%; text-align: left;">
                                     <span class="me-2 text-primary"><i class="fas fa-chevron-down faq-chevron"></i></span>
                                     <span class="flex-grow-1">{{ $faq->question }}</span>
                                     @if($faq->category)

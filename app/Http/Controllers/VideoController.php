@@ -303,4 +303,13 @@ class VideoController extends Controller
         
         return $videoWatchCounts;
     }
+
+    /**
+     * Check if user has watched a video today
+     */
+    private function hasWatchedVideoToday($subscribedPlan, $today)
+    {
+        $rewardClaimedDate = date('Y-m-d', strtotime($subscribedPlan->daily_reward_claimed));
+        return $rewardClaimedDate == $today;
+    }
 }

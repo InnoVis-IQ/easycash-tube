@@ -177,7 +177,7 @@
         <h5><i class="fa-solid fa-play-circle me-2"></i>Available Videos</h5>
         <div class="row">
             @php
-                $unWatched = $videos->whereNotIn('id', $watchedVideos);
+                $unWatched = $videos->whereNotIn('id', $watchedVideos)->take(1);
             @endphp
             @forelse($unWatched as $video)
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">

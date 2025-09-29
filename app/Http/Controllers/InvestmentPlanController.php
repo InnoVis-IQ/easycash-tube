@@ -34,6 +34,10 @@ class InvestmentPlanController extends Controller
             foreach ($allPlans as $plan) {
                 $plan->is_purchased = in_array($plan->id, $purchasedPlanIds);
                 $plan->can_upgrade = !$plan->is_purchased && $walletBalance >= $plan->amount;
+                
+                // Add withdrawal restriction info
+                $plan->withdrawal_allowed = $plan->limit === 'daily_withdrawal';
+                $plan->withdrawal_restriction = $plan->limit === 'no_withdrawal' ? 'No withdrawal allowed' : 'Daily withdrawal allowed';
             }
             
             return view('backend.user.investmentPlans.index')->with([
@@ -76,8 +80,8 @@ class InvestmentPlanController extends Controller
             'daily_profit' => 'required|numeric',
             'plan_days' => 'required|numeric',
             'buffer_days' => 'nullable|numeric',
-            'limit' => 'nullable|string',
-            'status' => 'required|string',
+            'limit' => 'nullable|string|in:no_withdrawal,daily_withdrawal',
+            'status' => 'required|string|in:active,inactive',
         ]);
 
         $validated['total_profit'] = $validated['daily_profit'] * $validated['plan_days'];
@@ -117,8 +121,8 @@ class InvestmentPlanController extends Controller
             'daily_profit' => 'required|numeric',
             'plan_days' => 'required|numeric',
             'buffer_days' => 'nullable|numeric',
-            'limit' => 'nullable|string',
-            'status' => 'required|string',
+            'limit' => 'nullable|string|in:no_withdrawal,daily_withdrawal',
+            'status' => 'required|string|in:active,inactive',
         ]);
 
         if($validated){

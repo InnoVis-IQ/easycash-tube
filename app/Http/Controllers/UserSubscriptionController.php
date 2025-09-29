@@ -39,20 +39,20 @@ class UserSubscriptionController extends Controller
         $userAccount = UserAccount::where('user_id', $request['user'])->first();
         $investmentPlan = InvestmentPlan::where('id', $request['invest'])->where('status', 'active')->first();
         
-        // Check if user has already subscribed to this plan
+        // Check if user has already subscribed to this specific plan
         $existingSubscription = UserSubscription::where('user_id', $request['user'])->where('investment_plan_id', $request['invest'])->first();
         if ($existingSubscription) {
             Session::flash('error', 'You have already subscribed to this plan.');
             return back();
         }
 
-        // Check if user already has an active subscription to any plan
-        $activeSubscription = UserSubscription::where('user_id', $request['user'])
+        // Check if user already has maximum 2 active subscriptions
+        $activeSubscriptions = UserSubscription::where('user_id', $request['user'])
             ->where('expire_at', '>', date('Y-m-d'))
-            ->first();
+            ->count();
 
-        if ($activeSubscription) {
-            Session::flash('error', 'You already have an active subscription. You cannot subscribe to another plan until your current plan expires.');
+        if ($activeSubscriptions >= 2) {
+            Session::flash('error', 'You can have a maximum of 2 active plans at the same time. Please wait for one of your current plans to expire.');
             return redirect()->route('plans.index');
         }
 
@@ -65,7 +65,8 @@ class UserSubscriptionController extends Controller
             $data['expire_at'] = $expiry;
             $data->save();
 
-            // UserAccount::where('user_id', $request['user'])->decrement('net_amount', $investmentPlan['amount']);
+            // Deduct the plan amount from user's wallet
+            UserAccount::where('user_id', $request['user'])->decrement('net_amount', $investmentPlan['amount']);
 
             // 15% referral bonus
             // $isReferred = User::where('id', Auth::user()['id'])->where('bonus_given', 0)->first();

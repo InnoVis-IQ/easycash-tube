@@ -21,5 +21,6 @@ class InvestmentPlan extends Model
         'plan_frequency',
         'status',
         'total_profit',
+        'limit',
     ];
 }

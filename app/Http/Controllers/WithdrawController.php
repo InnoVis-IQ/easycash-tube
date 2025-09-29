@@ -68,19 +68,27 @@ class WithdrawController extends Controller
             $userWithdraws = Withdraw::where('user_id',Auth::user()['id'])->where('status','requested')->sum('amount');
             $netAmount = $userAccount['net_amount'] - $userWithdraws;
 
-            // Check for previous completed plans (withdrawals only available on previous plans)
-            $previousPlans = UserSubscription::where('user_id',Auth::user()['id'])
-                ->where('investment_plan_id', '!=', 1)
-                ->where('expire_at', '<', date('Y-m-d'))
-                ->whereRaw('JSON_LENGTH(watched_videos) >= 5')
-                ->orderBy('created_at', 'desc')
+            // Check for active plans with withdrawal restrictions
+            $activeSubscriptions = UserSubscription::where('user_id', Auth::user()['id'])
+                ->where('expire_at', '>', date('Y-m-d'))
+                ->with('plan')
                 ->get();
+
+            $hasNoWithdrawalPlan = false;
+            $restrictedPlanName = '';
+            foreach ($activeSubscriptions as $subscription) {
+                if ($subscription->plan && $subscription->plan->limit === 'no_withdrawal') {
+                    $hasNoWithdrawalPlan = true;
+                    $restrictedPlanName = $subscription->plan->title;
+                    break;
+                }
+            }
             
-            $isEligible = $previousPlans->count() > 0;
+            $isEligible = !$hasNoWithdrawalPlan;
             $eligibilityMessage = '';
             
-            if (!$isEligible) {
-                $eligibilityMessage = 'Withdrawals are only available after completing a plan. Please complete your current plan first.';
+            if ($hasNoWithdrawalPlan) {
+                $eligibilityMessage = 'Withdrawal not allowed. You have an active ' . $restrictedPlanName . ' plan that does not allow withdrawals.';
             } elseif ($netAmount < 500) {
                 $eligibilityMessage = 'Minimum withdrawal amount is Rs. 500. Your current balance is Rs. ' . $netAmount;
             }
@@ -137,6 +145,24 @@ class WithdrawController extends Controller
         $userAccount = UserAccount::where('user_id',Auth::user()['id'])->first();
         $userWithdraws = Withdraw::where('user_id',Auth::user()['id'])->where('status','requested')->sum('amount');
         $netAmount = $userAccount['net_amount'] - $userWithdraws;
+
+        // Check if user has any active plans with withdrawal restrictions
+        $activeSubscriptions = UserSubscription::where('user_id', Auth::user()['id'])
+            ->where('expire_at', '>', date('Y-m-d'))
+            ->with('plan')
+            ->get();
+
+        $hasNoWithdrawalPlan = false;
+        foreach ($activeSubscriptions as $subscription) {
+            if ($subscription->plan && $subscription->plan->limit === 'no_withdrawal') {
+                $hasNoWithdrawalPlan = true;
+                break;
+            }
+        }
+
+        if ($hasNoWithdrawalPlan) {
+            return back()->with(['message' => 'Withdrawal not allowed. You have an active plan that does not allow withdrawals.']);
+        }
 
         // Validate minimum and maximum amounts
         $amount = $request['amount'];

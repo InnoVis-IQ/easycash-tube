@@ -97,36 +97,14 @@
 @section('content')
 <div class="container-fluid px-2">
     @if($subscription_status == 'no')
-        <!-- Wallet Balance -->
-        <div class="row mb-4">
-            <div class="col-md-4">
-                <div class="card card-body text-center">
-                    <h5><i class="fa-solid fa-wallet me-2"></i>Wallet Balance</h5>
-                    <h3>0 PKR</h3>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card card-body text-center">
-                    <h5><i class="fa-solid fa-play-circle me-2"></i>Active Plans</h5>
-                    <h3>0</h3>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card card-body text-center">
-                    <h5><i class="fa-solid fa-compass-drafting me-2"></i>Available Plans</h5>
-                    <h3>{{ $allPlans->count() }}</h3>
-                </div>
-            </div>
-        </div>
-
-        <div class="row mb-4">
+        <div class="row mb-3">
             <div class="col-12 text-center">
                 <a href="{{ route('plans.index') }}" class="btn btn-primary btn-lg" style="border-radius: 8px;">
                     <i class="fa-solid fa-plus-circle me-2"></i>Buy a plan to start earning
                 </a>
             </div>
         </div>
-    @else
+    @endif
         <!-- Notification Banners -->
         @if($announcements && count($announcements) > 0)
         <div class="row mb-3">
@@ -165,7 +143,8 @@
         </div>
         @endif
         
-        <!-- User Progress and Level Card -->
+        <!-- User Progress and Level Card (only with active subscription) -->
+        @if($activeSubscriptions > 0)
         <div class="row mb-3">
             <div class="col-12 col-lg-8 mb-3">
                 <div class="card bg-dark text-white">
@@ -243,8 +222,10 @@
                 </div>
             </div>
         </div>
+        @endif
         
-        <!-- Invite & Earn Section -->
+        <!-- Daily Reward (only with active subscription) -->
+        @if($activeSubscriptions > 0)
         <div class="row mb-3">
             <div class="col-12 col-lg-4">
                 <div class="card">
@@ -260,8 +241,10 @@
                 </div>
             </div>
         </div>
+        @endif
         
-        <!-- Invite & Earn Section -->
+        <!-- Bonus Video (only with active subscription) -->
+        @if($activeSubscriptions > 0)
         <div class="row mb-3">
             <div class="col-12 col-lg-4">
                 <div class="card">
@@ -288,6 +271,7 @@
                 </div>
             </div>
         </div>
+        @endif
         
         <!-- Referral Section -->
         <div class="row mb-3">
@@ -479,7 +463,7 @@
                 </div>
             </div>
         </div>
-        @endif
+        
     @endif
 </div>
 

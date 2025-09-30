@@ -265,7 +265,7 @@
                         </div>
                     </form>
                 </div>
-            </div>
+        </div>
         </div>
     </div>
 
@@ -294,7 +294,7 @@
                         <a href="{{ route('plans.index') }}" class="btn btn-info">
                             <i class="fa-solid fa-shopping-cart me-2"></i>Buy Plans
                         </a>
-                    </div>
+                        </div>
                 </div>
             </div>
         </div>
@@ -310,7 +310,7 @@
                         </div>
                         <div class="mb-2">
                             <strong>Earn Wallet:</strong> Contains your daily plan earnings. This is the only wallet you can withdraw from.
-                        </div>
+                            </div>
                         <div class="mb-0">
                             <strong>Bonus Wallet:</strong> Contains referral and daily bonuses. Cannot be withdrawn but can be used to buy plans.
                         </div>

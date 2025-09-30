@@ -107,12 +107,77 @@ class DashboardController extends Controller
         Session::put('UserSessionVars',[]);
 
         if(!Models\UserSubscription::where('user_id',Auth::user()['id'])->count()){
+            $userId = Auth::user()['id'];
+            $subscription_status = 'no';
             $allPlans = Models\InvestmentPlan::withTrashed()->get();
             
-            return view('backend.user.dashboard')->with([
-                'subscription_status' => 'no',
-                'allPlans' => $allPlans,
-            ]);
+            // Get wallet data even when no subscriptions
+            $mainWallet = \App\Models\UserWallet::getOrCreateWallet($userId, 'main');
+            $earnWallet = \App\Models\UserWallet::getOrCreateWallet($userId, 'earn');
+            $bonusWallet = \App\Models\UserWallet::getOrCreateWallet($userId, 'bonus');
+            $totalWalletBalance = \App\Models\UserWallet::getTotalBalance($userId);
+            $withdrawableBalance = \App\Models\UserWallet::getWithdrawableBalance($userId);
+            
+            // Get referral count
+            $referralCount = Models\User::where('referred_by', Auth::user()->referral_code)->count();
+            
+            // Get basic stats
+            $pendingDeposits = Models\Deposit::where('user_id',$userId)->where('status','deposited')->count();
+            $activeSubscriptions = 0;
+            $subscriptions = collect();
+            $investedAmount = 0;
+            $upcomingIncome = 0;
+            $earningsToday = 0;
+            $daysWatched = 0;
+            $totalPlanDays = 0;
+            $userLevel = 1;
+            $levelProgress = 0;
+            $watchedVideosProgress = 0;
+            $taskCount = 0;
+            $totalClicks = 0;
+            $totalDeposits = Models\Deposit::where('user_id', $userId)->where('status', 'approved')->sum('amount');
+            $totalEarned = 0;
+            $todayReward = 0;
+            $totalWithdrawals = Models\Withdraw::where('user_id', $userId)->where('status', 'approved')->sum('amount');
+            $walletBalance = optional(Models\UserAccount::where('user_id', $userId)->first())->net_amount ?? 0;
+            
+            // Get active announcements
+            $announcements = $this->getActiveAnnouncements();
+            
+            $message = "0";
+            $currentSubscription = null;
+            
+            return view('backend.user.dashboard',compact(
+                'message',
+                'subscription_status',
+                'currentSubscription',
+                'pendingDeposits',
+                'activeSubscriptions', 
+                'subscriptions',
+                'investedAmount',
+                'upcomingIncome',
+                'walletBalance',
+                'earningsToday',
+                'daysWatched',
+                'totalPlanDays',
+                'userLevel',
+                'levelProgress',
+                'watchedVideosProgress',
+                'referralCount',
+                'taskCount',
+                'totalClicks',
+                'totalDeposits',
+                'mainWallet',
+                'earnWallet',
+                'bonusWallet',
+                'totalWalletBalance',
+                'withdrawableBalance',
+                'totalEarned',
+                'todayReward',
+                'totalWithdrawals',
+                'announcements',
+                'allPlans'
+            ));
         }
         else{
             $subscription_status = 'yes';
@@ -203,6 +268,9 @@ class DashboardController extends Controller
             $totalWalletBalance = \App\Models\UserWallet::getTotalBalance($userId);
             $withdrawableBalance = \App\Models\UserWallet::getWithdrawableBalance($userId);
             
+            // Get all plans for display
+            $allPlans = Models\InvestmentPlan::withTrashed()->get();
+            
             $message = "0";
             return view('backend.user.dashboard',compact(
                 'message',
@@ -232,7 +300,8 @@ class DashboardController extends Controller
                 'totalEarned',
                 'todayReward',
                 'totalWithdrawals',
-                'announcements'
+                'announcements',
+                'allPlans'
             ));
         }
     }

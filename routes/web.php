@@ -81,6 +81,19 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::delete('admin/notifications/{id}', [Controllers\NotificationController::class, 'destroy'])->name('admin.notifications.destroy');
     Route::get('user/notifications', [Controllers\NotificationController::class, 'getUserNotifications'])->name('user.notifications');
 
+    // Lucky Withdraw Routes
+    Route::get('/lucky-withdraw', [Controllers\LuckyWithdrawController::class, 'index'])->name('lucky-withdraw.index');
+    Route::get('/lucky-withdraw/create', [Controllers\LuckyWithdrawController::class, 'create'])->name('lucky-withdraw.create');
+    Route::post('/lucky-withdraw', [Controllers\LuckyWithdrawController::class, 'store'])->name('lucky-withdraw.store');
+    Route::get('/lucky-withdraw/{luckyWithdrawEntry}', [Controllers\LuckyWithdrawController::class, 'show'])->name('lucky-withdraw.show');
+    Route::get('/lucky-withdraw/stats', [Controllers\LuckyWithdrawController::class, 'getRoundStats'])->name('lucky-withdraw.stats');
+    
+    // Admin Lucky Withdraw Routes
+    Route::get('/admin/lucky-withdraw', [Controllers\LuckyWithdrawController::class, 'adminIndex'])->name('admin.lucky-withdraw.index');
+    Route::post('/admin/lucky-withdraw/{luckyWithdrawEntry}/approve', [Controllers\LuckyWithdrawController::class, 'approve'])->name('admin.lucky-withdraw.approve');
+    Route::post('/admin/lucky-withdraw/{luckyWithdrawEntry}/reject', [Controllers\LuckyWithdrawController::class, 'reject'])->name('admin.lucky-withdraw.reject');
+    Route::post('/admin/lucky-withdraw/select-winner', [Controllers\LuckyWithdrawController::class, 'selectWinner'])->name('admin.lucky-withdraw.select-winner');
+
 });
 
 

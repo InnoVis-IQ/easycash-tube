@@ -332,6 +332,46 @@
             </div>
         </div>
         
+        <!-- Lucky Withdraw Section -->
+        <div class="row mb-3">
+            <div class="col-12 col-lg-6">
+                <div class="card">
+                    <div class="card-body text-center p-3">
+                        <h6 class="mb-2"><i class="fa-solid fa-gift me-2"></i>Lucky Withdraw Contest</h6>
+                        <div class="mb-3">
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <h6 class="text-primary">Entry Fee</h6>
+                                    <p class="mb-0">Rs. 100</p>
+                                </div>
+                                <div class="col-6">
+                                    <h6 class="text-success">Prize</h6>
+                                    <p class="mb-0">Plan 3 (Rs. 7,000)</p>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-muted small mb-3">Deposit Rs. 100 for a chance to win Plan 3 absolutely FREE!</p>
+                        <a href="{{ route('lucky-withdraw.index') }}" class="btn btn-warning btn-sm">
+                            <i class="fa-solid fa-ticket me-2"></i>Enter Contest
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-6">
+                <div class="card">
+                    <div class="card-body p-3">
+                        <h6 class="mb-2"><i class="fa-solid fa-info-circle me-2"></i>How Lucky Withdraw Works</h6>
+                        <ul class="list-unstyled small">
+                            <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Deposit Rs. 100 via EasyPaisa/JazzCash</li>
+                            <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Submit your entry with transaction ID</li>
+                            <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Wait for admin approval</li>
+                            <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Every 15 days, one winner is selected!</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- Current Plans Section -->
         @if($subscriptions && count($subscriptions) > 0)
         <div class="card mb-3">

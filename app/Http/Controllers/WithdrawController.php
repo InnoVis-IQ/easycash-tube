@@ -225,6 +225,9 @@ class WithdrawController extends Controller
         
         // Also update the legacy UserAccount for backward compatibility
         UserAccount::where('user_id',$withdraw['user_id'])->decrement('net_amount', $withdraw['amount']);
+        
+        // Send notification to user
+        \App\Models\UserNotification::createWithdrawalProcessedNotification($withdraw['user_id'], $withdraw['amount']);
 
         return back()->with('success', 'Withdrawal processed successfully');
     }
@@ -263,6 +266,9 @@ class WithdrawController extends Controller
             
             // Also update the legacy UserAccount for backward compatibility
             UserAccount::where('user_id', $withdrawal->user_id)->decrement('net_amount', $withdrawal->amount);
+            
+            // Send notification to user
+            \App\Models\UserNotification::createWithdrawalProcessedNotification($withdrawal->user_id, $withdrawal->amount);
         }
 
         return back()->with('success', count($withdrawals) . ' withdrawals approved successfully');

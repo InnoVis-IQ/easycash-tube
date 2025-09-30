@@ -104,6 +104,9 @@ class UserSubscriptionController extends Controller
                     // Also update the legacy UserAccount for backward compatibility
                     UserAccount::where('user_id', $referrer->id)->increment('net_amount', 100);
                     
+                    // Send notification to referrer
+                    \App\Models\UserNotification::createReferralBonusNotification($referrer->id, 100, $currentUser->name);
+                    
                     // Mark bonus as given to prevent multiple bonuses
                     User::where('id', Auth::user()['id'])->update(['bonus_given' => 100]);
                 }

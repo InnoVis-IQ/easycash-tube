@@ -196,6 +196,13 @@ class DashboardController extends Controller
             // Get active announcements
             $announcements = $this->getActiveAnnouncements();
             
+            // Get wallet data
+            $mainWallet = \App\Models\UserWallet::getOrCreateWallet($userId, 'main');
+            $earnWallet = \App\Models\UserWallet::getOrCreateWallet($userId, 'earn');
+            $bonusWallet = \App\Models\UserWallet::getOrCreateWallet($userId, 'bonus');
+            $totalWalletBalance = \App\Models\UserWallet::getTotalBalance($userId);
+            $withdrawableBalance = \App\Models\UserWallet::getWithdrawableBalance($userId);
+            
             $message = "0";
             return view('backend.user.dashboard',compact(
                 'message',
@@ -217,6 +224,11 @@ class DashboardController extends Controller
                 'taskCount',
                 'totalClicks',
                 'totalDeposits',
+                'mainWallet',
+                'earnWallet',
+                'bonusWallet',
+                'totalWalletBalance',
+                'withdrawableBalance',
                 'totalEarned',
                 'todayReward',
                 'totalWithdrawals',

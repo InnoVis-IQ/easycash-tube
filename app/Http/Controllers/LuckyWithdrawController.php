@@ -269,6 +269,9 @@ class LuckyWithdrawController extends Controller
             // Mark winner
             $winner->update(['is_winner' => true]);
             
+            // Send notification to winner
+            \App\Models\UserNotification::createLuckyWinnerNotification($winner->user_id, 'Plan 3', 7000);
+            
             // Create free Plan 3 subscription for winner
             $plan3 = InvestmentPlan::where('title', 'Plan 3')->first();
             

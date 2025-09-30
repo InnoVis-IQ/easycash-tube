@@ -8,7 +8,7 @@ use Session;
 
 use App\Models\Deposit;
 use App\Models\BankAccount;
-use App\Models\UserAccount;
+use App\Models\UserAccount; 
 use App\Http\Requests\StoreDepositRequest;
 use App\Http\Requests\UpdateDepositRequest;
 use Illuminate\Support\Facades\Storage;
@@ -115,6 +115,9 @@ class DepositController extends Controller
                 
                 // Also update the legacy UserAccount for backward compatibility
                 UserAccount::where('user_id',$deposit['user_id'])->increment('net_amount', $deposit['amount']);
+                
+                // Send notification to user
+                \App\Models\UserNotification::createDepositApprovedNotification($deposit['user_id'], $deposit['amount']);
             }
 
             return back();

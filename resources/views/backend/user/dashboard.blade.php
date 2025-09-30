@@ -341,25 +341,50 @@
                     </div>
                     <div class="card-body p-3">
                         <div class="row">
-                            <div class="col-md-4">
-                                <div class="text-center p-3 border rounded">
-                                    <h6 class="text-primary">Main Wallet</h6>
-                                    <h4 class="text-primary">Rs. {{ number_format(\App\Models\UserWallet::getWalletByType(Auth::id(), 'main')->balance ?? 0, 2) }}</h4>
-                                    <small class="text-muted">Deposits & Bonuses</small>
+                            <div class="col-md-6">
+                                <div class="text-center p-3 border rounded bg-primary text-white">
+                                    <h6 class="mb-2"><i class="fa-solid fa-piggy-bank me-2"></i>Main Wallet</h6>
+                                    <h3 class="mb-2">Rs. {{ number_format($mainWallet->balance, 2) }}</h3>
+                                    <small class="opacity-75">Deposits & Bonuses</small>
+                                    <div class="mt-2">
+                                        <small class="d-block">Total Deposited: Rs. {{ number_format($mainWallet->total_deposited, 2) }}</small>
+                                        <small class="d-block">Total Withdrawn: Rs. {{ number_format($mainWallet->total_withdrawn, 2) }}</small>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="text-center p-3 border rounded">
-                                    <h6 class="text-success">Earn Wallet</h6>
-                                    <h4 class="text-success">Rs. {{ number_format(\App\Models\UserWallet::getWalletByType(Auth::id(), 'earn')->balance ?? 0, 2) }}</h4>
-                                    <small class="text-muted">Daily Earnings (Withdrawable)</small>
+                            <div class="col-md-6">
+                                <div class="text-center p-3 border rounded bg-success text-white">
+                                    <h6 class="mb-2"><i class="fa-solid fa-chart-line me-2"></i>Earn Wallet</h6>
+                                    <h3 class="mb-2">Rs. {{ number_format($earnWallet->balance, 2) }}</h3>
+                                    <small class="opacity-75">Daily Earnings (Withdrawable)</small>
+                                    <div class="mt-2">
+                                        <small class="d-block">Total Earned: Rs. {{ number_format($earnWallet->total_earned, 2) }}</small>
+                                        <small class="d-block">Total Withdrawn: Rs. {{ number_format($earnWallet->total_withdrawn, 2) }}</small>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="text-center p-3 border rounded">
-                                    <h6 class="text-warning">Bonus Wallet</h6>
-                                    <h4 class="text-warning">Rs. {{ number_format(\App\Models\UserWallet::getWalletByType(Auth::id(), 'bonus')->balance ?? 0, 2) }}</h4>
-                                    <small class="text-muted">Referral & Daily Bonuses</small>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div class="text-center p-3 border rounded bg-warning text-white">
+                                    <h6 class="mb-2"><i class="fa-solid fa-gift me-2"></i>Bonus Wallet</h6>
+                                    <h3 class="mb-2">Rs. {{ number_format($bonusWallet->balance, 2) }}</h3>
+                                    <small class="opacity-75">Referral & Daily Bonuses</small>
+                                    <div class="mt-2">
+                                        <small class="d-block">Total Earned: Rs. {{ number_format($bonusWallet->total_earned, 2) }}</small>
+                                        <small class="d-block">Used for Plans: Rs. {{ number_format($bonusWallet->total_withdrawn, 2) }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="text-center p-3 border rounded bg-info text-white">
+                                    <h6 class="mb-2"><i class="fa-solid fa-wallet me-2"></i>Total Balance</h6>
+                                    <h3 class="mb-2">Rs. {{ number_format($totalWalletBalance, 2) }}</h3>
+                                    <small class="opacity-75">All Wallets Combined</small>
+                                    <div class="mt-2">
+                                        <small class="d-block">Withdrawable: Rs. {{ number_format($withdrawableBalance, 2) }}</small>
+                                        <small class="d-block">For Plans: Rs. {{ number_format($totalWalletBalance, 2) }}</small>
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -77,9 +77,14 @@ Route::middleware(['auth','verified'])->group(function () {
     // Notification Routes
     Route::get('admin/notifications', [Controllers\NotificationController::class, 'index'])->name('admin.notifications');
     Route::post('admin/notifications/send', [Controllers\NotificationController::class, 'send'])->name('admin.notifications.send');
+    Route::post('admin/notifications/send-all', [Controllers\NotificationController::class, 'sendToAllUsers'])->name('admin.notifications.send-all');
+    Route::post('admin/notifications/new-offer', [Controllers\NotificationController::class, 'sendNewOffer'])->name('admin.notifications.new-offer');
     Route::post('admin/notifications/mark-read', [Controllers\NotificationController::class, 'markAsRead'])->name('admin.notifications.mark-read');
     Route::delete('admin/notifications/{id}', [Controllers\NotificationController::class, 'destroy'])->name('admin.notifications.destroy');
     Route::get('user/notifications', [Controllers\NotificationController::class, 'getUserNotifications'])->name('user.notifications');
+    Route::get('user/notifications/unread-count', [Controllers\NotificationController::class, 'getUnreadCount'])->name('user.notifications.unread-count');
+    Route::post('user/notifications/{id}/mark-read', [Controllers\NotificationController::class, 'markDatabaseNotificationAsRead'])->name('user.notifications.mark-read');
+    Route::post('admin/notifications/cleanup', [Controllers\NotificationController::class, 'cleanupExpired'])->name('admin.notifications.cleanup');
 
     // Lucky Withdraw Routes
     Route::get('/lucky-withdraw', [Controllers\LuckyWithdrawController::class, 'index'])->name('lucky-withdraw.index');
@@ -104,6 +109,17 @@ Route::middleware(['auth','verified'])->group(function () {
     // Admin Wallet Routes
     Route::get('/admin/wallets', [Controllers\WalletController::class, 'adminIndex'])->name('admin.wallets.index');
     Route::post('/admin/wallets/{wallet}/adjust', [Controllers\WalletController::class, 'adjustBalance'])->name('admin.wallets.adjust');
+
+    // Admin User Management Routes
+    Route::get('/admin/users', [Controllers\AdminUserController::class, 'index'])->name('admin.users.index');
+    Route::get('/admin/users/{user}', [Controllers\AdminUserController::class, 'show'])->name('admin.users.show');
+    Route::post('/admin/users/{user}/toggle-block', [Controllers\AdminUserController::class, 'toggleBlock'])->name('admin.users.toggle-block');
+    Route::post('/admin/users/{user}/reset-password', [Controllers\AdminUserController::class, 'resetPassword'])->name('admin.users.reset-password');
+    Route::post('/admin/users/{user}/add-funds', [Controllers\AdminUserController::class, 'addFunds'])->name('admin.users.add-funds');
+    Route::post('/admin/users/{user}/send-notification', [Controllers\AdminUserController::class, 'sendNotification'])->name('admin.users.send-notification');
+    Route::get('/admin/users/{user}/activity-log', [Controllers\AdminUserController::class, 'getActivityLog'])->name('admin.users.activity-log');
+    Route::get('/admin/users/{user}/export-data', [Controllers\AdminUserController::class, 'exportUserData'])->name('admin.users.export-data');
+    Route::get('/admin/users/stats', [Controllers\AdminUserController::class, 'getUserStats'])->name('admin.users.stats');
 
 });
 

@@ -94,6 +94,17 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::post('/admin/lucky-withdraw/{luckyWithdrawEntry}/reject', [Controllers\LuckyWithdrawController::class, 'reject'])->name('admin.lucky-withdraw.reject');
     Route::post('/admin/lucky-withdraw/select-winner', [Controllers\LuckyWithdrawController::class, 'selectWinner'])->name('admin.lucky-withdraw.select-winner');
 
+    // Wallet Routes
+    Route::get('/wallet', [Controllers\WalletController::class, 'index'])->name('wallet.index');
+    Route::post('/wallet/transfer', [Controllers\WalletController::class, 'transfer'])->name('wallet.transfer');
+    Route::get('/wallet/balance', [Controllers\WalletController::class, 'getBalance'])->name('wallet.balance');
+    Route::get('/wallet/history', [Controllers\WalletController::class, 'history'])->name('wallet.history');
+    Route::get('/wallet/stats', [Controllers\WalletController::class, 'getStats'])->name('wallet.stats');
+    
+    // Admin Wallet Routes
+    Route::get('/admin/wallets', [Controllers\WalletController::class, 'adminIndex'])->name('admin.wallets.index');
+    Route::post('/admin/wallets/{wallet}/adjust', [Controllers\WalletController::class, 'adjustBalance'])->name('admin.wallets.adjust');
+
 });
 
 

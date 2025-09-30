@@ -284,7 +284,11 @@ class LuckyWithdrawController extends Controller
                     'daily_reward_claimed' => null,
                 ]);
 
-                // Update user's wallet (Plan 3 amount as bonus)
+                // Add Plan 3 amount to main wallet as bonus
+                $mainWallet = \App\Models\UserWallet::getOrCreateWallet($winner->user_id, 'main');
+                $mainWallet->addFunds($plan3->amount, 'earned');
+                
+                // Also update the legacy UserAccount for backward compatibility
                 $userAccount = \App\Models\UserAccount::where('user_id', $winner->user_id)->first();
                 if ($userAccount) {
                     $userAccount->increment('net_amount', $plan3->amount);

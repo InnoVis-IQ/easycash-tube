@@ -247,7 +247,11 @@ class VideoController extends Controller
                 'daily_reward_claimed' => $today
             ]);
 
-            // Update user's wallet balance
+            // Update user's earn wallet balance
+            $earnWallet = \App\Models\UserWallet::getOrCreateWallet($userId, 'earn');
+            $earnWallet->addFunds($dailyRewardAmount, 'earned');
+            
+            // Also update the legacy UserAccount for backward compatibility
             $userAccount = \App\Models\UserAccount::where('user_id', $userId)->first();
             if ($userAccount) {
                 $userAccount->update([

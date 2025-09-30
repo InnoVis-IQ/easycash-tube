@@ -64,9 +64,10 @@ class WithdrawController extends Controller
             ]);
         }
         else{
-            $userAccount = UserAccount::where('user_id',Auth::user()['id'])->first();
+            // Get withdrawable balance from earn wallet only
+            $withdrawableBalance = \App\Models\UserWallet::getWithdrawableBalance(Auth::user()['id']);
             $userWithdraws = Withdraw::where('user_id',Auth::user()['id'])->where('status','requested')->sum('amount');
-            $netAmount = $userAccount['net_amount'] - $userWithdraws;
+            $netAmount = $withdrawableBalance - $userWithdraws;
 
             // Check for active plans with withdrawal restrictions
             $activeSubscriptions = UserSubscription::where('user_id', Auth::user()['id'])
@@ -142,9 +143,10 @@ class WithdrawController extends Controller
             $userBankAccountID = $userBankAccount['id'];
         }
 
-        $userAccount = UserAccount::where('user_id',Auth::user()['id'])->first();
+        // Get withdrawable balance from earn wallet only
+        $withdrawableBalance = \App\Models\UserWallet::getWithdrawableBalance(Auth::user()['id']);
         $userWithdraws = Withdraw::where('user_id',Auth::user()['id'])->where('status','requested')->sum('amount');
-        $netAmount = $userAccount['net_amount'] - $userWithdraws;
+        $netAmount = $withdrawableBalance - $userWithdraws;
 
         // Check if user has any active plans with withdrawal restrictions
         $activeSubscriptions = UserSubscription::where('user_id', Auth::user()['id'])
@@ -215,6 +217,13 @@ class WithdrawController extends Controller
         $withdraw['status'] = 'transferred';
         $withdraw->save();
 
+        // Deduct from earn wallet
+        $earnWallet = \App\Models\UserWallet::getWalletByType($withdraw['user_id'], 'earn');
+        if ($earnWallet) {
+            $earnWallet->deductFunds($withdraw['amount'], 'withdrawal');
+        }
+        
+        // Also update the legacy UserAccount for backward compatibility
         UserAccount::where('user_id',$withdraw['user_id'])->decrement('net_amount', $withdraw['amount']);
 
         return back()->with('success', 'Withdrawal processed successfully');
@@ -246,6 +255,13 @@ class WithdrawController extends Controller
             $withdrawal->status = 'transferred';
             $withdrawal->save();
             
+            // Deduct from earn wallet
+            $earnWallet = \App\Models\UserWallet::getWalletByType($withdrawal->user_id, 'earn');
+            if ($earnWallet) {
+                $earnWallet->deductFunds($withdrawal->amount, 'withdrawal');
+            }
+            
+            // Also update the legacy UserAccount for backward compatibility
             UserAccount::where('user_id', $withdrawal->user_id)->decrement('net_amount', $withdrawal->amount);
         }
 

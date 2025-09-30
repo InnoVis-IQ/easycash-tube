@@ -37,6 +37,12 @@ class UpdateProfit extends Command
             // $userSubscription->save();
 
             UserSubscription::where('id',$userSubscription['id'])->increment('earning', $userSubscription['plan']['daily_profit']);
+            
+            // Update earn wallet for daily profits
+            $earnWallet = \App\Models\UserWallet::getOrCreateWallet($userSubscription['user_id'], 'earn');
+            $earnWallet->addFunds($userSubscription['plan']['daily_profit'], 'earned');
+            
+            // Also update the legacy UserAccount for backward compatibility
             UserAccount::where('user_id',$userSubscription['user_id'])->increment('net_amount', $userSubscription['plan']['daily_profit']);
         }
 

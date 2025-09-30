@@ -332,6 +332,47 @@
             </div>
         </div>
         
+        <!-- Wallet System Section -->
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header p-3">
+                        <h6 class="mb-0"><i class="fa-solid fa-wallet me-2"></i>My Wallets</h6>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="text-center p-3 border rounded">
+                                    <h6 class="text-primary">Main Wallet</h6>
+                                    <h4 class="text-primary">Rs. {{ number_format(\App\Models\UserWallet::getWalletByType(Auth::id(), 'main')->balance ?? 0, 2) }}</h4>
+                                    <small class="text-muted">Deposits & Bonuses</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center p-3 border rounded">
+                                    <h6 class="text-success">Earn Wallet</h6>
+                                    <h4 class="text-success">Rs. {{ number_format(\App\Models\UserWallet::getWalletByType(Auth::id(), 'earn')->balance ?? 0, 2) }}</h4>
+                                    <small class="text-muted">Daily Earnings (Withdrawable)</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center p-3 border rounded">
+                                    <h6 class="text-warning">Bonus Wallet</h6>
+                                    <h4 class="text-warning">Rs. {{ number_format(\App\Models\UserWallet::getWalletByType(Auth::id(), 'bonus')->balance ?? 0, 2) }}</h4>
+                                    <small class="text-muted">Referral & Daily Bonuses</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="{{ route('wallet.index') }}" class="btn btn-primary">
+                                <i class="fa-solid fa-wallet me-2"></i>Manage Wallets
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Lucky Withdraw Section -->
         <div class="row mb-3">
             <div class="col-12 col-lg-6">

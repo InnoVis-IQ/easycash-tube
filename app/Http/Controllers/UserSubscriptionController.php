@@ -56,7 +56,10 @@ class UserSubscriptionController extends Controller
             return redirect()->route('plans.index');
         }
 
-        if ($userAccount['net_amount'] >= $investmentPlan['amount']) {
+        // Check if user has sufficient balance across all wallets for plan purchase
+        $planPurchaseBalance = \App\Models\UserWallet::getPlanPurchaseBalance($request['user']);
+        
+        if ($planPurchaseBalance >= $investmentPlan['amount']) {
             $expiry = date("Y-m-d", strtotime("+" . $investmentPlan['plan_days']+$investmentPlan['buffer_days'] . " days", strtotime(date("Y-m-d"))));
 
             $data = new UserSubscription;
@@ -65,7 +68,28 @@ class UserSubscriptionController extends Controller
             $data['expire_at'] = $expiry;
             $data->save();
 
-            // Deduct the plan amount from user's wallet
+            // Deduct the plan amount from user's wallets (prioritize main wallet, then bonus wallet)
+            $remainingAmount = $investmentPlan['amount'];
+            
+            // First, try to deduct from main wallet
+            $mainWallet = \App\Models\UserWallet::getWalletByType($request['user'], 'main');
+            if ($mainWallet && $mainWallet->balance > 0) {
+                $deductFromMain = min($remainingAmount, $mainWallet->balance);
+                $mainWallet->deductFunds($deductFromMain, 'plan_purchase');
+                $remainingAmount -= $deductFromMain;
+            }
+            
+            // If still need more, deduct from bonus wallet
+            if ($remainingAmount > 0) {
+                $bonusWallet = \App\Models\UserWallet::getWalletByType($request['user'], 'bonus');
+                if ($bonusWallet && $bonusWallet->balance > 0) {
+                    $deductFromBonus = min($remainingAmount, $bonusWallet->balance);
+                    $bonusWallet->deductFunds($deductFromBonus, 'plan_purchase');
+                    $remainingAmount -= $deductFromBonus;
+                }
+            }
+            
+            // Also update the legacy UserAccount for backward compatibility
             UserAccount::where('user_id', $request['user'])->decrement('net_amount', $investmentPlan['amount']);
 
             // Referral bonus: Rs. 100 when referred user buys any plan
@@ -73,7 +97,11 @@ class UserSubscriptionController extends Controller
             if ($currentUser && $currentUser->referred_by && $currentUser->bonus_given == 0) {
                 $referrer = User::where('referral_code', $currentUser->referred_by)->first();
                 if ($referrer) {
-                    // Give Rs. 100 bonus to referrer
+                    // Give Rs. 100 bonus to referrer's bonus wallet
+                    $bonusWallet = \App\Models\UserWallet::getOrCreateWallet($referrer->id, 'bonus');
+                    $bonusWallet->addFunds(100, 'earned');
+                    
+                    // Also update the legacy UserAccount for backward compatibility
                     UserAccount::where('user_id', $referrer->id)->increment('net_amount', 100);
                     
                     // Mark bonus as given to prevent multiple bonuses
@@ -84,7 +112,7 @@ class UserSubscriptionController extends Controller
             return redirect()->route('plans.index');
         } else {
             Session::put('UserSessionVars.InsufficientBalance', 1);
-            return redirect()->route('deposits.index')->with(['message' => 'Insufficient balance']);
+            return redirect()->route('deposits.index')->with(['message' => 'Insufficient balance. You need Rs. ' . $investmentPlan['amount'] . ' but only have Rs. ' . $planPurchaseBalance . ' available for plan purchases.']);
         }
     }
 
@@ -139,6 +167,12 @@ class UserSubscriptionController extends Controller
                 // $userSubscription->save();
 
                 UserSubscription::where('id', $userSubscription['id'])->increment('earning', $userSubscription['plan']['daily_profit']);
+                
+                // Update earn wallet for daily profits
+                $earnWallet = \App\Models\UserWallet::getOrCreateWallet($userSubscription['user_id'], 'earn');
+                $earnWallet->addFunds($userSubscription['plan']['daily_profit'], 'earned');
+                
+                // Also update the legacy UserAccount for backward compatibility
                 UserAccount::where('user_id', $userSubscription['user_id'])->increment('net_amount', $userSubscription['plan']['daily_profit']);
             }
             return back()->with(['message'=>'Profit for today is added successfully.']);

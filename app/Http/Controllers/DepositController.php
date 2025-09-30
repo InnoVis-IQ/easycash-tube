@@ -109,6 +109,11 @@ class DepositController extends Controller
                 $deposit['status'] = 'approved';
                 $deposit->save();
 
+                // Add funds to main wallet
+                $mainWallet = \App\Models\UserWallet::getOrCreateWallet($deposit['user_id'], 'main');
+                $mainWallet->addFunds($deposit['amount'], 'deposit');
+                
+                // Also update the legacy UserAccount for backward compatibility
                 UserAccount::where('user_id',$deposit['user_id'])->increment('net_amount', $deposit['amount']);
             }
 

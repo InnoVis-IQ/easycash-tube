@@ -289,6 +289,49 @@
             </div>
         </div>
         
+        <!-- Referral Section -->
+        <div class="row mb-3">
+            <div class="col-12 col-lg-6">
+                <div class="card">
+                    <div class="card-body text-center p-3">
+                        <h6 class="mb-2"><i class="fa-solid fa-share-alt me-2"></i>Referral System</h6>
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="referralCode" value="{{ Auth::user()->referral_code }}" readonly>
+                                <button class="btn btn-outline-secondary" type="button" onclick="copyReferralCode()">
+                                    <i class="fa-solid fa-copy"></i>
+                                </button>
+                            </div>
+                            <small class="text-muted">Share this code with friends to earn Rs. 100 bonus</small>
+                        </div>
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <h6 class="text-primary">{{ $referralCount }}</h6>
+                                <small class="text-muted">Referrals</small>
+                            </div>
+                            <div class="col-6">
+                                <h6 class="text-success">Rs. 100</h6>
+                                <small class="text-muted">Per Referral</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-6">
+                <div class="card">
+                    <div class="card-body p-3">
+                        <h6 class="mb-2"><i class="fa-solid fa-info-circle me-2"></i>How Referrals Work</h6>
+                        <ul class="list-unstyled small">
+                            <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Share your referral code with friends</li>
+                            <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>When they sign up using your code</li>
+                            <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>And buy any plan</li>
+                            <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>You earn Rs. 100 bonus instantly!</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- Current Plans Section -->
         @if($subscriptions && count($subscriptions) > 0)
         <div class="card mb-3">
@@ -697,6 +740,35 @@ function copyReferralLink() {
         copyBtn.classList.remove('btn-success');
         copyBtn.classList.add('btn-light');
     }, 2000);
+}
+
+function copyReferralCode() {
+    const referralInput = document.getElementById('referralCode');
+    referralInput.select();
+    referralInput.setSelectionRange(0, 99999); // For mobile devices
+    
+    try {
+        document.execCommand('copy');
+        
+        // Show feedback
+        const copyBtn = event.target;
+        const originalIcon = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<i class="fa-solid fa-check"></i>';
+        copyBtn.classList.add('btn-success');
+        copyBtn.classList.remove('btn-outline-secondary');
+        
+        setTimeout(() => {
+            copyBtn.innerHTML = originalIcon;
+            copyBtn.classList.remove('btn-success');
+            copyBtn.classList.add('btn-outline-secondary');
+        }, 2000);
+        
+        // Show toast notification
+        showToast('Referral code copied to clipboard!', 'success');
+    } catch (err) {
+        console.error('Failed to copy: ', err);
+        showToast('Failed to copy referral code', 'error');
+    }
 }
 
 // Auto-dismiss notifications after 10 seconds

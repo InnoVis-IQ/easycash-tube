@@ -68,14 +68,18 @@ class UserSubscriptionController extends Controller
             // Deduct the plan amount from user's wallet
             UserAccount::where('user_id', $request['user'])->decrement('net_amount', $investmentPlan['amount']);
 
-            // 15% referral bonus
-            // $isReferred = User::where('id', Auth::user()['id'])->where('bonus_given', 0)->first();
-            // // dd(round(0.15*$investmentPlan['amount']));
-            // if ($isReferred) {
-            //     $referredBy = User::where('referral_code', $isReferred['referred_by'])->first('id');
-            //     UserAccount::where('user_id', $referredBy['id'])->increment('net_amount', round(0.15 * $investmentPlan['amount']));
-            //     User::where('id', Auth::user()['id'])->update(['bonus_given' => round(0.15 * $investmentPlan['amount'])]);
-            // }
+            // Referral bonus: Rs. 100 when referred user buys any plan
+            $currentUser = User::where('id', Auth::user()['id'])->first();
+            if ($currentUser && $currentUser->referred_by && $currentUser->bonus_given == 0) {
+                $referrer = User::where('referral_code', $currentUser->referred_by)->first();
+                if ($referrer) {
+                    // Give Rs. 100 bonus to referrer
+                    UserAccount::where('user_id', $referrer->id)->increment('net_amount', 100);
+                    
+                    // Mark bonus as given to prevent multiple bonuses
+                    User::where('id', Auth::user()['id'])->update(['bonus_given' => 100]);
+                }
+            }
 
             return redirect()->route('plans.index');
         } else {

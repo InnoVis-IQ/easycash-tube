@@ -29,15 +29,15 @@
             @endif
           </div>
           <div style="width: 20%; display: inline;">
-              <a href="{{ route('withdraws.index') }}" class="btn btn-link text-decoration-none p-2">
-                  <i class="fa-solid fa-arrow-up fa-lg"></i>
-                  <div class="small">Withdraw</div>
-              </a>
-          </div>
-          <div style="width: 20%; display: inline;">
               <a href="{{ route('deposits.index') }}" class="btn btn-link text-decoration-none p-2">
                   <i class="fa-solid fa-arrow-down fa-lg"></i>
                   <div class="small">Deposit</div>
+              </a>
+          </div>
+          <div style="width: 20%; display: inline;">
+              <a href="{{ route('withdraws.index') }}" class="btn btn-link text-decoration-none p-2">
+                  <i class="fa-solid fa-arrow-up fa-lg"></i>
+                  <div class="small">Withdraw</div>
               </a>
           </div>
       </div>

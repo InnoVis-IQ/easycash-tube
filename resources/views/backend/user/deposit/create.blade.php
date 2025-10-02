@@ -12,8 +12,7 @@
     <div class="nav-container">
         <ol class="breadcrumb">
             <li class="breadcrumb-item active"><a href="{{ route($route[0] . '.index') }}">{{ ucfirst($route[0]) }}</a></li>
-            <a href="{{ route($route[0] . '.create') }}" class="btn btn-sm btn-primary breadcrumb-button"><i
-                    class="fa-solid fa-circle-plus"></i> Add</a>
+            {{-- <a href="{{ route($route[0] . '.create') }}" class="btn btn-sm btn-primary breadcrumb-button"><i class="fa-solid fa-circle-plus"></i> Add</a> --}}
         </ol>
     </div>
 

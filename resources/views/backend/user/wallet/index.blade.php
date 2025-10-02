@@ -1,4 +1,4 @@
-@extends('layouts.master')
+@extends('layout.master')
 
 @section('title', 'My Wallets')
 
@@ -98,10 +98,10 @@
                             <small>Deposited</small>
                             <div class="fw-bold">Rs. {{ number_format($mainWallet->total_deposited, 2) }}</div>
                         </div>
-                        <div class="col-6">
-                            <small>Withdrawn</small>
+                        {{-- <div class="col-6">
+                            <small>Used</small>
                             <div class="fw-bold">Rs. {{ number_format($mainWallet->total_withdrawn, 2) }}</div>
-                        </div>
+                        </div> --}}
                     </div>
                     <div class="mt-3">
                         <span class="badge bg-light text-dark">
@@ -219,7 +219,7 @@
     </div>
 
     <!-- Transfer Funds Section -->
-    <div class="row mb-4">
+    <div class="row mb-4 d-none">
         <div class="col-12">
             <div class="card">
                 <div class="card-header p-3">
@@ -294,7 +294,7 @@
                         <a href="{{ route('plans.index') }}" class="btn btn-info">
                             <i class="fa-solid fa-shopping-cart me-2"></i>Buy Plans
                         </a>
-                        </div>
+                    </div>
                 </div>
             </div>
         </div>

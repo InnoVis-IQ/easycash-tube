@@ -127,6 +127,8 @@ class UserWallet extends Model
             
             if ($type === 'withdrawal') {
                 $this->increment('total_withdrawn', $amount);
+            } elseif ($type === 'plan_purchase') {
+                $this->increment('total_withdrawn', $amount);
             }
             
             DB::commit();

@@ -1,4 +1,4 @@
-@extends('layouts.master')
+@extends('layout.master')
 
 @section('title', 'Lucky Withdraw Management')
 

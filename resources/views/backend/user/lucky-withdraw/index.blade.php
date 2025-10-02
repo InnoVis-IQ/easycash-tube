@@ -1,4 +1,4 @@
-@extends('layouts.master')
+@extends('layout.master')
 
 @section('title', 'Lucky Withdraw')
 
@@ -64,6 +64,22 @@
         50% { transform: scale(1.05); }
         100% { transform: scale(1); }
     }
+    
+    .wallet-card {
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+    
+    .wallet-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .wallet-card.bg-primary { border-color: #007bff; }
+    .wallet-card.bg-success { border-color: #28a745; }
+    .wallet-card.bg-warning { border-color: #ffc107; }
+    .wallet-card.bg-info { border-color: #17a2b8; }
+    .wallet-card.bg-secondary { border-color: #6c757d; }
 </style>
 @endpush
 
@@ -108,6 +124,77 @@
                     <h6 class="mb-2"><i class="fa-solid fa-users me-2"></i>Participants</h6>
                     <h4 class="mb-0">{{ $currentRoundEntries }} entries</h4>
                     <small>Approved participants</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wallet Balance Information -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body p-4">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h5 class="mb-3"><i class="fa-solid fa-wallet me-2"></i>Your Wallet Balance</h5>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <div class="text-center p-3 border rounded bg-primary text-white wallet-card">
+                                        <h6 class="mb-2"><i class="fa-solid fa-piggy-bank me-2"></i>Main Wallet</h6>
+                                        <h4 class="mb-0">Rs. {{ number_format($mainWallet->balance, 2) }}</h4>
+                                        <small class="opacity-75">Deposits & Bonuses</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="text-center p-3 border rounded bg-success text-white wallet-card">
+                                        <h6 class="mb-2"><i class="fa-solid fa-chart-line me-2"></i>Earnings Wallet</h6>
+                                        <h4 class="mb-0">Rs. {{ number_format($earnWallet->balance, 2) }}</h4>
+                                        <small class="opacity-75">Daily Plan Profits</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="text-center p-3 border rounded bg-warning text-white wallet-card">
+                                        <h6 class="mb-2"><i class="fa-solid fa-gift me-2"></i>Bonus Wallet</h6>
+                                        <h4 class="mb-0">Rs. {{ number_format($bonusWallet->balance, 2) }}</h4>
+                                        <small class="opacity-75">Referral & Daily Bonuses</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <div class="text-center p-3 border rounded bg-info text-white wallet-card">
+                                        <h6 class="mb-2"><i class="fa-solid fa-wallet me-2"></i>Total Balance</h6>
+                                        <h3 class="mb-0">Rs. {{ number_format($totalWalletBalance, 2) }}</h3>
+                                        <small class="opacity-75">All Wallets Combined</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="text-center p-3 border rounded bg-secondary text-white wallet-card">
+                                        <h6 class="mb-2"><i class="fa-solid fa-money-bill-wave me-2"></i>Withdrawable</h6>
+                                        <h3 class="mb-0">Rs. {{ number_format($withdrawableBalance, 2) }}</h3>
+                                        <small class="opacity-75">Available for Withdrawal</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="alert alert-warning">
+                                <h6 class="mb-2"><i class="fa-solid fa-exclamation-triangle me-2"></i>Important Notice</h6>
+                                <p class="mb-2"><strong>Lucky Withdraw Entry Fee:</strong></p>
+                                <ul class="mb-0 small">
+                                    <li><strong>Must be paid from Main Wallet only</strong></li>
+                                    <li>❌ <strong>Cannot use Bonus Wallet funds</strong></li>
+                                    <li>❌ <strong>Cannot use Earnings Wallet funds</strong></li>
+                                    <li>✅ <strong>Only personal deposits allowed</strong></li>
+                                </ul>
+                                <hr class="my-2">
+                                <p class="mb-0 small text-muted">
+                                    <i class="fa-solid fa-info-circle me-1"></i>
+                                    This ensures fair participation and prevents abuse of the system.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -320,7 +407,10 @@
                     <h6><i class="fa-solid fa-info-circle me-2"></i>Important Notes:</h6>
                     <ul class="mb-0">
                         <li>Only one entry per user per round</li>
-                        <li>Entry fee must be paid from personal funds (not from earnings/bonus)</li>
+                        <li><strong>Entry fee must be paid from Main Wallet only</strong></li>
+                        <li>❌ <strong>Cannot use Bonus Wallet funds</strong></li>
+                        <li>❌ <strong>Cannot use Earnings Wallet funds</strong></li>
+                        <li>✅ <strong>Only personal deposits allowed</strong></li>
                         <li>Winner selection is completely random and fair</li>
                         <li>All approved entries have equal chance of winning</li>
                     </ul>

@@ -48,6 +48,13 @@ class LuckyWithdrawController extends Controller
             ->take(5)
             ->get();
         
+        // Get user's wallet balances
+        $mainWallet = \App\Models\UserWallet::getOrCreateWallet($currentUser->id, 'main');
+        $earnWallet = \App\Models\UserWallet::getOrCreateWallet($currentUser->id, 'earn');
+        $bonusWallet = \App\Models\UserWallet::getOrCreateWallet($currentUser->id, 'bonus');
+        $totalWalletBalance = \App\Models\UserWallet::getTotalBalance($currentUser->id);
+        $withdrawableBalance = \App\Models\UserWallet::getWithdrawableBalance($currentUser->id);
+        
         return view('backend.user.lucky-withdraw.index', compact(
             'currentRoundStart',
             'currentRoundEnd',
@@ -55,7 +62,12 @@ class LuckyWithdrawController extends Controller
             'userEntry',
             'currentRoundEntries',
             'userEntries',
-            'recentWinners'
+            'recentWinners',
+            'mainWallet',
+            'earnWallet',
+            'bonusWallet',
+            'totalWalletBalance',
+            'withdrawableBalance'
         ));
     }
 
@@ -83,7 +95,20 @@ class LuckyWithdrawController extends Controller
                 ->with('error', 'Current round is not active. Please wait for the next round.');
         }
         
-        return view('backend.user.lucky-withdraw.create');
+        // Get user's wallet balances
+        $mainWallet = \App\Models\UserWallet::getOrCreateWallet($currentUser->id, 'main');
+        $earnWallet = \App\Models\UserWallet::getOrCreateWallet($currentUser->id, 'earn');
+        $bonusWallet = \App\Models\UserWallet::getOrCreateWallet($currentUser->id, 'bonus');
+        $totalWalletBalance = \App\Models\UserWallet::getTotalBalance($currentUser->id);
+        $withdrawableBalance = \App\Models\UserWallet::getWithdrawableBalance($currentUser->id);
+        
+        return view('backend.user.lucky-withdraw.create', compact(
+            'mainWallet',
+            'earnWallet',
+            'bonusWallet',
+            'totalWalletBalance',
+            'withdrawableBalance'
+        ));
     }
 
     /**
@@ -92,8 +117,7 @@ class LuckyWithdrawController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'payment_method' => 'required|in:easypaisa,jazzcash,bank_transfer',
-            'transaction_id' => 'required|string|max:255',
+            'terms' => 'required|accepted',
         ]);
 
         $currentUser = Auth::user();
@@ -115,24 +139,42 @@ class LuckyWithdrawController extends Controller
                 ->with('error', 'Current round is not active. Please wait for the next round.');
         }
 
+        // Check if user has sufficient balance in Main Wallet
+        $mainWallet = \App\Models\UserWallet::getOrCreateWallet($currentUser->id, 'main');
+        if ($mainWallet->balance < 100) {
+            return redirect()->route('lucky-withdraw.index')
+                ->with('error', 'Insufficient balance. You need Rs. 100 in your Main Wallet to enter the contest.');
+        }
+
         try {
+            DB::beginTransaction();
+            
+            // Deduct entry fee from Main Wallet
+            $mainWallet->deductFunds(100, 'plan_purchase');
+            
             // Create new entry
             $entry = LuckyWithdrawEntry::create([
                 'user_id' => $currentUser->id,
                 'entry_amount' => 100.00,
-                'payment_method' => $request->payment_method,
-                'transaction_id' => $request->transaction_id,
-                'status' => 'pending',
+                'payment_method' => 'wallet_deduction',
+                'transaction_id' => 'WALLET-' . time(),
+                'status' => 'approved', // Auto-approve wallet entries
                 'round_start_date' => $currentRoundStart,
                 'round_end_date' => LuckyWithdrawEntry::getCurrentRoundEndDate(),
             ]);
 
+            // Also update legacy UserAccount for backward compatibility
+            \App\Models\UserAccount::where('user_id', $currentUser->id)->decrement('net_amount', 100);
+
+            DB::commit();
+
             return redirect()->route('lucky-withdraw.index')
-                ->with('success', 'Your entry has been submitted successfully! Entry Code: ' . $entry->entry_code . '. Please wait for admin approval.');
+                ->with('success', 'Congratulations! You have successfully entered the Lucky Withdraw contest! Entry Code: ' . $entry->entry_code . '. Good luck!');
 
         } catch (\Exception $e) {
+            DB::rollBack();
             return redirect()->back()
-                ->with('error', 'An error occurred while submitting your entry. Please try again.')
+                ->with('error', 'An error occurred while processing your entry. Please try again.')
                 ->withInput();
         }
     }

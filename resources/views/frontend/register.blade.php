@@ -114,7 +114,27 @@
                             </div>
                         </div>
 
-                        <input type="hidden" name="referred_by" value="{{ isset($_GET['ref']) ? $_GET['ref'] : '' }}">
+                        <div class="form-group mb-4">
+                            <label class="label mb-2" style="color: #555; font-weight: 600; font-size: 0.9rem;">Referral Code
+                                <span class="text-muted" style="font-size: 0.8rem;">(Optional)</span>
+                            </label>
+                            <div class="input-group"
+                                style="border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);">
+                                <input type="text" name="referred_by" class="form-control"
+                                    placeholder="Enter referral code (if any)"
+                                    value="{{ isset($_GET['ref']) ? $_GET['ref'] : old('referred_by') }}"
+                                    style="border: none; padding: 15px 20px; font-size: 0.95rem; background: #f8f9fa;">
+                                <div class="input-group-append">
+                                    <span class="input-group-text"
+                                        style="border: none; background: #f8f9fa; color: #6c757d;">
+                                        <i class="mdi mdi-account-group-outline"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <small class="text-muted" style="font-size: 0.8rem; margin-top: 8px; display: block;">
+                                Enter the referral code of the person who referred you to earn bonus rewards
+                            </small>
+                        </div>
 
                         <div class="form-group mb-4">
                             <div class="form-check">

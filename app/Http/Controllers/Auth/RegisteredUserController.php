@@ -39,9 +39,8 @@ class RegisteredUserController extends Controller
             'contact' => ['required', 'string', 'max:15', 'unique:'.User::class], 'regex:/^\+[1-9]{1}[0-9]{11,14}$/g',
             'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'referred_by' => ['nullable', 'string', 'exists:users,referral_code'],
         ]);
-
-        $ref = explode('"',$request['referred_by']);
 
         $user = User::create([
             'name' => $request->name,
@@ -49,7 +48,7 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'contact' => $request->contact,
             'referral_code' => strtoupper(Str::random(8)),
-            'referred_by' => $request->referred_by ? $ref[0] : Null,
+            'referred_by' => $request->referred_by ?: null,
             'password' => Hash::make($request->password),
             'email_verified_at' => date('Y-m-d H:i:s'),
         ]);

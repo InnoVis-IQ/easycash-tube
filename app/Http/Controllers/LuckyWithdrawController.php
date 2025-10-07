@@ -51,7 +51,6 @@ class LuckyWithdrawController extends Controller
         // Get user's wallet balances
         $mainWallet = \App\Models\UserWallet::getOrCreateWallet($currentUser->id, 'main');
         $earnWallet = \App\Models\UserWallet::getOrCreateWallet($currentUser->id, 'earn');
-        $bonusWallet = \App\Models\UserWallet::getOrCreateWallet($currentUser->id, 'bonus');
         $totalWalletBalance = \App\Models\UserWallet::getTotalBalance($currentUser->id);
         $withdrawableBalance = \App\Models\UserWallet::getWithdrawableBalance($currentUser->id);
         
@@ -65,7 +64,6 @@ class LuckyWithdrawController extends Controller
             'recentWinners',
             'mainWallet',
             'earnWallet',
-            'bonusWallet',
             'totalWalletBalance',
             'withdrawableBalance'
         ));
@@ -98,16 +96,19 @@ class LuckyWithdrawController extends Controller
         // Get user's wallet balances
         $mainWallet = \App\Models\UserWallet::getOrCreateWallet($currentUser->id, 'main');
         $earnWallet = \App\Models\UserWallet::getOrCreateWallet($currentUser->id, 'earn');
-        $bonusWallet = \App\Models\UserWallet::getOrCreateWallet($currentUser->id, 'bonus');
         $totalWalletBalance = \App\Models\UserWallet::getTotalBalance($currentUser->id);
         $withdrawableBalance = \App\Models\UserWallet::getWithdrawableBalance($currentUser->id);
+        
+        // Get round dates for display
+        $currentRoundEnd = LuckyWithdrawEntry::getCurrentRoundEndDate();
         
         return view('backend.user.lucky-withdraw.create', compact(
             'mainWallet',
             'earnWallet',
-            'bonusWallet',
             'totalWalletBalance',
-            'withdrawableBalance'
+            'withdrawableBalance',
+            'currentRoundStart',
+            'currentRoundEnd'
         ));
     }
 

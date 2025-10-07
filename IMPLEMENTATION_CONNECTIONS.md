@@ -24,6 +24,10 @@ This document provides a comprehensive analysis of all implemented features and 
 
 ### 1. **WALLET SYSTEM CONNECTIONS**
 
+**Two-Wallet Architecture:**
+- **Main Wallet:** Stores deposits and bonuses (including referral bonuses). Used for plan purchases.
+- **Earn Wallet:** Stores daily plan earnings. This is the only withdrawable wallet.
+
 #### **A. Deposit Flow → Wallet System**
 ```
 User Deposit → Admin Approval → Main Wallet → Plan Purchase Balance
@@ -59,17 +63,17 @@ Earn Wallet → Withdrawal Request → Admin Processing → User Bank Account
 
 #### **C. Plan Purchase Flow → Wallet System**
 ```
-Main Wallet + Bonus Wallet → Plan Purchase → UserSubscription Creation
+Main Wallet → Plan Purchase → UserSubscription Creation
 ```
 
 **Files Involved:**
 - `app/Http/Controllers/UserSubscriptionController.php` (Lines 59-93)
-- `app/Models/UserWallet.php` (Lines 184-189)
+- `app/Models/UserWallet.php` (Lines 55-74)
 
 **Connection Flow:**
 1. User selects plan → `UserSubscriptionController@store()`
-2. System checks total wallet balance → `UserWallet::getPlanPurchaseBalance()`
-3. Funds deducted from Main Wallet first, then Bonus Wallet
+2. System checks Main Wallet balance → `UserWallet::getPlanPurchaseBalance()`
+3. Funds deducted from Main Wallet → `$mainWallet->deductFunds()`
 4. UserSubscription created with expiry date
 5. Referral bonus processed if applicable
 
@@ -112,18 +116,18 @@ Cron Job → UpdateProfit Command → All Active Subscriptions → Earn Wallets
 
 #### **A. Referral Bonus Flow**
 ```
-New User Registration → Plan Purchase → Referrer Bonus → Bonus Wallet
+New User Registration → Plan Purchase → Referrer Bonus → Main Wallet
 ```
 
 **Files Involved:**
-- `app/Http/Controllers/UserSubscriptionController.php` (Lines 95-113)
+- `app/Http/Controllers/UserSubscriptionController.php` (Lines 80-98)
 - `app/Models/User.php` (Lines 22-32)
 
 **Connection Flow:**
 1. New user registers with referral code
 2. New user purchases any plan
-3. Rs. 100 bonus added to referrer's Bonus Wallet
-4. Referrer notified via notification system
+3. Rs. 100 bonus added to referrer's Main Wallet → `$mainWallet->addFunds(100, 'earned')`
+4. Referrer notified via notification system → `UserNotification::createReferralBonusNotification()`
 5. Bonus marked as given to prevent duplicates
 
 ### 4. **LUCKY DRAW SYSTEM CONNECTIONS**

@@ -106,23 +106,42 @@ class DashboardController extends Controller
     public function userdashboard(){
         Session::put('UserSessionVars',[]);
 
-        if(!Models\UserSubscription::where('user_id',Auth::user()['id'])->count()){
-            $userId = Auth::user()['id'];
+        // Common variables for all users
+        $userId = Auth::user()['id'];
+        $message = "0";
+        
+        // Get wallet data
+        $mainWallet = \App\Models\UserWallet::getOrCreateWallet($userId, 'main');
+        $earnWallet = \App\Models\UserWallet::getOrCreateWallet($userId, 'earn');
+        $totalWalletBalance = \App\Models\UserWallet::getTotalBalance($userId);
+        $withdrawableBalance = \App\Models\UserWallet::getWithdrawableBalance($userId);
+        
+        // Calculate total earned
+        $totalEarned = ($earnWallet->total_earned ?? 0) + ($mainWallet->total_earned ?? 0);
+        
+        // Get common stats
+        $pendingDeposits = Models\Deposit::where('user_id',$userId)->where('status','deposited')->count();
+        $totalDeposits = Models\Deposit::where('user_id', $userId)->where('status', 'approved')->sum('amount');
+        $totalWithdrawals = Models\Withdraw::where('user_id', $userId)->where('status', 'approved')->sum('amount');
+        $walletBalance = optional(Models\UserAccount::where('user_id', $userId)->first())->net_amount ?? 0;
+        
+        // Get referral count
+        $referralCount = Models\User::where('referred_by', Auth::user()->referral_code)->count();
+        
+        // Get task completion count (placeholder - implement based on your task system)
+        $taskCount = 9; // This should be calculated based on actual task completion
+        
+        // Get active announcements
+        $announcements = $this->getActiveAnnouncements();
+        
+        // Get all plans for display
+        $allPlans = Models\InvestmentPlan::withTrashed()->get();
+
+        // Check if user has subscriptions
+        if(!Models\UserSubscription::where('user_id',$userId)->count()){
+            // User has NO subscriptions
             $subscription_status = 'no';
-            $allPlans = Models\InvestmentPlan::withTrashed()->get();
-            
-            // Get wallet data even when no subscriptions
-            $mainWallet = \App\Models\UserWallet::getOrCreateWallet($userId, 'main');
-            $earnWallet = \App\Models\UserWallet::getOrCreateWallet($userId, 'earn');
-            $bonusWallet = \App\Models\UserWallet::getOrCreateWallet($userId, 'bonus');
-            $totalWalletBalance = \App\Models\UserWallet::getTotalBalance($userId);
-            $withdrawableBalance = \App\Models\UserWallet::getWithdrawableBalance($userId);
-            
-            // Get referral count
-            $referralCount = Models\User::where('referred_by', Auth::user()->referral_code)->count();
-            
-            // Get basic stats
-            $pendingDeposits = Models\Deposit::where('user_id',$userId)->where('status','deposited')->count();
+            $currentSubscription = null;
             $activeSubscriptions = 0;
             $subscriptions = collect();
             $investedAmount = 0;
@@ -133,56 +152,12 @@ class DashboardController extends Controller
             $userLevel = 1;
             $levelProgress = 0;
             $watchedVideosProgress = 0;
-            $taskCount = 0;
             $totalClicks = 0;
-            $totalDeposits = Models\Deposit::where('user_id', $userId)->where('status', 'approved')->sum('amount');
-            $totalEarned = 0;
             $todayReward = 0;
-            $totalWithdrawals = Models\Withdraw::where('user_id', $userId)->where('status', 'approved')->sum('amount');
-            $walletBalance = optional(Models\UserAccount::where('user_id', $userId)->first())->net_amount ?? 0;
-            
-            // Get active announcements
-            $announcements = $this->getActiveAnnouncements();
-            
-            $message = "0";
-            $currentSubscription = null;
-            
-            return view('backend.user.dashboard',compact(
-                'message',
-                'subscription_status',
-                'currentSubscription',
-                'pendingDeposits',
-                'activeSubscriptions', 
-                'subscriptions',
-                'investedAmount',
-                'upcomingIncome',
-                'walletBalance',
-                'earningsToday',
-                'daysWatched',
-                'totalPlanDays',
-                'userLevel',
-                'levelProgress',
-                'watchedVideosProgress',
-                'referralCount',
-                'taskCount',
-                'totalClicks',
-                'totalDeposits',
-                'mainWallet',
-                'earnWallet',
-                'bonusWallet',
-                'totalWalletBalance',
-                'withdrawableBalance',
-                'totalEarned',
-                'todayReward',
-                'totalWithdrawals',
-                'announcements',
-                'allPlans'
-            ));
         }
         else{
+            // User HAS subscriptions
             $subscription_status = 'yes';
-            $userId = Auth::user()['id'];
-            $pendingDeposits = Models\Deposit::where('user_id',$userId)->where('status','deposited')->count();
             $activeSubscriptions = Models\UserSubscription::where('user_id',$userId)->where('expire_at','>',date('Y-m-d'))->count();
 
             $subscriptions = Models\UserSubscription::where('user_id',$userId)->where('expire_at','>',date('Y-m-d'))->get();
@@ -191,6 +166,7 @@ class DashboardController extends Controller
             $earningsToday = 0;
             $daysWatched = 0;
             $totalPlanDays = 0;
+            
             foreach ($subscriptions as $key => $value) {
                 $investmentPlan = Models\InvestmentPlan::find($value['investment_plan_id']);
                 $investedAmount += $investmentPlan['amount'];
@@ -213,9 +189,6 @@ class DashboardController extends Controller
                 $totalPlanDays += $investmentPlan['plan_days'];
             }
             
-            // Wallet balance
-            $walletBalance = optional(Models\UserAccount::where('user_id', $userId)->first())->net_amount ?? 0;
-            
             // Calculate user level and progress
             $userLevel = $this->calculateUserLevel($userId, $daysWatched);
             $levelProgress = $this->calculateLevelProgress($userId, $userLevel);
@@ -223,20 +196,8 @@ class DashboardController extends Controller
             // Calculate watched videos progress for current subscription (5 days requirement)
             $watchedVideosProgress = $this->calculateWatchedVideosProgress($userId);
             
-            // Get referral count
-            $referralCount = Models\User::where('referred_by', Auth::user()->referral_code)->count();
-            
-            // Get task completion count (placeholder - implement based on your task system)
-            $taskCount = 9; // This should be calculated based on actual task completion
-            
             // Get total clicks (video watches)
             $totalClicks = $daysWatched;
-            
-            // Calculate total deposits
-            $totalDeposits = Models\Deposit::where('user_id', $userId)->where('status', 'approved')->sum('amount');
-            
-            // Calculate total earned (from subscriptions)
-            $totalEarned = Models\UserSubscription::where('user_id', $userId)->sum('earning');
             
             // Calculate today's reward (daily video reward)
             $todayReward = 0;
@@ -254,56 +215,52 @@ class DashboardController extends Controller
                     $todayReward = $currentSubscription->plan ? $currentSubscription->plan->daily_profit : 0;
                 }
             }
-            
-            // Calculate total withdrawals
-            $totalWithdrawals = Models\Withdraw::where('user_id', $userId)->where('status', 'approved')->sum('amount');
-            
-            // Get active announcements
-            $announcements = $this->getActiveAnnouncements();
-            
-            // Get wallet data
-            $mainWallet = \App\Models\UserWallet::getOrCreateWallet($userId, 'main');
-            $earnWallet = \App\Models\UserWallet::getOrCreateWallet($userId, 'earn');
-            $bonusWallet = \App\Models\UserWallet::getOrCreateWallet($userId, 'bonus');
-            $totalWalletBalance = \App\Models\UserWallet::getTotalBalance($userId);
-            $withdrawableBalance = \App\Models\UserWallet::getWithdrawableBalance($userId);
-            
-            // Get all plans for display
-            $allPlans = Models\InvestmentPlan::withTrashed()->get();
-            
-            $message = "0";
-            return view('backend.user.dashboard',compact(
-                'message',
-                'subscription_status',
-                'currentSubscription',
-                'pendingDeposits',
-                'activeSubscriptions', 
-                'subscriptions',
-                'investedAmount',
-                'upcomingIncome',
-                'walletBalance',
-                'earningsToday',
-                'daysWatched',
-                'totalPlanDays',
-                'userLevel',
-                'levelProgress',
-                'watchedVideosProgress',
-                'referralCount',
-                'taskCount',
-                'totalClicks',
-                'totalDeposits',
-                'mainWallet',
-                'earnWallet',
-                'bonusWallet',
-                'totalWalletBalance',
-                'withdrawableBalance',
-                'totalEarned',
-                'todayReward',
-                'totalWithdrawals',
-                'announcements',
-                'allPlans'
-            ));
         }
+        
+        // Check if bonus video was watched today and add 25 to todayReward
+        $userAccount = Models\UserAccount::where('user_id', $userId)->first();
+        if ($userAccount && $userAccount->bonus_videos_watched) {
+            $bonusVideosWatched = is_array($userAccount->bonus_videos_watched) 
+                ? $userAccount->bonus_videos_watched 
+                : (json_decode($userAccount->bonus_videos_watched, true) ?: []);
+            
+            $today = date('Y-m-d');
+            if (in_array($today, $bonusVideosWatched)) {
+                $todayReward += 25;
+            }
+        }
+        
+        // Return view with all variables
+        return view('backend.user.dashboard',compact(
+            'message',
+            'subscription_status',
+            'currentSubscription',
+            'pendingDeposits',
+            'activeSubscriptions', 
+            'subscriptions',
+            'investedAmount',
+            'upcomingIncome',
+            'walletBalance',
+            'earningsToday',
+            'daysWatched',
+            'totalPlanDays',
+            'userLevel',
+            'levelProgress',
+            'watchedVideosProgress',
+            'referralCount',
+            'taskCount',
+            'totalClicks',
+            'totalDeposits',
+            'mainWallet',
+            'earnWallet',
+            'totalWalletBalance',
+            'withdrawableBalance',
+            'totalEarned',
+            'todayReward',
+            'totalWithdrawals',
+            'announcements',
+            'allPlans'
+        ));
     }
     
     /**
@@ -456,7 +413,11 @@ class DashboardController extends Controller
             // Calculate bonus reward (e.g., 25 PKR)
             $bonusReward = 25;
             
-            // Add bonus reward to user's wallet
+            // Add bonus reward to user's main wallet
+            $mainWallet = \App\Models\UserWallet::getOrCreateWallet($userId, 'main');
+            $mainWallet->addFunds($bonusReward, 'earned');
+            
+            // Also add to legacy UserAccount for backward compatibility
             $userAccount->net_amount += $bonusReward;
             
             // Mark bonus video as watched for today

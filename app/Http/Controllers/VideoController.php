@@ -112,55 +112,60 @@ class VideoController extends Controller
 
     public function watch()
     {
-        $subscribedPlan = \App\Models\UserSubscription::where('user_id', Auth::user()['id'])
+        // Get all active subscriptions for the user (max 2)
+        $subscribedPlans = \App\Models\UserSubscription::where('user_id', Auth::user()['id'])
             ->where('expire_at', '>', date('Y-m-d'))
+            ->with('plan')
             ->orderBy('created_at', 'desc')
-            ->first();
+            ->limit(2)
+            ->get();
 
-        if (!$subscribedPlan) {
+        if ($subscribedPlans->isEmpty()) {
             return redirect()->route('plans.index')->with('error', 'You are not subscribed to any plan.');
         }
 
-        $rewardClaimedDate = date('Y-m-d', strtotime($subscribedPlan->daily_reward_claimed));
-        $watchedVideos = $subscribedPlan['watched_videos'];
-        $watchedVideos = is_array($watchedVideos) ? $watchedVideos : (json_decode($watchedVideos, true) ?: []);
-
-        // Check if user has watched a video today
-        $watchedToday = false;
-        $dailyRewardClaimed = false;
+        $today = date('Y-m-d');
         
-        if (!empty($watchedVideos)) {
-            // Check if user has watched a video today
-            $today = date('Y-m-d');
+        // Prepare data for each subscription
+        $subscriptionData = [];
+        
+        foreach ($subscribedPlans as $subscription) {
+            $rewardClaimedDate = date('Y-m-d', strtotime($subscription->daily_reward_claimed));
+            $watchedVideos = $subscription->watched_videos;
+            $watchedVideos = is_array($watchedVideos) ? $watchedVideos : (json_decode($watchedVideos, true) ?: []);
+
+            // Check if user has watched a video today for this subscription
             $watchedToday = ($rewardClaimedDate == $today);
             $dailyRewardClaimed = ($rewardClaimedDate == $today);
+
+            // Get all videos for this subscription's plan that are active and not expired
+            $videos = \App\Models\Video::where('plan_id', $subscription->investment_plan_id)
+                ->where('status', 'active')
+                ->where(function($query) {
+                    $query->whereNull('expiry_date')
+                            ->orWhere('expiry_date', '>', now());
+                })
+                ->get();
+
+            // Progress bar: days watched / plan days
+            $daysWatched = is_array($watchedVideos) ? count($watchedVideos) : 0;
+            $totalPlanDays = $subscription->plan ? $subscription->plan->plan_days : 0;
+            $dailyRewardAmount = $subscription->plan ? $subscription->plan->daily_profit : 0;
+
+            $subscriptionData[] = [
+                'subscription' => $subscription,
+                'plan' => $subscription->plan,
+                'videos' => $videos,
+                'watchedVideos' => $watchedVideos,
+                'watchedToday' => $watchedToday,
+                'dailyRewardClaimed' => $dailyRewardClaimed,
+                'daysWatched' => $daysWatched,
+                'totalPlanDays' => $totalPlanDays,
+                'dailyRewardAmount' => $dailyRewardAmount
+            ];
         }
 
-        // Get all videos for the user's subscribed plan that are active and not expired
-        $videos = collect();
-        $videos = \App\Models\Video::where('plan_id', $subscribedPlan->investment_plan_id)
-            ->where('status', 'active')
-            ->where(function($query) {
-                $query->whereNull('expiry_date')
-                        ->orWhere('expiry_date', '>', now());
-            })
-            ->get();
-
-        // Progress bar: days watched / plan days
-        $daysWatched = is_array($watchedVideos) ? count($watchedVideos) : 0;
-        $totalPlanDays = $subscribedPlan->plan ? $subscribedPlan->plan->plan_days : 0;
-
-        $dailyRewardAmount = $subscribedPlan->plan->daily_profit;
-
-        return view('backend.user.videos.watch', compact(
-            'videos',
-            'watchedVideos',
-            'watchedToday',
-            'daysWatched',
-            'totalPlanDays',
-            'dailyRewardClaimed',
-            'dailyRewardAmount'
-        ));
+        return view('backend.user.videos.watch', compact('subscriptionData'));
     }
 
     /**
@@ -202,25 +207,33 @@ class VideoController extends Controller
             ]);
         }
 
-        // Get the user's active subscription
+        // Get the video to find its plan
+        $video = \App\Models\Video::find($videoId);
+        if (!$video) {
+            Log::error('Video not found: ' . $videoId);
+            return response()->json(['success' => false, 'message' => 'Video not found.'], 400);
+        }
+
+        // Get the user's active subscription for this video's plan
         $subscribedPlan = \App\Models\UserSubscription::where('user_id', $userId)
+            ->where('investment_plan_id', $video->plan_id)
             ->where('expire_at', '>', date('Y-m-d'))
             ->orderBy('created_at', 'desc')
             ->first();
 
         if (!$subscribedPlan) {
-            Log::error('No active subscription found for user: ' . $userId);
-            return response()->json(['success' => false, 'message' => 'No active subscription found.'], 400);
+            Log::error('No active subscription found for user: ' . $userId . ' for plan: ' . $video->plan_id);
+            return response()->json(['success' => false, 'message' => 'No active subscription found for this video\'s plan.'], 400);
         }
 
         Log::info('Found subscription:', $subscribedPlan->toArray());
 
-        // Check if user has already watched a video today
+        // Check if user has already watched a video today for this subscription
         $today = date('Y-m-d');
         if ($this->hasWatchedVideoToday($subscribedPlan, $today)) {
             return response()->json([
                 'success' => false, 
-                'message' => 'You have already watched a video today.',
+                'message' => 'You have already watched a video today for this plan. Come back tomorrow!',
                 'video_id' => $videoId
             ]);
         }

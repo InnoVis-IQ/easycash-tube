@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('user_wallets', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->enum('wallet_type', ['main', 'earn', 'bonus'])->default('main');
+            $table->enum('wallet_type', ['main', 'earn'])->default('main');
             $table->decimal('balance', 15, 2)->default(0.00);
             $table->decimal('total_deposited', 15, 2)->default(0.00); // Total amount deposited into this wallet
             $table->decimal('total_withdrawn', 15, 2)->default(0.00); // Total amount withdrawn from this wallet

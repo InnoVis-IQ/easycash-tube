@@ -24,11 +24,6 @@
         color: white;
     }
     
-    .bonus-wallet {
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        color: white;
-    }
-    
     .stats-card {
         background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
         border-radius: 15px;
@@ -84,7 +79,7 @@
     <!-- Wallet Cards -->
     <div class="row mb-4">
         <!-- Main Wallet -->
-        <div class="col-lg-4 col-md-6 mb-4">
+        <div class="col-lg-4 col-md-4 mb-4">
             <div class="card wallet-card main-wallet">
                 <div class="card-body p-4 text-center">
                     <div class="wallet-icon mb-3">
@@ -94,31 +89,22 @@
                     <div class="balance-amount mb-3">Rs. {{ number_format($mainWallet->balance, 2) }}</div>
                     <p class="mb-3 small">Deposits & Bonuses</p>
                     <div class="row text-center">
-                        <div class="col-6">
-                            <small>Deposited</small>
+                        <div class="col-12">
+                            <small>Total Deposited</small>
                             <div class="fw-bold">Rs. {{ number_format($mainWallet->total_deposited, 2) }}</div>
                         </div>
-                        {{-- <div class="col-6">
-                            <small>Used</small>
-                            <div class="fw-bold">Rs. {{ number_format($mainWallet->total_withdrawn, 2) }}</div>
-                        </div> --}}
                     </div>
                     <div class="mt-3">
                         <span class="badge bg-light text-dark">
                             <i class="fa-solid fa-check me-1"></i>Can Buy Plans
                         </span>
-                        @if($mainWallet->is_withdrawable)
-                            <span class="badge bg-success ms-1">
-                                <i class="fa-solid fa-arrow-up me-1"></i>Withdrawable
-                            </span>
-                        @endif
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Earn Wallet -->
-        <div class="col-lg-4 col-md-6 mb-4">
+        <div class="col-lg-4 col-md-4 mb-4">
             <div class="card wallet-card earn-wallet">
                 <div class="card-body p-4 text-center">
                     <div class="wallet-icon mb-3">
@@ -126,7 +112,7 @@
                     </div>
                     <h5 class="mb-3">Earn Wallet</h5>
                     <div class="balance-amount mb-3">Rs. {{ number_format($earnWallet->balance, 2) }}</div>
-                    <p class="mb-3 small">Daily Plan Earnings</p>
+                    <p class="mb-3 small">Daily Plan Earnings (Withdrawable)</p>
                     <div class="row text-center">
                         <div class="col-6">
                             <small>Earned</small>
@@ -138,9 +124,6 @@
                         </div>
                     </div>
                     <div class="mt-3">
-                        <span class="badge bg-light text-dark">
-                            <i class="fa-solid fa-check me-1"></i>Can Buy Plans
-                        </span>
                         <span class="badge bg-success ms-1">
                             <i class="fa-solid fa-arrow-up me-1"></i>Withdrawable
                         </span>
@@ -149,74 +132,31 @@
             </div>
         </div>
 
-        <!-- Bonus Wallet -->
-        <div class="col-lg-4 col-md-6 mb-4">
-            <div class="card wallet-card bonus-wallet">
+        <!-- Total Wallet -->
+        <div class="col-lg-4 col-md-4 mb-4">
+            <div class="card wallet-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
                 <div class="card-body p-4 text-center">
                     <div class="wallet-icon mb-3">
-                        <i class="fa-solid fa-gift"></i>
+                        <i class="fa-solid fa-wallet"></i>
                     </div>
-                    <h5 class="mb-3">Bonus Wallet</h5>
-                    <div class="balance-amount mb-3">Rs. {{ number_format($bonusWallet->balance, 2) }}</div>
-                    <p class="mb-3 small">Referral & Daily Bonuses</p>
+                    <h5 class="mb-3">Total Balance</h5>
+                    <div class="balance-amount mb-3">Rs. {{ number_format($totalBalance, 2) }}</div>
+                    <p class="mb-3 small">All Wallets Combined</p>
                     <div class="row text-center">
                         <div class="col-6">
-                            <small>Earned</small>
-                            <div class="fw-bold">Rs. {{ number_format($bonusWallet->total_earned, 2) }}</div>
+                            <small>Withdrawable</small>
+                            <div class="fw-bold">Rs. {{ number_format($withdrawableBalance, 2) }}</div>
                         </div>
                         <div class="col-6">
-                            <small>Used</small>
-                            <div class="fw-bold">Rs. {{ number_format($bonusWallet->total_withdrawn, 2) }}</div>
+                            <small>For Plans</small>
+                            <div class="fw-bold">Rs. {{ number_format($planPurchaseBalance, 2) }}</div>
                         </div>
-                    </div>
-                    <div class="mt-3">
-                        <span class="badge bg-light text-dark">
-                            <i class="fa-solid fa-check me-1"></i>Can Buy Plans
-                        </span>
-                        <span class="badge bg-warning ms-1">
-                            <i class="fa-solid fa-ban me-1"></i>Not Withdrawable
-                        </span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Wallet Statistics -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card bg-primary text-white">
-                <div class="card-body p-3 text-center">
-                    <h5 class="mb-1">Rs. {{ number_format($totalBalance, 2) }}</h5>
-                    <small>Total Balance</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-success text-white">
-                <div class="card-body p-3 text-center">
-                    <h5 class="mb-1">Rs. {{ number_format($withdrawableBalance, 2) }}</h5>
-                    <small>Withdrawable</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-info text-white">
-                <div class="card-body p-3 text-center">
-                    <h5 class="mb-1">Rs. {{ number_format($planPurchaseBalance, 2) }}</h5>
-                    <small>For Plans</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-warning text-white">
-                <div class="card-body p-3 text-center">
-                    <h5 class="mb-1">{{ $activeSubscriptions->count() }}</h5>
-                    <small>Active Plans</small>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Transfer Funds Section -->
     <div class="row mb-4 d-none">
@@ -234,7 +174,6 @@
                                 <select name="from_wallet" class="form-select" required>
                                     <option value="">Select Source</option>
                                     <option value="main" {{ old('from_wallet') == 'main' ? 'selected' : '' }}>Main Wallet (Rs. {{ number_format($mainWallet->balance, 2) }})</option>
-                                    <option value="bonus" {{ old('from_wallet') == 'bonus' ? 'selected' : '' }}>Bonus Wallet (Rs. {{ number_format($bonusWallet->balance, 2) }})</option>
                                 </select>
                             </div>
                             <div class="col-md-4">
@@ -271,7 +210,7 @@
 
     <!-- Quick Actions -->
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-12">
             <div class="card">
                 <div class="card-header p-3">
                     <h6 class="mb-0"><i class="fa-solid fa-plus-circle me-2"></i>Quick Actions</h6>
@@ -298,26 +237,6 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header p-3">
-                    <h6 class="mb-0"><i class="fa-solid fa-info-circle me-2"></i>Wallet Information</h6>
-                </div>
-                <div class="card-body p-3">
-                    <div class="small">
-                        <div class="mb-2">
-                            <strong>Main Wallet:</strong> Your primary wallet for deposits and bonuses. Can be used to buy plans.
-                        </div>
-                        <div class="mb-2">
-                            <strong>Earn Wallet:</strong> Contains your daily plan earnings. This is the only wallet you can withdraw from.
-                            </div>
-                        <div class="mb-0">
-                            <strong>Bonus Wallet:</strong> Contains referral and daily bonuses. Cannot be withdrawn but can be used to buy plans.
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 @endsection
@@ -332,7 +251,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 // Update balance displays
                 document.querySelectorAll('.balance-amount').forEach((element, index) => {
-                    const balances = [data.main_balance, data.earn_balance, data.bonus_balance];
+                    const balances = [data.main_balance, data.earn_balance];
                     if (balances[index] !== undefined) {
                         element.textContent = 'Rs. ' + parseFloat(balances[index]).toFixed(2);
                     }
@@ -366,7 +285,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Check available balance
-        const fromWalletBalance = fromWallet === 'main' ? {{ $mainWallet->balance }} : {{ $bonusWallet->balance }};
+        const fromWalletBalance = {{ $mainWallet->balance }};
         if (amount > fromWalletBalance) {
             e.preventDefault();
             alert('Insufficient balance in source wallet.');

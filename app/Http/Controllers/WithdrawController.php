@@ -100,6 +100,13 @@ class WithdrawController extends Controller
                 ->orderBy('created_at', 'desc')
                 ->get();
 
+            // Get user's previous/expired plans
+            $previousPlans = UserSubscription::where('user_id', Auth::user()['id'])
+                ->where('expire_at', '<=', date('Y-m-d'))
+                ->with('plan')
+                ->orderBy('expire_at', 'desc')
+                ->get();
+
             return view('backend.user.withdraw.index', compact(
                 'netAmount',
                 'userWithdraws',

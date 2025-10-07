@@ -179,11 +179,11 @@ class UserNotification extends Model
             'user_id' => $userId,
             'type' => 'referral_bonus',
             'title' => 'Referral Bonus Earned!',
-            'message' => "You earned Rs. {$amount} referral bonus! {$referredUserName} bought a plan using your referral code.",
+            'message' => "You earned Rs. {$amount} referral bonus! {$referredUserName} bought a plan using your referral code. Bonus added to your Main Wallet.",
             'data' => [
                 'amount' => $amount,
                 'referred_user' => $referredUserName,
-                'wallet_type' => 'bonus'
+                'wallet_type' => 'main'
             ],
             'is_important' => true
         ]);

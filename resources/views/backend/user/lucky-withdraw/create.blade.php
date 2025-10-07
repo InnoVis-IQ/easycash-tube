@@ -94,13 +94,6 @@
                                     </div>
                                 </div>
                         <div class="col-md-3 mb-3">
-                            <div class="text-center p-3 border rounded bg-warning text-white wallet-card">
-                                <h6 class="mb-2"><i class="fa-solid fa-gift me-2"></i>Bonus</h6>
-                                <h4 class="mb-0">Rs. {{ number_format($bonusWallet->balance, 2) }}</h4>
-                                <small class="opacity-75">Referral Bonuses</small>
-                                    </div>
-                                </div>
-                        <div class="col-md-3 mb-3">
                             <div class="text-center p-3 border rounded bg-info text-white wallet-card">
                                 <h6 class="mb-2"><i class="fa-solid fa-wallet me-2"></i>Total</h6>
                                 <h4 class="mb-0">Rs. {{ number_format($totalWalletBalance, 2) }}</h4>
@@ -140,6 +133,19 @@
                         <h6 class="mb-0"><i class="fa-solid fa-ticket me-2"></i>Enter Contest</h6>
                     </div>
                     <div class="card-body p-4">
+                        <!-- Display Validation Errors -->
+                        @if ($errors->any())
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <h6 class="mb-2"><i class="fa-solid fa-exclamation-triangle me-2"></i>Error</h6>
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
+
                         <form action="{{ route('lucky-withdraw.store') }}" method="POST" id="entryForm">
                             @csrf
                             
@@ -160,10 +166,15 @@
                         <!-- Terms and Conditions -->
                         <div class="mb-4">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="terms" required>
+                                <input class="form-check-input @error('terms') is-invalid @enderror" type="checkbox" name="terms" id="terms" value="1" required>
                                 <label class="form-check-label" for="terms">
                                     I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terms and Conditions</a>
                                 </label>
+                                @error('terms')
+                                    <div class="invalid-feedback d-block">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
                             </div>
                         </div>
 

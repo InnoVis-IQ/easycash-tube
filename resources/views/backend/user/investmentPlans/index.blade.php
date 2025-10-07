@@ -106,7 +106,10 @@
                                     @else
                                         <button class="btn btn-secondary" disabled>
                                             <i class="fas fa-lock"></i> Insufficient Balance
-                                        </button>
+                                        </button><br>
+                                        <a href="{{ route('deposits.create') }}" class="btn btn-success mt-2">
+                                            <i class="fas fa-plus-circle"></i> Deposit
+                                        </a>
                                     @endif
                                 </div>
                             </div>

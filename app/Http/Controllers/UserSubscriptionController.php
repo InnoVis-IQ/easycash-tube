@@ -68,25 +68,10 @@ class UserSubscriptionController extends Controller
             $data['expire_at'] = $expiry;
             $data->save();
 
-            // Deduct the plan amount from user's wallets (prioritize main wallet, then bonus wallet)
-            $remainingAmount = $investmentPlan['amount'];
-            
-            // First, try to deduct from main wallet
+            // Deduct the plan amount from user's main wallet
             $mainWallet = \App\Models\UserWallet::getWalletByType($request['user'], 'main');
-            if ($mainWallet && $mainWallet->balance > 0) {
-                $deductFromMain = min($remainingAmount, $mainWallet->balance);
-                $mainWallet->deductFunds($deductFromMain, 'plan_purchase');
-                $remainingAmount -= $deductFromMain;
-            }
-            
-            // If still need more, deduct from bonus wallet
-            if ($remainingAmount > 0) {
-                $bonusWallet = \App\Models\UserWallet::getWalletByType($request['user'], 'bonus');
-                if ($bonusWallet && $bonusWallet->balance > 0) {
-                    $deductFromBonus = min($remainingAmount, $bonusWallet->balance);
-                    $bonusWallet->deductFunds($deductFromBonus, 'plan_purchase');
-                    $remainingAmount -= $deductFromBonus;
-                }
+            if ($mainWallet && $mainWallet->balance >= $investmentPlan['amount']) {
+                $mainWallet->deductFunds($investmentPlan['amount'], 'plan_purchase');
             }
             
             // Also update the legacy UserAccount for backward compatibility
@@ -97,9 +82,9 @@ class UserSubscriptionController extends Controller
             if ($currentUser && $currentUser->referred_by && $currentUser->bonus_given == 0) {
                 $referrer = User::where('referral_code', $currentUser->referred_by)->first();
                 if ($referrer) {
-                    // Give Rs. 100 bonus to referrer's bonus wallet
-                    $bonusWallet = \App\Models\UserWallet::getOrCreateWallet($referrer->id, 'bonus');
-                    $bonusWallet->addFunds(100, 'earned');
+                    // Give Rs. 100 bonus to referrer's main wallet
+                    $mainWallet = \App\Models\UserWallet::getOrCreateWallet($referrer->id, 'main');
+                    $mainWallet->addFunds(100, 'earned');
                     
                     // Also update the legacy UserAccount for backward compatibility
                     UserAccount::where('user_id', $referrer->id)->increment('net_amount', 100);

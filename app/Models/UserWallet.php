@@ -65,7 +65,7 @@ class UserWallet extends Model
                 'total_withdrawn' => 0.00,
                 'total_earned' => 0.00,
                 'is_withdrawable' => $walletType === 'earn', // Only earn wallet is withdrawable
-                'can_buy_plans' => true, // All wallets can buy plans
+                'can_buy_plans' => $walletType === 'main', // Only main wallet can buy plans
                 'description' => self::getWalletDescription($walletType)
             ]);
         }
@@ -80,8 +80,7 @@ class UserWallet extends Model
     {
         $descriptions = [
             'main' => 'Main wallet for deposits and bonuses',
-            'earn' => 'Earnings wallet for daily plan profits (withdrawable)',
-            'bonus' => 'Bonus wallet for referral and daily bonuses (not withdrawable)'
+            'earn' => 'Earnings wallet for daily plan profits (withdrawable)'
         ];
         
         return $descriptions[$walletType] ?? '';

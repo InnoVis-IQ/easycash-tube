@@ -50,6 +50,20 @@
         margin-bottom: 20px;
     }
     
+    .plan-header-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        margin-bottom: 20px;
+        border: none;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+    
+    .plan-divider {
+        border-top: 2px dashed #ccc;
+        margin: 30px 0;
+    }
+    
     .reward-amount {
         font-size: 2rem;
         font-weight: bold;
@@ -130,121 +144,169 @@
 
 @section('content')
 <div class="container-fluid px-2">
-    <!-- Daily Reward Section -->
-    <div class="daily-reward-card">
-        <div class="row align-items-center">
-            <div class="col-12 col-md-8">
-                <h5><i class="fa-solid fa-gift me-2"></i>Daily Reward</h5>
-                <p class="mb-2 small">Watch a video today to earn your daily reward!</p>
-                @if($dailyRewardClaimed)
-                    <div class="alert alert-success mb-0">
-                        <i class="fa-solid fa-check-circle me-2"></i>
-                        Daily reward claimed! Come back tomorrow for more rewards.
-                    </div>
-                @else
-                    <div class="alert alert-info mb-0">
-                        <i class="fa-solid fa-play-circle me-2"></i>
-                        Click on any video below to start watching and earn Rs {{ $dailyRewardAmount }}!
-                    </div>
-                @endif
-            </div>
-            <div class="col-12 col-md-4 text-center">
-                <div class="reward-amount">Rs {{ $dailyRewardAmount }}</div>
-                <small>Daily Reward</small>
-            </div>
-        </div>
-    </div>
+    @foreach($subscriptionData as $index => $data)
+        @php
+            $subscription = $data['subscription'];
+            $plan = $data['plan'];
+            $videos = $data['videos'];
+            $watchedVideos = $data['watchedVideos'];
+            $watchedToday = $data['watchedToday'];
+            $dailyRewardClaimed = $data['dailyRewardClaimed'];
+            $daysWatched = $data['daysWatched'];
+            $totalPlanDays = $data['totalPlanDays'];
+            $dailyRewardAmount = $data['dailyRewardAmount'];
+        @endphp
 
-    <!-- Progress Section -->
-    <div class="progress-container">
-        <h6><i class="fa-solid fa-chart-line me-2"></i>Your Progress</h6>
-        <div class="progress" style="height: 20px;">
-            <div class="progress-bar bg-success" role="progressbar" 
-                 style="width: {{ $totalPlanDays > 0 ? round(($daysWatched/$totalPlanDays)*100) : 0 }}%" 
-                 aria-valuenow="{{ $daysWatched }}" aria-valuemin="0" aria-valuemax="{{ $totalPlanDays }}">
-                                 <small>{{ $daysWatched }} / {{ $totalPlanDays }} days watched</small>
+        <!-- Plan Header -->
+        <div class="card plan-header-card">
+            <div class="card-body">
+                <h4 class="mb-3">
+                    <i class="fa-solid fa-star me-2"></i>
+                    {{ $plan->plan_name ?? 'Plan ' . ($index + 1) }}
+                </h4>
+                <div class="row">
+                    <div class="col-6 col-md-4 mb-2">
+                        <p class="mb-0"><small>Investment</small></p>
+                        <h5 class="mb-0">Rs {{ number_format($plan->plan_amount ?? 0, 2) }}</h5>
+                    </div>
+                    <div class="col-6 col-md-4 mb-2">
+                        <p class="mb-0"><small>Daily Earning</small></p>
+                        <h5 class="mb-0">Rs {{ number_format($dailyRewardAmount, 2) }}</h5>
+                    </div>
+                    <div class="col-12 col-md-4 mb-2">
+                        <p class="mb-0"><small>Total Earned</small></p>
+                        <h5 class="mb-0">Rs {{ number_format($subscription->earning ?? 0, 2) }}</h5>
+                    </div>
+                </div>
             </div>
         </div>
-        <small class="text-muted">Keep watching to earn more rewards!</small>
-    </div>
 
-    @if($watchedToday)
-        <div class="alert alert-success">
-            <i class="fa-solid fa-check-circle me-2"></i>
-            You have already watched your video for today. Come back tomorrow for the next one!
+        <!-- Daily Reward Section -->
+        <div class="daily-reward-card">
+            <div class="row align-items-center">
+                <div class="col-12 col-md-8">
+                    <h5><i class="fa-solid fa-gift me-2"></i>Daily Reward - {{ $plan->plan_name ?? 'Plan ' . ($index + 1) }}</h5>
+                    <p class="mb-2 small">Watch a video today to earn your daily reward!</p>
+                    @if($dailyRewardClaimed)
+                        <div class="alert alert-success mb-0">
+                            <i class="fa-solid fa-check-circle me-2"></i>
+                            Daily reward claimed! Come back tomorrow for more rewards.
+                        </div>
+                    @else
+                        <div class="alert alert-info mb-0">
+                            <i class="fa-solid fa-play-circle me-2"></i>
+                            Click on any video below to start watching and earn Rs {{ $dailyRewardAmount }}!
+                        </div>
+                    @endif
+                </div>
+                <div class="col-12 col-md-4 text-center">
+                    <div class="reward-amount">Rs {{ $dailyRewardAmount }}</div>
+                    <small>Daily Reward</small>
+                </div>
+            </div>
         </div>
-    @else
-        <h5><i class="fa-solid fa-play-circle me-2"></i>Available Videos</h5>
-        <div class="row">
-            @php
-                $unWatched = $videos->whereNotIn('id', $watchedVideos)->take(1);
-            @endphp
-            @forelse($unWatched as $video)
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
-                    <div class="card h-100 video-card"
-                         data-title="{{ $video->title }}"
-                         data-url="{{ $video->video_url }}"
-                         data-video-id="{{ $video->id }}"
-                         style="cursor:pointer;">
-                        @if($video->video_thumbnail)
-                            <img src="{{ asset($video->video_thumbnail) }}" class="card-img-top" alt="Thumbnail" style="height: 200px; object-fit: cover;">
-                        @else
-                            <div class="d-flex justify-content-center align-items-center" style="height:200px;background:#f5f5f5;">
-                                <img src="{{ asset('assets/images/product_images/watch.jpeg') }}" alt="Plan Icon" style="height:80px;">
+
+        <!-- Progress Section -->
+        <div class="progress-container">
+            <h6><i class="fa-solid fa-chart-line me-2"></i>Your Progress</h6>
+            <div class="progress" style="height: 20px;">
+                <div class="progress-bar bg-success" role="progressbar" 
+                     style="width: {{ $totalPlanDays > 0 ? round(($daysWatched/$totalPlanDays)*100) : 0 }}%" 
+                     aria-valuenow="{{ $daysWatched }}" aria-valuemin="0" aria-valuemax="{{ $totalPlanDays }}">
+                    <small>{{ $daysWatched }} / {{ $totalPlanDays }} days watched</small>
+                </div>
+            </div>
+            <small class="text-muted">Keep watching to earn more rewards!</small>
+        </div>
+
+        @if($watchedToday)
+            <div class="alert alert-success">
+                <i class="fa-solid fa-check-circle me-2"></i>
+                You have already watched your video for today for this plan. Come back tomorrow for the next one!
+            </div>
+        @else
+            <h5><i class="fa-solid fa-play-circle me-2"></i>Available Videos - {{ $plan->plan_name ?? 'Plan ' . ($index + 1) }}</h5>
+            <div class="row mb-4">
+                @php
+                    $unWatched = $videos->whereNotIn('id', $watchedVideos)->take(1);
+                @endphp
+                @forelse($unWatched as $video)
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
+                        <div class="card h-100 video-card"
+                             data-title="{{ $video->title }}"
+                             data-url="{{ $video->video_url }}"
+                             data-video-id="{{ $video->id }}"
+                             style="cursor:pointer;">
+                            @if($video->video_thumbnail)
+                                <img src="{{ asset($video->video_thumbnail) }}" class="card-img-top" alt="Thumbnail" style="height: 200px; object-fit: cover;">
+                            @else
+                                <div class="d-flex justify-content-center align-items-center" style="height:200px;background:#f5f5f5;">
+                                    <img src="{{ asset('assets/images/product_images/watch.jpeg') }}" alt="Plan Icon" style="height:80px;">
+                                </div>
+                            @endif
+                            <div class="card-body p-3">
+                                <h6 class="card-title small">{{ $video->title }}</h6>
+                                <p class="card-text small">{{ $video->description }}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-warning small">Click to Watch</span>
+                                    <span class="badge bg-success small">Earn Rs {{ $dailyRewardAmount }}</span>
+                                </div>
                             </div>
-                        @endif
-                        <div class="card-body p-3">
-                            <h6 class="card-title small">{{ $video->title }}</h6>
-                            <p class="card-text small">{{ $video->description }}</p>
-                            <span class="badge bg-warning small">Click to Watch</span>
                         </div>
                     </div>
-                </div>
-            @empty
-                <div class="col-12">
-                    <div class="alert alert-info">
-                        <i class="fa-solid fa-info-circle me-2"></i>
-                        No videos available for your plan at the moment.
-                    </div>
-                </div>
-            @endforelse
-        </div>
-    @endif
-
-    @if(count($watchedVideos) > 0)
-        <h3 class="mt-5"><i class="fa-solid fa-history me-2"></i>Watched Videos</h3>
-        <div class="row">
-            @php
-                $watched = $videos->whereIn('id', $watchedVideos);
-            @endphp
-            @forelse($watched as $video)
-                <div class="col-md-4 col-lg-3 mb-4">
-                    <div class="card h-100 border-success video-card"
-                         data-title="{{ $video->title }}"
-                         data-url="{{ $video->video_url }}"
-                         data-video-id="{{ $video->id }}"
-                         style="cursor:pointer;">
-                        @if($video->video_thumbnail)
-                            <img src="{{ asset($video->video_thumbnail) }}" class="card-img-top" alt="Thumbnail" style="height: 200px; object-fit: cover;">
-                        @else
-                            <div class="d-flex justify-content-center align-items-center" style="height:200px;background:#f5f5f5;">
-                                <img src="{{ asset('assets/images/product_images/watch.jpeg') }}" alt="Plan Icon" style="height:80px;">
-                            </div>
-                        @endif
-                        <div class="card-body">
-                            <h6 class="card-title">{{ $video->title }}</h6>
-                            <p class="card-text small">{{ $video->description }}</p>
-                            <span class="badge bg-success">Watched</span>
+                @empty
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <i class="fa-solid fa-info-circle me-2"></i>
+                            No videos available for this plan at the moment.
                         </div>
                     </div>
-                </div>
-            @empty
-                <div class="col-12">
-                    <p class="text-muted">You have not watched any videos yet.</p>
-                </div>
-            @endforelse
-        </div>
-    @endif
+                @endforelse
+            </div>
+        @endif
+
+        @if(count($watchedVideos) > 0)
+            <h5 class="mt-3"><i class="fa-solid fa-history me-2"></i>Watched Videos - {{ $plan->plan_name ?? 'Plan ' . ($index + 1) }}</h5>
+            <div class="row mb-4">
+                @php
+                    $watched = $videos->whereIn('id', $watchedVideos);
+                @endphp
+                @forelse($watched as $video)
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
+                        <div class="card h-100 border-success video-card"
+                             data-title="{{ $video->title }}"
+                             data-url="{{ $video->video_url }}"
+                             data-video-id="{{ $video->id }}"
+                             style="cursor:pointer;">
+                            @if($video->video_thumbnail)
+                                <img src="{{ asset($video->video_thumbnail) }}" class="card-img-top" alt="Thumbnail" style="height: 200px; object-fit: cover;">
+                            @else
+                                <div class="d-flex justify-content-center align-items-center" style="height:200px;background:#f5f5f5;">
+                                    <img src="{{ asset('assets/images/product_images/watch.jpeg') }}" alt="Plan Icon" style="height:80px;">
+                                </div>
+                            @endif
+                            <div class="card-body p-3">
+                                <h6 class="card-title small">{{ $video->title }}</h6>
+                                <p class="card-text small">{{ $video->description }}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-success small">Watched</span>
+                                    <span class="badge bg-info small">Earned Rs {{ $dailyRewardAmount }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @empty
+                    <div class="col-12">
+                        <p class="text-muted small">You have not watched any videos yet for this plan.</p>
+                    </div>
+                @endforelse
+            </div>
+        @endif
+
+        @if($index < count($subscriptionData) - 1)
+            <hr class="plan-divider">
+        @endif
+    @endforeach
 </div>
 
 <!-- Video Modal -->

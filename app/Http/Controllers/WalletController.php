@@ -22,7 +22,6 @@ class WalletController extends Controller
         // Get or create all wallets for user
         $mainWallet = UserWallet::getOrCreateWallet($userId, 'main');
         $earnWallet = UserWallet::getOrCreateWallet($userId, 'earn');
-        $bonusWallet = UserWallet::getOrCreateWallet($userId, 'bonus');
         
         // Get wallet statistics
         $totalBalance = UserWallet::getTotalBalance($userId);
@@ -43,8 +42,7 @@ class WalletController extends Controller
         
         return view('backend.user.wallet.index', compact(
             'mainWallet',
-            'earnWallet', 
-            'bonusWallet',
+            'earnWallet',
             'totalBalance',
             'withdrawableBalance',
             'planPurchaseBalance',
@@ -59,8 +57,8 @@ class WalletController extends Controller
     public function transfer(Request $request)
     {
         $request->validate([
-            'from_wallet' => 'required|in:main,bonus',
-            'to_wallet' => 'required|in:earn,main',
+            'from_wallet' => 'required|in:main',
+            'to_wallet' => 'required|in:earn',
             'amount' => 'required|numeric|min:0.01',
         ]);
 
@@ -178,7 +176,6 @@ class WalletController extends Controller
             'total_balance' => UserWallet::sum('balance'),
             'main_wallets' => UserWallet::where('wallet_type', 'main')->count(),
             'earn_wallets' => UserWallet::where('wallet_type', 'earn')->count(),
-            'bonus_wallets' => UserWallet::where('wallet_type', 'bonus')->count(),
         ];
         
         return view('backend.admin.wallet.index', compact(
@@ -224,7 +221,6 @@ class WalletController extends Controller
         $stats = [
             'main_balance' => UserWallet::getWalletByType($userId, 'main')->balance ?? 0,
             'earn_balance' => UserWallet::getWalletByType($userId, 'earn')->balance ?? 0,
-            'bonus_balance' => UserWallet::getWalletByType($userId, 'bonus')->balance ?? 0,
             'total_balance' => UserWallet::getTotalBalance($userId),
             'withdrawable_balance' => UserWallet::getWithdrawableBalance($userId),
             'plan_purchase_balance' => UserWallet::getPlanPurchaseBalance($userId)

@@ -119,7 +119,12 @@ class UserWallet extends Model
             return false; // Insufficient funds
         }
         
-        DB::beginTransaction();
+        // Check if we're already in a transaction
+        $inTransaction = DB::transactionLevel() > 0;
+        
+        if (!$inTransaction) {
+            DB::beginTransaction();
+        }
         
         try {
             $this->decrement('balance', $amount);
@@ -130,11 +135,16 @@ class UserWallet extends Model
                 $this->increment('total_withdrawn', $amount);
             }
             
-            DB::commit();
+            if (!$inTransaction) {
+                DB::commit();
+            }
+            
             return true;
         } catch (\Exception $e) {
-            DB::rollBack();
-            return false;
+            if (!$inTransaction) {
+                DB::rollBack();
+            }
+            throw $e; // Re-throw so calling code can handle
         }
     }
 

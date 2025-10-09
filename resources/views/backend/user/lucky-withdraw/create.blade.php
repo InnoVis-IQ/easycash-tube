@@ -160,36 +160,36 @@
                                         <li><strong>Duration:</strong> 15 days with Rs. 700 daily profit</li>
                                         <li><strong>Total Potential Profit:</strong> Rs. 10,500</li>
                                     </ul>
+                                </div>
                             </div>
-                        </div>
 
-                        <!-- Terms and Conditions -->
-                        <div class="mb-4">
-                            <div class="form-check">
-                                <input class="form-check-input @error('terms') is-invalid @enderror" type="checkbox" name="terms" id="terms" value="1" required>
-                                <label class="form-check-label" for="terms">
-                                    I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terms and Conditions</a>
-                                </label>
-                                @error('terms')
-                                    <div class="invalid-feedback d-block">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
+                            <!-- Terms and Conditions -->
+                            <div class="mb-4">
+                                <div class="form-check">
+                                    <input class="form-check-input @error('terms') is-invalid @enderror" type="checkbox" name="terms" id="terms" value="1" required>
+                                    <label class="form-check-label" for="terms">
+                                        I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terms and Conditions</a>
+                                    </label>
+                                    @error('terms')
+                                        <div class="invalid-feedback d-block">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
                             </div>
-                        </div>
 
-                        <!-- Submit Button -->
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <a href="{{ route('lucky-withdraw.index') }}" class="btn btn-secondary me-md-2">
-                                <i class="fa-solid fa-arrow-left me-2"></i>Cancel
-                            </a>
-                            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
-                                    <i class="fa-solid fa-ticket me-2"></i>Enter Contest (Rs. 100)
-                            </button>
-                        </div>
-                    </form>
+                            <!-- Submit Button -->
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a href="{{ route('lucky-withdraw.index') }}" class="btn btn-secondary me-md-2">
+                                    <i class="fa-solid fa-arrow-left me-2"></i>Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                                        <i class="fa-solid fa-ticket me-2"></i> Enter Contest (Rs. 100)
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-            </div>
             @endif
         </div>
 

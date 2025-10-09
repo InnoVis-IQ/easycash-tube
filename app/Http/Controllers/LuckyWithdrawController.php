@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use App\Models\LuckyWithdrawEntry;
 use App\Models\User;
 use App\Models\UserSubscription;
@@ -151,8 +152,12 @@ class LuckyWithdrawController extends Controller
             DB::beginTransaction();
             
             // Deduct entry fee from Main Wallet
-            $mainWallet->deductFunds(100, 'plan_purchase');
+            $deductResult = $mainWallet->deductFunds(100, 'plan_purchase');
             
+            if (!$deductResult) {
+                throw new \Exception('Failed to deduct funds from wallet');
+            }
+
             // Create new entry
             $entry = LuckyWithdrawEntry::create([
                 'user_id' => $currentUser->id,
@@ -174,6 +179,7 @@ class LuckyWithdrawController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error("Lucky Draw - Entry creation failed: " . $e->getMessage());
             return redirect()->back()
                 ->with('error', 'An error occurred while processing your entry. Please try again.')
                 ->withInput();

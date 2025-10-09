@@ -20,8 +20,8 @@ class AdminMiddleware
             return redirect()->route('login');
         }
 
-        // Check if user is admin (you can modify this logic based on your user roles)
-        if (!Auth::user()->is_admin) {
+        // Check if user is admin or superadmin
+        if (!in_array(strtoupper(Auth::user()->role), ['ADMIN', 'SUPERADMIN'])) {
             abort(403, 'Access denied. Admin privileges required.');
         }
 

@@ -207,9 +207,15 @@
             <div class="card">
                 <div class="card-body p-3">
                     <div class="d-grid gap-2">
-                        <a href="{{ route('lucky-withdraw.index') }}" class="btn btn-outline-primary">
-                            <i class="fa-solid fa-arrow-left me-2"></i>Back to Lucky Withdraw
-                        </a>
+                        @if(isset($isAdmin) && $isAdmin)
+                            <a href="{{ route('admin.lucky-withdraw.index') }}" class="btn btn-outline-primary">
+                                <i class="fa-solid fa-arrow-left me-2"></i>Back to Admin Panel
+                            </a>
+                        @else
+                            <a href="{{ route('lucky-withdraw.index') }}" class="btn btn-outline-primary">
+                                <i class="fa-solid fa-arrow-left me-2"></i>Back to Lucky Withdraw
+                            </a>
+                        @endif
                         @if($luckyWithdrawEntry->is_winner)
                             <a href="{{ route('dashboard') }}" class="btn btn-success">
                                 <i class="fa-solid fa-chart-line me-2"></i>View Dashboard

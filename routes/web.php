@@ -93,11 +93,17 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::get('/lucky-withdraw/{luckyWithdrawEntry}', [Controllers\LuckyWithdrawController::class, 'show'])->name('lucky-withdraw.show');
     Route::get('/lucky-withdraw/stats', [Controllers\LuckyWithdrawController::class, 'getRoundStats'])->name('lucky-withdraw.stats');
     
-    // Admin Lucky Withdraw Routes
-    Route::get('/admin/lucky-withdraw', [Controllers\LuckyWithdrawController::class, 'adminIndex'])->name('admin.lucky-withdraw.index');
-    Route::post('/admin/lucky-withdraw/{luckyWithdrawEntry}/approve', [Controllers\LuckyWithdrawController::class, 'approve'])->name('admin.lucky-withdraw.approve');
-    Route::post('/admin/lucky-withdraw/{luckyWithdrawEntry}/reject', [Controllers\LuckyWithdrawController::class, 'reject'])->name('admin.lucky-withdraw.reject');
-    Route::post('/admin/lucky-withdraw/select-winner', [Controllers\LuckyWithdrawController::class, 'selectWinner'])->name('admin.lucky-withdraw.select-winner');
+    // Admin Lucky Withdraw Routes (Protected by admin middleware)
+    Route::middleware(['admin'])->group(function () {
+        Route::get('/admin/lucky-withdraw', [Controllers\LuckyWithdrawController::class, 'adminIndex'])->name('admin.lucky-withdraw.index');
+        Route::get('/admin/lucky-withdraw/contestants', [Controllers\LuckyWithdrawController::class, 'contestants'])->name('admin.lucky-withdraw.contestants');
+        Route::post('/admin/lucky-withdraw/{luckyWithdrawEntry}/approve', [Controllers\LuckyWithdrawController::class, 'approve'])->name('admin.lucky-withdraw.approve');
+        Route::post('/admin/lucky-withdraw/{luckyWithdrawEntry}/reject', [Controllers\LuckyWithdrawController::class, 'reject'])->name('admin.lucky-withdraw.reject');
+        Route::post('/admin/lucky-withdraw/select-winner', [Controllers\LuckyWithdrawController::class, 'selectWinner'])->name('admin.lucky-withdraw.select-winner');
+        Route::post('/admin/lucky-withdraw/{luckyWithdrawEntry}/select-as-winner', [Controllers\LuckyWithdrawController::class, 'selectSpecificWinner'])->name('admin.lucky-withdraw.select-specific-winner');
+        Route::post('/admin/lucky-withdraw/end-round', [Controllers\LuckyWithdrawController::class, 'endCurrentRound'])->name('admin.lucky-withdraw.end-round');
+        Route::post('/admin/lucky-withdraw/start-round', [Controllers\LuckyWithdrawController::class, 'startNewRound'])->name('admin.lucky-withdraw.start-round');
+    });
 
     // Wallet Routes
     Route::get('/wallet', [Controllers\WalletController::class, 'index'])->name('wallet.index');

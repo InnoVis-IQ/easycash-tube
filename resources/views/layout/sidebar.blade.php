@@ -113,6 +113,12 @@
                 </a>
             </li>
             <li class="nav-item active" style="transition: all 0.3s ease;">
+                <a class="nav-link text-white" href="{{ route('admin.lucky-withdraw.index') }}" style="color: white !important; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
+                    <i class="fa-solid fa-trophy"></i>
+                    <span class="menu-title pl-2">Lucky Draw</span>
+                </a>
+            </li>
+            <li class="nav-item active" style="transition: all 0.3s ease;">
                 <a class="nav-link text-white" href="{{ route('admin.settings') }}" style="color: white !important; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
                     <i class="fa-solid fa-cog"></i>
                     <span class="menu-title pl-2">Settings</span>
@@ -120,7 +126,7 @@
             </li>
             <li class="nav-item active" style="transition: all 0.3s ease;">
                 <a class="nav-link text-white" href="{{ route('admin.support.index') }}" style="color: white !important; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
-                    <i class="fa-solid fa-cog"></i>
+                    <i class="fa-solid fa-headset"></i>
                     <span class="menu-title pl-2">Support</span>
                 </a>
             </li>
@@ -163,6 +169,14 @@
                 <a class="nav-link text-white" href="{{ route('withdraws.index') }}" style="color: white !important; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
                     <i class="fa-solid fa-arrow-up"></i>
                     <span class="menu-title pl-2">Withdrawals</span>
+                </a>
+            </li>
+            
+            <!-- Lucky Draw -->
+            <li class="nav-item active" style="transition: all 0.3s ease;">
+                <a class="nav-link text-white" href="{{ route('lucky-withdraw.index') }}" style="color: white !important; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
+                    <i class="fa-solid fa-trophy"></i>
+                    <span class="menu-title pl-2">Lucky Draw</span>
                 </a>
             </li>
             

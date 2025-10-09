@@ -196,7 +196,10 @@ class LuckyWithdrawController extends Controller
             abort(403);
         }
 
-        return view('backend.user.lucky-withdraw.show', compact('luckyWithdrawEntry'));
+        // Determine if current user is admin
+        $isAdmin = in_array(Auth::user()->role, ['ADMIN', 'SUPERADMIN']);
+
+        return view('backend.user.lucky-withdraw.show', compact('luckyWithdrawEntry', 'isAdmin'));
     }
 
     /**
@@ -249,6 +252,49 @@ class LuckyWithdrawController extends Controller
     }
 
     /**
+     * Display list of contestants for current round
+     */
+    public function contestants(Request $request)
+    {
+        // Get current round info
+        $currentRoundStart = LuckyWithdrawEntry::getCurrentRoundStartDate();
+        $currentRoundEnd = LuckyWithdrawEntry::getCurrentRoundEndDate();
+        $isRoundActive = LuckyWithdrawEntry::isCurrentRoundActive();
+        
+        // Get all approved entries for current round
+        $query = LuckyWithdrawEntry::with(['user', 'user.subscriptions.plan'])
+            ->currentRound()
+            ->approved()
+            ->activeRound();
+
+        // Search by user
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->whereHas('user', function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $contestants = $query->orderBy('created_at', 'desc')->paginate(20);
+        
+        // Check if winner already selected for this round
+        $existingWinner = LuckyWithdrawEntry::currentRound()
+            ->where('is_winner', true)
+            ->with('user')
+            ->first();
+        
+        return view('backend.admin.lucky-withdraw.contestants', compact(
+            'contestants',
+            'currentRoundStart',
+            'currentRoundEnd',
+            'isRoundActive',
+            'existingWinner',
+            'request'
+        ));
+    }
+
+    /**
      * Approve an entry
      */
     public function approve(LuckyWithdrawEntry $luckyWithdrawEntry)
@@ -284,7 +330,7 @@ class LuckyWithdrawController extends Controller
     }
 
     /**
-     * Select winner for current round
+     * Select winner for current round (Random)
      */
     public function selectWinner()
     {
@@ -315,42 +361,8 @@ class LuckyWithdrawController extends Controller
             // Randomly select winner
             $winner = $eligibleEntries->random();
             
-            // Mark winner
-            $winner->update(['is_winner' => true]);
-            
-            // Send notification to winner
-            \App\Models\UserNotification::createLuckyWinnerNotification($winner->user_id, 'Plan 3', 7000);
-            
-            // Create free Plan 3 subscription for winner
-            $plan3 = InvestmentPlan::where('title', 'Plan 3')->first();
-            
-            if ($plan3) {
-                $expiryDate = date('Y-m-d', strtotime('+' . $plan3->plan_days . ' days'));
-                
-                UserSubscription::create([
-                    'user_id' => $winner->user_id,
-                    'investment_plan_id' => $plan3->id,
-                    'expire_at' => $expiryDate,
-                    'earning' => 0,
-                    'watched_videos' => [],
-                    'daily_reward_claimed' => null,
-                ]);
-
-                // Add Plan 3 amount to main wallet as bonus
-                $mainWallet = \App\Models\UserWallet::getOrCreateWallet($winner->user_id, 'main');
-                $mainWallet->addFunds($plan3->amount, 'earned');
-                
-                // Also update the legacy UserAccount for backward compatibility
-                $userAccount = \App\Models\UserAccount::where('user_id', $winner->user_id)->first();
-                if ($userAccount) {
-                    $userAccount->increment('net_amount', $plan3->amount);
-                } else {
-                    \App\Models\UserAccount::create([
-                        'user_id' => $winner->user_id,
-                        'net_amount' => $plan3->amount,
-                    ]);
-                }
-            }
+            // Process winner reward
+            $result = $this->processWinnerReward($winner);
 
             // Mark all entries for this round as completed
             LuckyWithdrawEntry::currentRound()
@@ -359,12 +371,163 @@ class LuckyWithdrawController extends Controller
 
             DB::commit();
 
-            return back()->with('success', 'Winner selected successfully! Winner: ' . $winner->user->name . ' (Entry Code: ' . $winner->entry_code . ')');
+            return back()->with('success', $result['message']);
 
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error("Lucky Draw - Winner selection failed: " . $e->getMessage());
             return back()->with('error', 'An error occurred while selecting the winner. Please try again.');
         }
+    }
+
+    /**
+     * Select specific user as winner
+     */
+    public function selectSpecificWinner(Request $request, LuckyWithdrawEntry $luckyWithdrawEntry)
+    {
+        // Check if entry is eligible
+        if ($luckyWithdrawEntry->status !== 'approved') {
+            return back()->with('error', 'Only approved entries can be selected as winner.');
+        }
+
+        if ($luckyWithdrawEntry->round_status !== 'active') {
+            return back()->with('error', 'Only active entries can be selected as winner.');
+        }
+
+        // Check if entry is from current round
+        $currentRoundStart = LuckyWithdrawEntry::getCurrentRoundStartDate();
+        if ($luckyWithdrawEntry->round_start_date !== $currentRoundStart) {
+            return back()->with('error', 'Only current round entries can be selected as winner.');
+        }
+
+        // Check if winner already selected for this round
+        $existingWinner = LuckyWithdrawEntry::currentRound()
+            ->where('is_winner', true)
+            ->first();
+
+        if ($existingWinner) {
+            return back()->with('error', 'Winner has already been selected for this round.');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Process winner reward
+            $result = $this->processWinnerReward($luckyWithdrawEntry);
+
+            // Mark all entries for this round as completed
+            LuckyWithdrawEntry::currentRound()
+                ->where('status', 'approved')
+                ->update(['round_status' => 'completed']);
+
+            DB::commit();
+
+            return back()->with('success', $result['message']);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Lucky Draw - Winner selection failed: " . $e->getMessage());
+            return back()->with('error', 'An error occurred while selecting the winner. Please try again.');
+        }
+    }
+
+    /**
+     * Process winner reward based on conditions
+     */
+    private function processWinnerReward(LuckyWithdrawEntry $winner)
+    {
+        // Mark as winner
+        $winner->update(['is_winner' => true]);
+        
+        // Get Plan 3
+        $plan3 = InvestmentPlan::find(3);
+        
+        if (!$plan3) {
+            throw new \Exception('Plan 3 not found in the system.');
+        }
+
+        $userId = $winner->user_id;
+        $rewardType = '';
+        $rewardMessage = '';
+
+        // Check condition 1: Has user subscribed to plan 3 earlier or currently?
+        $hasSubscribedPlan3 = UserSubscription::where('user_id', $userId)
+            ->where('investment_plan_id', 3)
+            ->exists();
+
+        // Check condition 2: Does user have 2 active plans?
+        $activePlansCount = UserSubscription::where('user_id', $userId)
+            ->where('expire_at', '>=', now())
+            ->whereNull('deleted_at')
+            ->count();
+
+        // Determine reward based on conditions
+        if (!$hasSubscribedPlan3 && $activePlansCount < 2) {
+            // User meets conditions: Subscribe to Plan 3
+            $expiryDate = now()->addDays($plan3->plan_days);
+            
+            UserSubscription::create([
+                'user_id' => $userId,
+                'investment_plan_id' => $plan3->id,
+                'expire_at' => $expiryDate,
+                'earning' => 0,
+                'watched_videos' => [],
+                'daily_reward_claimed' => null,
+            ]);
+
+            $rewardType = 'Plan 3 Subscription';
+            $rewardMessage = 'Winner: ' . $winner->user->name . ' (Entry Code: ' . $winner->entry_code . ') - Reward: Plan 3 Subscription';
+            
+            // Send notification
+            \App\Models\UserNotification::create([
+                'user_id' => $userId,
+                'title' => 'Lucky Draw Winner!',
+                'message' => 'Congratulations! You won the Lucky Draw! You have been subscribed to Plan 3 for ' . $plan3->plan_days . ' days.',
+                'type' => 'success',
+                'is_read' => false,
+            ]);
+
+        } else {
+            // User doesn't meet conditions: Add Rs. 7000 to main wallet
+            $mainWallet = \App\Models\UserWallet::getOrCreateWallet($userId, 'main');
+            $mainWallet->addFunds(7000, 'earned');
+            
+            // Also update the legacy UserAccount for backward compatibility
+            $userAccount = \App\Models\UserAccount::where('user_id', $userId)->first();
+            if ($userAccount) {
+                $userAccount->increment('net_amount', 7000);
+            } else {
+                \App\Models\UserAccount::create([
+                    'user_id' => $userId,
+                    'net_amount' => 7000,
+                ]);
+            }
+
+            $reason = '';
+            if ($hasSubscribedPlan3) {
+                $reason = 'User has already subscribed to Plan 3. ';
+            }
+            if ($activePlansCount >= 2) {
+                $reason .= 'User has reached the maximum limit of 2 active plans.';
+            }
+
+            $rewardType = 'Rs. 7000 Bonus';
+            $rewardMessage = 'Winner: ' . $winner->user->name . ' (Entry Code: ' . $winner->entry_code . ') - Reward: Rs. 7000 added to Main Wallet. Reason: ' . $reason;
+            
+            // Send notification
+            \App\Models\UserNotification::create([
+                'user_id' => $userId,
+                'title' => 'Lucky Draw Winner!',
+                'message' => 'Congratulations! You won the Lucky Draw! Rs. 7000 has been added to your Main Wallet as bonus.',
+                'type' => 'success',
+                'is_read' => false,
+            ]);
+        }
+
+        return [
+            'reward_type' => $rewardType,
+            'message' => 'Winner selected successfully! ' . $rewardMessage
+        ];
     }
 
     /**
@@ -386,5 +549,102 @@ class LuckyWithdrawController extends Controller
         ];
 
         return response()->json($stats);
+    }
+
+    /**
+     * End current round manually (Admin only)
+     */
+    public function endCurrentRound()
+    {
+        $currentRoundStart = LuckyWithdrawEntry::getCurrentRoundStartDate();
+        
+        // Get current round entries
+        $currentRoundEntries = LuckyWithdrawEntry::currentRound()
+            ->where('round_status', 'active')
+            ->count();
+
+        if ($currentRoundEntries === 0) {
+            return back()->with('error', 'No active round found to end.');
+        }
+
+        // Check if winner has been selected
+        $hasWinner = LuckyWithdrawEntry::currentRound()
+            ->where('is_winner', true)
+            ->exists();
+
+        if (!$hasWinner) {
+            return back()->with('error', 'Please select a winner before ending the round.');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Mark all entries for current round as completed
+            LuckyWithdrawEntry::currentRound()
+                ->where('round_status', 'active')
+                ->update([
+                    'round_status' => 'completed',
+                    'round_end_date' => now()->format('Y-m-d') // Update end date to today
+                ]);
+
+            DB::commit();
+
+            Log::info("Lucky Draw - Round ended manually. Round start: {$currentRoundStart}, Entries affected: {$currentRoundEntries}");
+
+            return back()->with('success', "Current round ended successfully! {$currentRoundEntries} entries marked as completed. You can now start a new round.");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Lucky Draw - Failed to end round: " . $e->getMessage());
+            return back()->with('error', 'An error occurred while ending the round. Please try again.');
+        }
+    }
+
+    /**
+     * Start new round manually (Admin only)
+     */
+    public function startNewRound()
+    {
+        // Check if there are any active entries in the current calculated round
+        $currentRoundStart = LuckyWithdrawEntry::getCurrentRoundStartDate();
+        $activeEntries = LuckyWithdrawEntry::where('round_start_date', $currentRoundStart)
+            ->where('round_status', 'active')
+            ->count();
+
+        if ($activeEntries > 0) {
+            return back()->with('error', 'Cannot start a new round. Current round still has active entries. Please end the current round first.');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Calculate new round dates (start from today)
+            $newRoundStart = now()->format('Y-m-d');
+            $newRoundEnd = now()->addDays(14)->format('Y-m-d');
+
+            // Send notification to all users about new round
+            $users = User::where('role', 'USER')->get();
+            foreach ($users as $user) {
+                \App\Models\UserNotification::create([
+                    'user_id' => $user->id,
+                    'title' => 'New Lucky Draw Round Started!',
+                    'message' => "A new Lucky Draw round has started! Enter now for a chance to win Plan 3 (Rs. 7,000). Round ends on " . date('M d, Y', strtotime($newRoundEnd)) . ".",
+                    'type' => 'info',
+                    'is_read' => false,
+                    'is_important' => false,
+                ]);
+            }
+
+            DB::commit();
+
+            Log::info("Lucky Draw - New round started manually. Start: {$newRoundStart}, End: {$newRoundEnd}");
+
+            return back()->with('success', "New Lucky Draw round started successfully! Round runs from " . date('M d, Y', strtotime($newRoundStart)) . " to " . date('M d, Y', strtotime($newRoundEnd)) . ". Users have been notified.");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Lucky Draw - Failed to start new round: " . $e->getMessage());
+            return back()->with('error', 'An error occurred while starting the new round. Please try again.');
+        }
     }
 }

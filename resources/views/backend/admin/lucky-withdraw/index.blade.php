@@ -132,11 +132,14 @@
                 </div>
                 <div class="card-body p-3">
                     @if($roundStats['approved_entries'] > 0)
-                        <form action="{{ route('admin.lucky-withdraw.select-winner') }}" method="POST" class="d-inline">
+                        <a href="{{ route('admin.lucky-withdraw.contestants') }}" class="btn btn-primary btn-lg w-100 mb-2">
+                            <i class="fa-solid fa-users me-2"></i>View Contestants & Select Winner
+                        </a>
+                        <form action="{{ route('admin.lucky-withdraw.select-winner') }}" method="POST" class="d-inline w-100">
                             @csrf
                             <button type="submit" class="btn btn-success btn-lg w-100" 
-                                    onclick="return confirm('Are you sure you want to select a winner? This action cannot be undone.')">
-                                <i class="fa-solid fa-dice me-2"></i>Select Winner
+                                    onclick="return confirm('Are you sure you want to randomly select a winner? This action cannot be undone.')">
+                                <i class="fa-solid fa-dice me-2"></i>Random Winner Selection
                             </button>
                         </form>
                         <small class="text-muted d-block mt-2">
@@ -155,6 +158,100 @@
         </div>
     </div>
 
+    <!-- Round Management -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-warning">
+                <div class="card-header p-3 bg-warning bg-opacity-10">
+                    <h6 class="mb-0"><i class="fa-solid fa-tools me-2"></i>Round Management Controls</h6>
+                </div>
+                <div class="card-body p-3">
+                    <div class="row">
+                        @php
+                            $hasActiveEntries = $roundStats['approved_entries'] > 0;
+                            $hasWinner = \App\Models\LuckyWithdrawEntry::currentRound()->where('is_winner', true)->exists();
+                            $isRoundActive = \Carbon\Carbon::parse($currentRoundEnd)->isFuture();
+                        @endphp
+                        
+                        <div class="col-md-6">
+                            <div class="card mb-3 mb-md-0">
+                                <div class="card-body p-3">
+                                    <h6 class="mb-2"><i class="fa-solid fa-stop-circle text-danger me-2"></i>End Current Round</h6>
+                                    <p class="small text-muted mb-3">Manually end the current round before the scheduled end date.</p>
+                                    
+                                    @if($hasActiveEntries && $hasWinner)
+                                        <form action="{{ route('admin.lucky-withdraw.end-round') }}" method="POST" class="d-inline w-100">
+                                            @csrf
+                                            <button type="submit" class="btn btn-danger w-100" 
+                                                    onclick="return confirm('Are you sure you want to end the current round? This will mark all entries as completed and allow you to start a new round.')">
+                                                <i class="fa-solid fa-flag-checkered me-2"></i>End Current Round
+                                            </button>
+                                        </form>
+                                        <small class="text-muted d-block mt-2">
+                                            <i class="fa-solid fa-check-circle text-success"></i> Winner selected. Round can be ended.
+                                        </small>
+                                    @elseif($hasActiveEntries && !$hasWinner)
+                                        <button class="btn btn-secondary w-100" disabled>
+                                            <i class="fa-solid fa-ban me-2"></i>End Current Round
+                                        </button>
+                                        <small class="text-danger d-block mt-2">
+                                            <i class="fa-solid fa-exclamation-circle"></i> Please select a winner first
+                                        </small>
+                                    @else
+                                        <button class="btn btn-secondary w-100" disabled>
+                                            <i class="fa-solid fa-ban me-2"></i>No Active Round
+                                        </button>
+                                        <small class="text-muted d-block mt-2">
+                                            No active entries to end
+                                        </small>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body p-3">
+                                    <h6 class="mb-2"><i class="fa-solid fa-play-circle text-success me-2"></i>Start New Round</h6>
+                                    <p class="small text-muted mb-3">Begin a new Lucky Draw round and notify all users.</p>
+                                    
+                                    @if(!$hasActiveEntries)
+                                        <form action="{{ route('admin.lucky-withdraw.start-round') }}" method="POST" class="d-inline w-100">
+                                            @csrf
+                                            <button type="submit" class="btn btn-success w-100" 
+                                                    onclick="return confirm('Are you sure you want to start a new round? All users will be notified about the new Lucky Draw.')">
+                                                <i class="fa-solid fa-rocket me-2"></i>Start New Round
+                                            </button>
+                                        </form>
+                                        <small class="text-muted d-block mt-2">
+                                            <i class="fa-solid fa-info-circle text-info"></i> New 15-day round will begin today
+                                        </small>
+                                    @else
+                                        <button class="btn btn-secondary w-100" disabled>
+                                            <i class="fa-solid fa-ban me-2"></i>Start New Round
+                                        </button>
+                                        <small class="text-danger d-block mt-2">
+                                            <i class="fa-solid fa-exclamation-circle"></i> End current round first
+                                        </small>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info mt-3 mb-0">
+                        <small>
+                            <strong><i class="fa-solid fa-lightbulb me-1"></i>Note:</strong> 
+                            Round management allows you to control the Lucky Draw schedule manually. 
+                            End the current round after selecting a winner, then start a new round to allow users to participate again. 
+                            All users will be notified when a new round starts.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Filters -->
     <div class="row mb-4">
         <div class="col-12">
@@ -163,7 +260,7 @@
                     <form method="GET" action="{{ route('admin.lucky-withdraw.index') }}">
                         <div class="row g-3">
                             <div class="col-md-3">
-                                <select name="status" class="form-select">
+                                <select name="status" class="form-select form-control">
                                     <option value="">All Status</option>
                                     <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
                                     <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Approved</option>

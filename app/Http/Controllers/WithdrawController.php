@@ -137,6 +137,7 @@ class WithdrawController extends Controller
         if(!$userBankAccount){
             $newAccount = new UserBankAccount;
             $newAccount['user_id'] = $request['userID'];
+            $newAccount['bank_name'] = $request['bank_name'];
             $newAccount['account_title'] = $request['acc_title'];
             $newAccount['account_number'] = $request['acc_number'];
             // Store payment method in account_title for now (since we don't have a separate field)

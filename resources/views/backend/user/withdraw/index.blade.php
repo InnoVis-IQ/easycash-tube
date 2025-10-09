@@ -109,7 +109,6 @@
         </div>
         <div class="card-body">
             <ul class="list-unstyled mb-0">
-                <li><i class="fas fa-check text-success"></i> Withdrawals only available after completing a plan</li>
                 <li><i class="fas fa-check text-success"></i> Withdrawals can only be made for the previously completed plans (except starter plan)</li>
                 <li><i class="fas fa-check text-success"></i> Withdrawal requests are processed within 24-48 hours</li>
                 <li><i class="fas fa-check text-success"></i> Supported payment methods: Easypaisa, JazzCash, NayaPay</li>
@@ -137,7 +136,16 @@
                                 <option value="easypaisa">Easypaisa</option>
                                 <option value="jazzcash">JazzCash</option>
                                 <option value="nayapay">NayaPay</option>
+                                <option value="bank">Bank</option>
                             </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-5">
+                            <label>Bank Name</label>
+                        </div>
+                        <div class="col-md-7">
+                            <input type="text" name="bank_name" placeholder="HBL" class="form-control">
                         </div>
                     </div>
                     <div class="form-group row">
@@ -161,9 +169,9 @@
                             <label>Amount (PKR)</label>
                         </div>
                         <div class="col-md-7">
-                            <input type="number" name="amount" min="500" max="{{ $netAmount }}" placeholder="500"
+                            <input type="number" name="amount" min="500" placeholder="500"
                                 class="form-control" required>
-                            <small class="text-muted">Minimum: Rs. 500, Maximum: Rs. {{ $netAmount }}</small>
+                            <small class="text-muted">Minimum: Rs. 500</small>
                         </div>
                     </div>
                     <div class="form-group">
@@ -176,7 +184,6 @@
             @else
             <div class="alert alert-danger">
                 <h4><i class="fa-solid fa-lock me-2"></i>Withdrawals Not Available</h4>
-                <p>Withdrawals are only available after completing a plan. You need to finish your current plan before you can withdraw earnings.</p>
                 <p>
                     <a href="{{ route('plans.index') }}" class="btn btn-primary">
                         <i class="fa-solid fa-compass-drafting me-2"></i>View Plans
@@ -213,15 +220,15 @@
                                     <td>{{ $withdrawal->created_at->format('M d, Y H:i') }}</td>
                                     <td>{{ $withdrawal->amount }} PKR</td>
                                     <td>
-                                        @if($withdrawal->user_bank)
-                                            {{ ucfirst($withdrawal->user_bank->account_title ?? 'N/A') }}
+                                        @if($withdrawal->userBankAccount)
+                                            {{ ucfirst($withdrawal->userBankAccount->account_title ?? 'N/A') }}
                                         @else
                                             N/A
                                         @endif
                                     </td>
                                     <td>
-                                        @if($withdrawal->user_bank)
-                                            {{ $withdrawal->user_bank->account_number ?? 'N/A' }}
+                                        @if($withdrawal->userBankAccount)
+                                            {{ $withdrawal->userBankAccount->account_number ?? 'N/A' }}
                                         @else
                                             N/A
                                         @endif

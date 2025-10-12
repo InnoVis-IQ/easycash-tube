@@ -23,55 +23,62 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 style="font-weight: bold;" class="mb-3">
-                        <i class="fa-solid fa-trophy text-warning"></i> Current Round Information
-                    </h4>
-                    <div class="row">
-                        <div class="col-md-3">
-                            <p class="mb-1"><strong>Round Start:</strong></p>
-                            <p class="text-primary">{{ \Carbon\Carbon::parse($currentRoundStart)->format('d M Y') }}</p>
+                    @if($activeRound)
+                        <h4 style="font-weight: bold;" class="mb-3">
+                            <i class="fa-solid fa-trophy text-warning"></i> Round #{{ $activeRound->round_number }} Information
+                        </h4>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <p class="mb-1"><strong>Round Start:</strong></p>
+                                <p class="text-primary">{{ $activeRound->start_date->format('d M Y') }}</p>
+                            </div>
+                            <div class="col-md-3">
+                                <p class="mb-1"><strong>Round End:</strong></p>
+                                <p class="text-primary">{{ $activeRound->end_date->format('d M Y') }}</p>
+                            </div>
+                            <div class="col-md-3">
+                                <p class="mb-1"><strong>Total Contestants:</strong></p>
+                                <p class="text-success" style="font-size: 1.5rem; font-weight: bold;">{{ $contestants->total() }}</p>
+                            </div>
+                            <div class="col-md-3">
+                                <p class="mb-1"><strong>Round Status:</strong></p>
+                                @if($activeRound->status === 'active' && $activeRound->isInDateRange())
+                                    <span class="badge badge-success" style="font-size: 1rem;">Active</span>
+                                @else
+                                    <span class="badge badge-danger" style="font-size: 1rem;">Ended</span>
+                                @endif
+                            </div>
                         </div>
-                        <div class="col-md-3">
-                            <p class="mb-1"><strong>Round End:</strong></p>
-                            <p class="text-primary">{{ \Carbon\Carbon::parse($currentRoundEnd)->format('d M Y') }}</p>
-                        </div>
-                        <div class="col-md-3">
-                            <p class="mb-1"><strong>Total Contestants:</strong></p>
-                            <p class="text-success" style="font-size: 1.5rem; font-weight: bold;">{{ $contestants->total() }}</p>
-                        </div>
-                        <div class="col-md-3">
-                            <p class="mb-1"><strong>Round Status:</strong></p>
-                            @if($isRoundActive)
-                                <span class="badge badge-success" style="font-size: 1rem;">Active</span>
-                            @else
-                                <span class="badge badge-danger" style="font-size: 1rem;">Ended</span>
-                            @endif
-                        </div>
-                    </div>
 
-                    @if($existingWinner)
-                        <div class="alert alert-success mt-3">
-                            <h5><i class="fa-solid fa-crown"></i> Winner Already Selected!</h5>
-                            <p class="mb-0">
-                                <strong>Winner:</strong> {{ $existingWinner->user->name }} 
-                                ({{ $existingWinner->user->email }}) <br>
-                                <strong>Entry Code:</strong> {{ $existingWinner->entry_code }}
-                            </p>
-                        </div>
+                        @if($activeRound->winner_id)
+                            <div class="alert alert-success mt-3">
+                                <h5><i class="fa-solid fa-crown"></i> Winner Already Selected!</h5>
+                                <p class="mb-0">
+                                    <strong>Winner:</strong> {{ $activeRound->winner->name }} 
+                                    ({{ $activeRound->winner->email }}) <br>
+                                    <strong>Entry Code:</strong> {{ $activeRound->winnerEntry->entry_code }}
+                                </p>
+                            </div>
+                        @else
+                            <div class="alert alert-info mt-3">
+                                <h5><i class="fa-solid fa-info-circle"></i> Winner Selection Available</h5>
+                                <p class="mb-0">
+                                    You can select a winner randomly or choose a specific contestant below.
+                                </p>
+                                <form method="POST" action="{{ route('admin.lucky-withdraw.select-winner') }}" 
+                                      onsubmit="return confirm('Are you sure you want to randomly select a winner from all contestants? This action cannot be undone.');" 
+                                      class="mt-2">
+                                    @csrf
+                                    <button type="submit" class="btn btn-warning" style="background-color: #ffc107; border-color: #ffc107;">
+                                        <i class="fa-solid fa-dice"></i> Select Winner Randomly
+                                    </button>
+                                </form>
+                            </div>
+                        @endif
                     @else
-                        <div class="alert alert-info mt-3">
-                            <h5><i class="fa-solid fa-info-circle"></i> Winner Selection Available</h5>
-                            <p class="mb-0">
-                                You can select a winner randomly or choose a specific contestant below.
-                            </p>
-                            <form method="POST" action="{{ route('admin.lucky-withdraw.select-winner') }}" 
-                                  onsubmit="return confirm('Are you sure you want to randomly select a winner from all contestants? This action cannot be undone.');" 
-                                  class="mt-2">
-                                @csrf
-                                <button type="submit" class="btn btn-warning" style="background-color: #ffc107; border-color: #ffc107;">
-                                    <i class="fa-solid fa-dice"></i> Select Winner Randomly
-                                </button>
-                            </form>
+                        <div class="alert alert-warning">
+                            <h5><i class="fa-solid fa-exclamation-triangle"></i> No Active Round</h5>
+                            <p class="mb-0">There is no active round. Please start a new round first.</p>
                         </div>
                     @endif
                 </div>

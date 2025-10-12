@@ -12,6 +12,7 @@ class LuckyWithdrawEntry extends Model
 
     protected $fillable = [
         'user_id',
+        'round_id',
         'entry_code',
         'entry_amount',
         'payment_method',
@@ -43,12 +44,38 @@ class LuckyWithdrawEntry extends Model
                 $model->entry_code = 'LW' . strtoupper(Str::random(8));
             }
             
-            // Set round dates if not provided
-            if (empty($model->round_start_date)) {
-                $model->round_start_date = self::getCurrentRoundStartDate();
+            // Assign to active round if not set
+            if (empty($model->round_id)) {
+                $activeRound = LuckyWithdrawRound::getActiveRound();
+                if ($activeRound) {
+                    $model->round_id = $activeRound->id;
+                    // Keep legacy date fields for backward compatibility
+                    $model->round_start_date = $activeRound->start_date;
+                    $model->round_end_date = $activeRound->end_date;
+                }
             }
-            if (empty($model->round_end_date)) {
-                $model->round_end_date = self::getCurrentRoundEndDate();
+        });
+
+        static::created(function ($model) {
+            // Update round statistics when a new entry is created
+            if ($model->round) {
+                $model->round->updateStatistics();
+            }
+        });
+
+        static::updated(function ($model) {
+            // Update round statistics when entry status changes
+            if ($model->isDirty('status') || $model->isDirty('round_status')) {
+                if ($model->round) {
+                    $model->round->updateStatistics();
+                }
+            }
+        });
+
+        static::deleted(function ($model) {
+            // Update round statistics when an entry is deleted
+            if ($model->round) {
+                $model->round->updateStatistics();
             }
         });
     }
@@ -62,29 +89,85 @@ class LuckyWithdrawEntry extends Model
     }
 
     /**
-     * Get current round start date (every 15 days)
+     * Get the round this entry belongs to
      */
-    public static function getCurrentRoundStartDate()
+    public function round()
     {
-        $today = now();
-        $daysSinceStart = $today->diffInDays('2024-01-01') % 15;
-        return $today->subDays($daysSinceStart)->format('Y-m-d');
+        return $this->belongsTo(LuckyWithdrawRound::class, 'round_id');
     }
 
     /**
-     * Get current round end date
+     * Get current round start date from database (legacy method for backward compatibility)
+     * @deprecated Use LuckyWithdrawRound::getActiveRound() instead
+     */
+    public static function getCurrentRoundStartDate()
+    {
+        $activeRound = LuckyWithdrawRound::getActiveRound();
+        
+        if ($activeRound) {
+            return $activeRound->start_date->format('Y-m-d');
+        }
+        
+        // Fallback to old logic if no active round exists
+        $today = now()->format('Y-m-d');
+        
+        $currentRound = self::where('round_start_date', '<=', $today)
+                           ->where('round_end_date', '>=', $today)
+                           ->orderBy('round_start_date', 'desc')
+                           ->first();
+        
+        if ($currentRound) {
+            return $currentRound->round_start_date->format('Y-m-d');
+        }
+        
+        $latestRound = self::orderBy('round_start_date', 'desc')
+                          ->first();
+        
+        if ($latestRound) {
+            return $latestRound->round_start_date->format('Y-m-d');
+        }
+        
+        $daysSinceStart = now()->diffInDays('2024-01-01') % 15;
+        return now()->subDays($daysSinceStart)->format('Y-m-d');
+    }
+
+    /**
+     * Get current round end date from database (legacy method for backward compatibility)
+     * @deprecated Use LuckyWithdrawRound::getActiveRound() instead
      */
     public static function getCurrentRoundEndDate()
     {
+        $activeRound = LuckyWithdrawRound::getActiveRound();
+        
+        if ($activeRound) {
+            return $activeRound->end_date->format('Y-m-d');
+        }
+        
+        // Fallback to old logic
+        $latestEntry = self::where('round_start_date', self::getCurrentRoundStartDate())
+                           ->orderBy('round_end_date', 'desc')
+                           ->first();
+        
+        if ($latestEntry && $latestEntry->round_end_date) {
+            return $latestEntry->round_end_date->format('Y-m-d');
+        }
+        
         $startDate = self::getCurrentRoundStartDate();
         return date('Y-m-d', strtotime($startDate . ' +14 days'));
     }
 
     /**
-     * Check if current round is active
+     * Check if current round is active (legacy method for backward compatibility)
+     * @deprecated Use LuckyWithdrawRound::getActiveRound() instead
      */
     public static function isCurrentRoundActive()
     {
+        $activeRound = LuckyWithdrawRound::getActiveRound();
+        
+        if ($activeRound) {
+            return $activeRound->isInDateRange();
+        }
+        
         $today = now()->format('Y-m-d');
         $endDate = self::getCurrentRoundEndDate();
         return $today <= $endDate;
@@ -95,6 +178,13 @@ class LuckyWithdrawEntry extends Model
      */
     public static function getActiveEntriesForCurrentRound()
     {
+        $activeRound = LuckyWithdrawRound::getActiveRound();
+        
+        if ($activeRound) {
+            return $activeRound->approvedEntries()->get();
+        }
+        
+        // Fallback to old logic
         return self::where('round_start_date', self::getCurrentRoundStartDate())
                    ->where('status', 'approved')
                    ->where('round_status', 'active')
@@ -106,6 +196,12 @@ class LuckyWithdrawEntry extends Model
      */
     public function scopeCurrentRound($query)
     {
+        $activeRound = LuckyWithdrawRound::getActiveRound();
+        
+        if ($activeRound) {
+            return $query->where('round_id', $activeRound->id);
+        }
+        
         return $query->where('round_start_date', self::getCurrentRoundStartDate());
     }
 

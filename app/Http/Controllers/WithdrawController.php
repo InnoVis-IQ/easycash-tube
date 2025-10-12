@@ -142,7 +142,7 @@ class WithdrawController extends Controller
             $newAccount['account_number'] = $request['acc_number'];
             // Store payment method in account_title for now (since we don't have a separate field)
             $paymentMethod = $request['payment_method'] ?? 'easypaisa';
-            $newAccount['account_title'] = $request['acc_title'] . ' (' . ucfirst($paymentMethod) . ')';
+            $newAccount['bank_name'] = $request['bank_name'] . ' (' . ucfirst($paymentMethod) . ')';
             $newAccount->save();
 
             $userBankAccountID = $newAccount->id;

@@ -60,8 +60,13 @@
                             <p class="mb-0">Manage contest entries and select winners</p>
                         </div>
                         <div class="col-md-4 text-center">
-                            <h4 class="mb-0">{{ $roundStats['total_entries'] }}</h4>
-                            <small>Total Entries This Round</small>
+                            @if($activeRound)
+                                <h4 class="mb-0">{{ $activeRound->total_entries }}</h4>
+                                <small>Round #{{ $activeRound->round_number }} Entries</small>
+                            @else
+                                <h4 class="mb-0">-</h4>
+                                <small>No Active Round</small>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -70,11 +75,12 @@
     </div>
 
     <!-- Round Statistics -->
+    @if($activeRound)
     <div class="row mb-4">
         <div class="col-md-3">
             <div class="card bg-primary text-white">
                 <div class="card-body p-3 text-center">
-                    <h5 class="mb-1">{{ $roundStats['total_entries'] }}</h5>
+                    <h5 class="mb-1">{{ $activeRound->entries()->count() }}</h5>
                     <small>Total Entries</small>
                 </div>
             </div>
@@ -82,7 +88,7 @@
         <div class="col-md-3">
             <div class="card bg-success text-white">
                 <div class="card-body p-3 text-center">
-                    <h5 class="mb-1">{{ $roundStats['approved_entries'] }}</h5>
+                    <h5 class="mb-1">{{ $activeRound->entries()->where('status', 'approved')->count() }}</h5>
                     <small>Approved</small>
                 </div>
             </div>
@@ -90,7 +96,7 @@
         <div class="col-md-3">
             <div class="card bg-warning text-white">
                 <div class="card-body p-3 text-center">
-                    <h5 class="mb-1">{{ $roundStats['pending_entries'] }}</h5>
+                    <h5 class="mb-1">{{ $activeRound->entries()->where('status', 'pending')->count() }}</h5>
                     <small>Pending</small>
                 </div>
             </div>
@@ -98,12 +104,13 @@
         <div class="col-md-3">
             <div class="card bg-danger text-white">
                 <div class="card-body p-3 text-center">
-                    <h5 class="mb-1">{{ $roundStats['rejected_entries'] }}</h5>
+                    <h5 class="mb-1">{{ $activeRound->entries()->where('status', 'rejected')->count() }}</h5>
                     <small>Rejected</small>
                 </div>
             </div>
         </div>
     </div>
+    @endif
 
     <!-- Current Round Information -->
     <div class="row mb-4">
@@ -113,15 +120,21 @@
                     <h6 class="mb-0"><i class="fa-solid fa-calendar me-2"></i>Current Round</h6>
                 </div>
                 <div class="card-body p-3">
-                    <p class="mb-2"><strong>Start Date:</strong> {{ \Carbon\Carbon::parse($currentRoundStart)->format('M d, Y') }}</p>
-                    <p class="mb-2"><strong>End Date:</strong> {{ \Carbon\Carbon::parse($currentRoundEnd)->format('M d, Y') }}</p>
-                    <p class="mb-0"><strong>Status:</strong> 
-                        @if(\Carbon\Carbon::parse($currentRoundEnd)->isFuture())
-                            <span class="text-success">Active</span>
-                        @else
-                            <span class="text-danger">Ended</span>
-                        @endif
-                    </p>
+                    @if($activeRound)
+                        <p class="mb-2"><strong>Round Number:</strong> #{{ $activeRound->round_number }}</p>
+                        <p class="mb-2"><strong>Start Date:</strong> {{ $activeRound->start_date->format('M d, Y') }}</p>
+                        <p class="mb-2"><strong>End Date:</strong> {{ $activeRound->end_date->format('M d, Y') }}</p>
+                        <p class="mb-2"><strong>Days Remaining:</strong> {{ $activeRound->days_remaining }} days</p>
+                        <p class="mb-0"><strong>Status:</strong> 
+                            @if($activeRound->isInDateRange())
+                                <span class="text-success">Active</span>
+                            @else
+                                <span class="text-danger">Ended</span>
+                            @endif
+                        </p>
+                    @else
+                        <p class="text-muted mb-0">No active round. Start a new round to begin accepting entries.</p>
+                    @endif
                 </div>
             </div>
         </div>
@@ -131,7 +144,7 @@
                     <h6 class="mb-0"><i class="fa-solid fa-crown me-2"></i>Winner Selection</h6>
                 </div>
                 <div class="card-body p-3">
-                    @if($roundStats['approved_entries'] > 0)
+                    @if($activeRound && $activeRound->approvedEntries()->count() > 0)
                         <a href="{{ route('admin.lucky-withdraw.contestants') }}" class="btn btn-primary btn-lg w-100 mb-2">
                             <i class="fa-solid fa-users me-2"></i>View Contestants & Select Winner
                         </a>
@@ -143,14 +156,18 @@
                             </button>
                         </form>
                         <small class="text-muted d-block mt-2">
-                            {{ $roundStats['approved_entries'] }} approved entries eligible for winner selection
+                            {{ $activeRound->approvedEntries()->count() }} approved entries eligible for winner selection
                         </small>
                     @else
                         <button class="btn btn-secondary btn-lg w-100" disabled>
                             <i class="fa-solid fa-ban me-2"></i>No Eligible Entries
                         </button>
                         <small class="text-muted d-block mt-2">
-                            No approved entries available for winner selection
+                            @if(!$activeRound)
+                                No active round. Start a new round first.
+                            @else
+                                No approved entries available for winner selection
+                            @endif
                         </small>
                     @endif
                 </div>
@@ -168,9 +185,9 @@
                 <div class="card-body p-3">
                     <div class="row">
                         @php
-                            $hasActiveEntries = $roundStats['approved_entries'] > 0;
-                            $hasWinner = \App\Models\LuckyWithdrawEntry::currentRound()->where('is_winner', true)->exists();
-                            $isRoundActive = \Carbon\Carbon::parse($currentRoundEnd)->isFuture();
+                            $hasActiveEntries = $activeRound && $activeRound->approvedEntries()->count() > 0;
+                            $hasWinner = $activeRound && $activeRound->winner_id !== null;
+                            $isRoundActive = $activeRound && $activeRound->status === 'active';
                         @endphp
                         
                         <div class="col-md-6">
@@ -179,24 +196,31 @@
                                     <h6 class="mb-2"><i class="fa-solid fa-stop-circle text-danger me-2"></i>End Current Round</h6>
                                     <p class="small text-muted mb-3">Manually end the current round before the scheduled end date.</p>
                                     
-                                    @if($hasActiveEntries && $hasWinner)
-                                        <form action="{{ route('admin.lucky-withdraw.end-round') }}" method="POST" class="d-inline w-100">
-                                            @csrf
-                                            <button type="submit" class="btn btn-danger w-100" 
-                                                    onclick="return confirm('Are you sure you want to end the current round? This will mark all entries as completed and allow you to start a new round.')">
-                                                <i class="fa-solid fa-flag-checkered me-2"></i>End Current Round
-                                            </button>
-                                        </form>
-                                        <small class="text-muted d-block mt-2">
-                                            <i class="fa-solid fa-check-circle text-success"></i> Winner selected. Round can be ended.
-                                        </small>
-                                    @elseif($hasActiveEntries && !$hasWinner)
-                                        <button class="btn btn-secondary w-100" disabled>
-                                            <i class="fa-solid fa-ban me-2"></i>End Current Round
+                                    @if(!$isRoundActive)
+                                    <button class="btn btn-secondary w-100" disabled>
+                                        <i class="fa-solid fa-ban me-2"></i>No Active Round
+                                    </button>
+                                    <small class="text-muted d-block mt-2">
+                                        No active entries to end
+                                    </small>
+                                    @elseif(!$hasWinner)
+                                    <button class="btn btn-secondary w-100" disabled>
+                                        <i class="fa-solid fa-ban me-2"></i>End Current Round
+                                    </button>
+                                    <small class="text-danger d-block mt-2">
+                                        <i class="fa-solid fa-exclamation-circle"></i> Please select a winner first
+                                    </small>
+                                    @elseif($isRoundActive && $hasWinner)
+                                    <form action="{{ route('admin.lucky-withdraw.end-round') }}" method="POST" class="d-inline w-100">
+                                        @csrf
+                                        <button type="submit" class="btn btn-danger w-100" 
+                                                onclick="return confirm('Are you sure you want to end the current round? This will mark all entries as completed and allow you to start a new round.')">
+                                            <i class="fa-solid fa-flag-checkered me-2"></i>End Current Round
                                         </button>
-                                        <small class="text-danger d-block mt-2">
-                                            <i class="fa-solid fa-exclamation-circle"></i> Please select a winner first
-                                        </small>
+                                    </form>
+                                    <small class="text-muted d-block mt-2">
+                                        <i class="fa-solid fa-check-circle text-success"></i> Winner selected. Round can be ended.
+                                    </small>
                                     @else
                                         <button class="btn btn-secondary w-100" disabled>
                                             <i class="fa-solid fa-ban me-2"></i>No Active Round
@@ -215,7 +239,7 @@
                                     <h6 class="mb-2"><i class="fa-solid fa-play-circle text-success me-2"></i>Start New Round</h6>
                                     <p class="small text-muted mb-3">Begin a new Lucky Draw round and notify all users.</p>
                                     
-                                    @if(!$hasActiveEntries)
+                                    @if(!$isRoundActive)
                                         <form action="{{ route('admin.lucky-withdraw.start-round') }}" method="POST" class="d-inline w-100">
                                             @csrf
                                             <button type="submit" class="btn btn-success w-100" 
@@ -268,8 +292,14 @@
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <input type="date" name="round_start_date" class="form-control" 
-                                       value="{{ request('round_start_date') }}" placeholder="Round Date">
+                                <select name="round_id" class="form-select form-control">
+                                    <option value="">All Rounds</option>
+                                    @foreach($allRounds as $round)
+                                        <option value="{{ $round->id }}" {{ request('round_id') == $round->id ? 'selected' : '' }}>
+                                            Round #{{ $round->round_number }} ({{ $round->start_date->format('M d, Y') }})
+                                        </option>
+                                    @endforeach
+                                </select>
                             </div>
                             <div class="col-md-4">
                                 <input type="text" name="search" class="form-control" 
@@ -329,10 +359,15 @@
                                         <td>{{ ucfirst(str_replace('_', ' ', $entry->payment_method)) }}</td>
                                         <td><code>{{ $entry->transaction_id }}</code></td>
                                         <td>
-                                            <small>
-                                                {{ \Carbon\Carbon::parse($entry->round_start_date)->format('M d') }} - 
-                                                {{ \Carbon\Carbon::parse($entry->round_end_date)->format('M d') }}
-                                            </small>
+                                            @if($entry->round)
+                                                <small>
+                                                    Round #{{ $entry->round->round_number }}<br>
+                                                    {{ $entry->round->start_date->format('M d') }} - 
+                                                    {{ $entry->round->end_date->format('M d') }}
+                                                </small>
+                                            @else
+                                                <small class="text-muted">No round</small>
+                                            @endif
                                         </td>
                                         <td>
                                             @if($entry->is_winner)

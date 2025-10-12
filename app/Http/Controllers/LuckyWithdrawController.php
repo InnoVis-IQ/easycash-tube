@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Models\LuckyWithdrawEntry;
+use App\Models\LuckyWithdrawRound;
 use App\Models\User;
 use App\Models\UserSubscription;
 use App\Models\InvestmentPlan;
@@ -21,31 +22,40 @@ class LuckyWithdrawController extends Controller
     {
         $currentUser = Auth::user();
         
-        // Get current round information
-        $currentRoundStart = LuckyWithdrawEntry::getCurrentRoundStartDate();
-        $currentRoundEnd = LuckyWithdrawEntry::getCurrentRoundEndDate();
-        $isRoundActive = LuckyWithdrawEntry::isCurrentRoundActive();
+        // Get active round
+        $activeRound = LuckyWithdrawRound::getActiveRound();
+        
+        if (!$activeRound) {
+            return view('backend.user.lucky-withdraw.index', [
+                'activeRound' => null,
+                'userEntry' => null,
+                'userEntries' => collect(),
+                'recentWinners' => collect(),
+                'mainWallet' => \App\Models\UserWallet::getOrCreateWallet($currentUser->id, 'main'),
+                'earnWallet' => \App\Models\UserWallet::getOrCreateWallet($currentUser->id, 'earn'),
+                'totalWalletBalance' => \App\Models\UserWallet::getTotalBalance($currentUser->id),
+                'withdrawableBalance' => \App\Models\UserWallet::getWithdrawableBalance($currentUser->id),
+                'currentRoundStart' => null,
+                'currentRoundEnd' => null
+            ]);
+        }
         
         // Check if user already has an entry for current round
         $userEntry = LuckyWithdrawEntry::where('user_id', $currentUser->id)
-            ->where('round_start_date', $currentRoundStart)
+            ->where('round_id', $activeRound->id)
             ->first();
-        
-        // Get current round entries count
-        $currentRoundEntries = LuckyWithdrawEntry::currentRound()
-            ->approved()
-            ->activeRound()
-            ->count();
         
         // Get user's entry history
         $userEntries = LuckyWithdrawEntry::where('user_id', $currentUser->id)
+            ->with('round')
             ->orderBy('created_at', 'desc')
             ->get();
         
         // Get recent winners
-        $recentWinners = LuckyWithdrawEntry::where('is_winner', true)
-            ->with('user')
-            ->orderBy('updated_at', 'desc')
+        $recentWinners = LuckyWithdrawRound::completed()
+            ->with(['winner', 'winnerEntry'])
+            ->whereNotNull('winner_id')
+            ->orderBy('draw_date', 'desc')
             ->take(5)
             ->get();
         
@@ -55,18 +65,21 @@ class LuckyWithdrawController extends Controller
         $totalWalletBalance = \App\Models\UserWallet::getTotalBalance($currentUser->id);
         $withdrawableBalance = \App\Models\UserWallet::getWithdrawableBalance($currentUser->id);
         
+        // For backward compatibility with views
+        $currentRoundStart = $activeRound ? $activeRound->start_date->format('Y-m-d') : null;
+        $currentRoundEnd = $activeRound ? $activeRound->end_date->format('Y-m-d') : null;
+        
         return view('backend.user.lucky-withdraw.index', compact(
-            'currentRoundStart',
-            'currentRoundEnd',
-            'isRoundActive',
+            'activeRound',
             'userEntry',
-            'currentRoundEntries',
             'userEntries',
             'recentWinners',
             'mainWallet',
             'earnWallet',
             'totalWalletBalance',
-            'withdrawableBalance'
+            'withdrawableBalance',
+            'currentRoundStart',
+            'currentRoundEnd'
         ));
     }
 
@@ -77,21 +90,27 @@ class LuckyWithdrawController extends Controller
     {
         $currentUser = Auth::user();
         
+        // Get active round
+        $activeRound = LuckyWithdrawRound::getActiveRound();
+        
+        if (!$activeRound) {
+            return redirect()->route('lucky-withdraw.index')
+                ->with('error', 'No active round available. Please wait for the next round.');
+        }
+        
+        if (!$activeRound->isInDateRange()) {
+            return redirect()->route('lucky-withdraw.index')
+                ->with('error', 'Current round is not active. Please wait for the next round.');
+        }
+        
         // Check if user already has an entry for current round
-        $currentRoundStart = LuckyWithdrawEntry::getCurrentRoundStartDate();
         $userEntry = LuckyWithdrawEntry::where('user_id', $currentUser->id)
-            ->where('round_start_date', $currentRoundStart)
+            ->where('round_id', $activeRound->id)
             ->first();
         
         if ($userEntry) {
             return redirect()->route('lucky-withdraw.index')
                 ->with('error', 'You already have an entry for the current round.');
-        }
-        
-        $isRoundActive = LuckyWithdrawEntry::isCurrentRoundActive();
-        if (!$isRoundActive) {
-            return redirect()->route('lucky-withdraw.index')
-                ->with('error', 'Current round is not active. Please wait for the next round.');
         }
         
         // Get user's wallet balances
@@ -100,10 +119,12 @@ class LuckyWithdrawController extends Controller
         $totalWalletBalance = \App\Models\UserWallet::getTotalBalance($currentUser->id);
         $withdrawableBalance = \App\Models\UserWallet::getWithdrawableBalance($currentUser->id);
         
-        // Get round dates for display
-        $currentRoundEnd = LuckyWithdrawEntry::getCurrentRoundEndDate();
+        // For backward compatibility with views
+        $currentRoundStart = $activeRound->start_date->format('Y-m-d');
+        $currentRoundEnd = $activeRound->end_date->format('Y-m-d');
         
         return view('backend.user.lucky-withdraw.create', compact(
+            'activeRound',
             'mainWallet',
             'earnWallet',
             'totalWalletBalance',
@@ -124,21 +145,27 @@ class LuckyWithdrawController extends Controller
 
         $currentUser = Auth::user();
         
+        // Get active round
+        $activeRound = LuckyWithdrawRound::getActiveRound();
+        
+        if (!$activeRound) {
+            return redirect()->route('lucky-withdraw.index')
+                ->with('error', 'No active round available. Please wait for the next round.');
+        }
+        
+        if (!$activeRound->isInDateRange()) {
+            return redirect()->route('lucky-withdraw.index')
+                ->with('error', 'Current round is not active. Please wait for the next round.');
+        }
+        
         // Check if user already has an entry for current round
-        $currentRoundStart = LuckyWithdrawEntry::getCurrentRoundStartDate();
         $existingEntry = LuckyWithdrawEntry::where('user_id', $currentUser->id)
-            ->where('round_start_date', $currentRoundStart)
+            ->where('round_id', $activeRound->id)
             ->first();
         
         if ($existingEntry) {
             return redirect()->route('lucky-withdraw.index')
                 ->with('error', 'You already have an entry for the current round.');
-        }
-        
-        $isRoundActive = LuckyWithdrawEntry::isCurrentRoundActive();
-        if (!$isRoundActive) {
-            return redirect()->route('lucky-withdraw.index')
-                ->with('error', 'Current round is not active. Please wait for the next round.');
         }
 
         // Check if user has sufficient balance in Main Wallet
@@ -161,12 +188,14 @@ class LuckyWithdrawController extends Controller
             // Create new entry
             $entry = LuckyWithdrawEntry::create([
                 'user_id' => $currentUser->id,
+                'round_id' => $activeRound->id,
                 'entry_amount' => 100.00,
                 'payment_method' => 'wallet_deduction',
                 'transaction_id' => 'WALLET-' . time(),
                 'status' => 'approved', // Auto-approve wallet entries
-                'round_start_date' => $currentRoundStart,
-                'round_end_date' => LuckyWithdrawEntry::getCurrentRoundEndDate(),
+                'round_status' => 'active',
+                'round_start_date' => $activeRound->start_date,
+                'round_end_date' => $activeRound->end_date,
             ]);
 
             // Also update legacy UserAccount for backward compatibility
@@ -207,7 +236,7 @@ class LuckyWithdrawController extends Controller
      */
     public function adminIndex(Request $request)
     {
-        $query = LuckyWithdrawEntry::with('user');
+        $query = LuckyWithdrawEntry::with(['user', 'round']);
 
         // Filter by status
         if ($request->has('status') && $request->status) {
@@ -215,8 +244,8 @@ class LuckyWithdrawController extends Controller
         }
 
         // Filter by round
-        if ($request->has('round_start_date') && $request->round_start_date) {
-            $query->where('round_start_date', $request->round_start_date);
+        if ($request->has('round_id') && $request->round_id) {
+            $query->where('round_id', $request->round_id);
         }
 
         // Search by user
@@ -230,23 +259,16 @@ class LuckyWithdrawController extends Controller
 
         $entries = $query->orderBy('created_at', 'desc')->paginate(20);
 
-        // Get current round info
-        $currentRoundStart = LuckyWithdrawEntry::getCurrentRoundStartDate();
-        $currentRoundEnd = LuckyWithdrawEntry::getCurrentRoundEndDate();
+        // Get active round
+        $activeRound = LuckyWithdrawRound::getActiveRound();
         
-        // Get round statistics
-        $roundStats = [
-            'total_entries' => LuckyWithdrawEntry::currentRound()->count(),
-            'approved_entries' => LuckyWithdrawEntry::currentRound()->approved()->count(),
-            'pending_entries' => LuckyWithdrawEntry::currentRound()->where('status', 'pending')->count(),
-            'rejected_entries' => LuckyWithdrawEntry::currentRound()->where('status', 'rejected')->count(),
-        ];
+        // Get all rounds for filter dropdown
+        $allRounds = LuckyWithdrawRound::orderBy('round_number', 'desc')->get();
 
         return view('backend.admin.lucky-withdraw.index', compact(
             'entries',
-            'currentRoundStart',
-            'currentRoundEnd',
-            'roundStats',
+            'activeRound',
+            'allRounds',
             'request'
         ));
     }
@@ -256,16 +278,19 @@ class LuckyWithdrawController extends Controller
      */
     public function contestants(Request $request)
     {
-        // Get current round info
-        $currentRoundStart = LuckyWithdrawEntry::getCurrentRoundStartDate();
-        $currentRoundEnd = LuckyWithdrawEntry::getCurrentRoundEndDate();
-        $isRoundActive = LuckyWithdrawEntry::isCurrentRoundActive();
+        // Get active round
+        $activeRound = LuckyWithdrawRound::getActiveRound();
         
-        // Get all approved entries for current round
-        $query = LuckyWithdrawEntry::with(['user', 'user.subscriptions.plan'])
-            ->currentRound()
-            ->approved()
-            ->activeRound();
+        if (!$activeRound) {
+            return view('backend.admin.lucky-withdraw.contestants', [
+                'activeRound' => null,
+                'contestants' => collect(),
+                'request' => $request
+            ]);
+        }
+        
+        // Get all approved entries for active round
+        $query = $activeRound->approvedEntries()->with(['user', 'user.subscriptions.plan']);
 
         // Search by user
         if ($request->has('search') && $request->search) {
@@ -278,18 +303,9 @@ class LuckyWithdrawController extends Controller
 
         $contestants = $query->orderBy('created_at', 'desc')->paginate(20);
         
-        // Check if winner already selected for this round
-        $existingWinner = LuckyWithdrawEntry::currentRound()
-            ->where('is_winner', true)
-            ->with('user')
-            ->first();
-        
         return view('backend.admin.lucky-withdraw.contestants', compact(
+            'activeRound',
             'contestants',
-            'currentRoundStart',
-            'currentRoundEnd',
-            'isRoundActive',
-            'existingWinner',
             'request'
         ));
     }
@@ -334,40 +350,35 @@ class LuckyWithdrawController extends Controller
      */
     public function selectWinner()
     {
-        $currentRoundStart = LuckyWithdrawEntry::getCurrentRoundStartDate();
+        $activeRound = LuckyWithdrawRound::getActiveRound();
         
-        // Get all approved entries for current round
-        $eligibleEntries = LuckyWithdrawEntry::currentRound()
-            ->approved()
-            ->activeRound()
-            ->get();
+        if (!$activeRound) {
+            return back()->with('error', 'No active round found.');
+        }
+
+        // Check if winner already selected for this round
+        if ($activeRound->winner_id) {
+            return back()->with('error', 'Winner has already been selected for this round.');
+        }
+
+        $eligibleEntries = $activeRound->approvedEntries()->get();
 
         if ($eligibleEntries->count() === 0) {
             return back()->with('error', 'No eligible entries found for winner selection.');
         }
 
-        // Check if winner already selected for this round
-        $existingWinner = LuckyWithdrawEntry::currentRound()
-            ->where('is_winner', true)
-            ->first();
-
-        if ($existingWinner) {
-            return back()->with('error', 'Winner has already been selected for this round.');
-        }
-
         try {
             DB::beginTransaction();
 
-            // Randomly select winner
-            $winner = $eligibleEntries->random();
+            // Select winner using the round model
+            $winner = $activeRound->selectWinner();
+            
+            if (!$winner) {
+                throw new \Exception('Failed to select winner');
+            }
             
             // Process winner reward
             $result = $this->processWinnerReward($winner);
-
-            // Mark all entries for this round as completed
-            LuckyWithdrawEntry::currentRound()
-                ->where('status', 'approved')
-                ->update(['round_status' => 'completed']);
 
             DB::commit();
 
@@ -394,31 +405,31 @@ class LuckyWithdrawController extends Controller
             return back()->with('error', 'Only active entries can be selected as winner.');
         }
 
-        // Check if entry is from current round
-        $currentRoundStart = LuckyWithdrawEntry::getCurrentRoundStartDate();
-        if ($luckyWithdrawEntry->round_start_date !== $currentRoundStart) {
-            return back()->with('error', 'Only current round entries can be selected as winner.');
+        // Get the round
+        $round = $luckyWithdrawEntry->round;
+        
+        if (!$round) {
+            return back()->with('error', 'Round not found for this entry.');
+        }
+
+        // Check if round is active
+        if ($round->status !== 'active') {
+            return back()->with('error', 'Only entries from active rounds can be selected as winner.');
         }
 
         // Check if winner already selected for this round
-        $existingWinner = LuckyWithdrawEntry::currentRound()
-            ->where('is_winner', true)
-            ->first();
-
-        if ($existingWinner) {
+        if ($round->winner_id) {
             return back()->with('error', 'Winner has already been selected for this round.');
         }
 
         try {
             DB::beginTransaction();
 
+            // Complete round with this winner
+            $round->completeWithWinner($luckyWithdrawEntry->id);
+            
             // Process winner reward
             $result = $this->processWinnerReward($luckyWithdrawEntry);
-
-            // Mark all entries for this round as completed
-            LuckyWithdrawEntry::currentRound()
-                ->where('status', 'approved')
-                ->update(['round_status' => 'completed']);
 
             DB::commit();
 
@@ -436,25 +447,22 @@ class LuckyWithdrawController extends Controller
      */
     private function processWinnerReward(LuckyWithdrawEntry $winner)
     {
-        // Mark as winner
-        $winner->update(['is_winner' => true]);
-        
         // Get Plan 3
         $plan3 = InvestmentPlan::find(3);
         
         if (!$plan3) {
             throw new \Exception('Plan 3 not found in the system.');
         }
-
+        
         $userId = $winner->user_id;
         $rewardType = '';
         $rewardMessage = '';
-
+        
         // Check condition 1: Has user subscribed to plan 3 earlier or currently?
         $hasSubscribedPlan3 = UserSubscription::where('user_id', $userId)
             ->where('investment_plan_id', 3)
             ->exists();
-
+            
         // Check condition 2: Does user have 2 active plans?
         $activePlansCount = UserSubscription::where('user_id', $userId)
             ->where('expire_at', '>=', now())
@@ -464,11 +472,11 @@ class LuckyWithdrawController extends Controller
         // Determine reward based on conditions
         if (!$hasSubscribedPlan3 && $activePlansCount < 2) {
             // User meets conditions: Subscribe to Plan 3
-            $expiryDate = now()->addDays($plan3->plan_days);
+            $expiryDate = now()->addDays($plan3['plan_days']);
             
             UserSubscription::create([
                 'user_id' => $userId,
-                'investment_plan_id' => $plan3->id,
+                'investment_plan_id' => $plan3['id'],
                 'expire_at' => $expiryDate,
                 'earning' => 0,
                 'watched_videos' => [],
@@ -482,9 +490,10 @@ class LuckyWithdrawController extends Controller
             \App\Models\UserNotification::create([
                 'user_id' => $userId,
                 'title' => 'Lucky Draw Winner!',
-                'message' => 'Congratulations! You won the Lucky Draw! You have been subscribed to Plan 3 for ' . $plan3->plan_days . ' days.',
-                'type' => 'success',
+                'message' => 'Congratulations! You won the Lucky Draw! You have been subscribed to Plan 3.',
+                'type' => 'lucky_winner',
                 'is_read' => false,
+                'is_important' => true,
             ]);
 
         } else {
@@ -519,8 +528,9 @@ class LuckyWithdrawController extends Controller
                 'user_id' => $userId,
                 'title' => 'Lucky Draw Winner!',
                 'message' => 'Congratulations! You won the Lucky Draw! Rs. 7000 has been added to your Main Wallet as bonus.',
-                'type' => 'success',
+                'type' => 'lucky_winner',
                 'is_read' => false,
+                'is_important' => true,
             ]);
         }
 
@@ -535,17 +545,24 @@ class LuckyWithdrawController extends Controller
      */
     public function getRoundStats()
     {
-        $currentRoundStart = LuckyWithdrawEntry::getCurrentRoundStartDate();
-        $currentRoundEnd = LuckyWithdrawEntry::getCurrentRoundEndDate();
+        $activeRound = LuckyWithdrawRound::getActiveRound();
+        
+        if (!$activeRound) {
+            return response()->json([
+                'active_round' => false,
+                'message' => 'No active round'
+            ]);
+        }
         
         $stats = [
-            'round_start' => $currentRoundStart,
-            'round_end' => $currentRoundEnd,
-            'total_entries' => LuckyWithdrawEntry::currentRound()->count(),
-            'approved_entries' => LuckyWithdrawEntry::currentRound()->approved()->count(),
-            'pending_entries' => LuckyWithdrawEntry::currentRound()->where('status', 'pending')->count(),
-            'is_round_active' => LuckyWithdrawEntry::isCurrentRoundActive(),
-            'days_remaining' => max(0, (strtotime($currentRoundEnd) - strtotime(now()->format('Y-m-d'))) / (60 * 60 * 24)),
+            'active_round' => true,
+            'round_number' => $activeRound->round_number,
+            'round_start' => $activeRound->start_date->format('Y-m-d'),
+            'round_end' => $activeRound->end_date->format('Y-m-d'),
+            'total_entries' => $activeRound->total_entries,
+            'total_amount' => $activeRound->total_amount,
+            'is_in_date_range' => $activeRound->isInDateRange(),
+            'days_remaining' => $activeRound->days_remaining,
         ];
 
         return response()->json($stats);
@@ -556,42 +573,35 @@ class LuckyWithdrawController extends Controller
      */
     public function endCurrentRound()
     {
-        $currentRoundStart = LuckyWithdrawEntry::getCurrentRoundStartDate();
+        $activeRound = LuckyWithdrawRound::getActiveRound();
         
-        // Get current round entries
-        $currentRoundEntries = LuckyWithdrawEntry::currentRound()
-            ->where('round_status', 'active')
-            ->count();
-
-        if ($currentRoundEntries === 0) {
-            return back()->with('error', 'No active round found to end.');
+        if (!$activeRound) {
+            return back()->with('error', 'No active round found.');
         }
 
         // Check if winner has been selected
-        $hasWinner = LuckyWithdrawEntry::currentRound()
-            ->where('is_winner', true)
-            ->exists();
-
-        if (!$hasWinner) {
+        if (!$activeRound->winner_id) {
             return back()->with('error', 'Please select a winner before ending the round.');
         }
 
         try {
             DB::beginTransaction();
 
-            // Mark all entries for current round as completed
-            LuckyWithdrawEntry::currentRound()
+            // Update round status to completed (winner was already set during selection)
+            $activeRound->update([
+                'status' => 'completed',
+            ]);
+
+            // Mark all remaining entries as completed
+            $activeRound->entries()
                 ->where('round_status', 'active')
-                ->update([
-                    'round_status' => 'completed',
-                    'round_end_date' => now()->format('Y-m-d') // Update end date to today
-                ]);
+                ->update(['round_status' => 'completed']);
 
             DB::commit();
 
-            Log::info("Lucky Draw - Round ended manually. Round start: {$currentRoundStart}, Entries affected: {$currentRoundEntries}");
+            Log::info("Lucky Draw - Round #{$activeRound->round_number} ended manually.");
 
-            return back()->with('success', "Current round ended successfully! {$currentRoundEntries} entries marked as completed. You can now start a new round.");
+            return back()->with('success', "Round #{$activeRound->round_number} ended successfully!");
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -605,14 +615,11 @@ class LuckyWithdrawController extends Controller
      */
     public function startNewRound()
     {
-        // Check if there are any active entries in the current calculated round
-        $currentRoundStart = LuckyWithdrawEntry::getCurrentRoundStartDate();
-        $activeEntries = LuckyWithdrawEntry::where('round_start_date', $currentRoundStart)
-            ->where('round_status', 'active')
-            ->count();
-
-        if ($activeEntries > 0) {
-            return back()->with('error', 'Cannot start a new round. Current round still has active entries. Please end the current round first.');
+        // Check if there's already an active round
+        $existingActiveRound = LuckyWithdrawRound::getActiveRound();
+        
+        if ($existingActiveRound) {
+            return back()->with('error', 'Cannot start a new round. An active round already exists. Please end it first.');
         }
 
         try {
@@ -622,14 +629,21 @@ class LuckyWithdrawController extends Controller
             $newRoundStart = now()->format('Y-m-d');
             $newRoundEnd = now()->addDays(14)->format('Y-m-d');
 
+            // Create new round
+            $newRound = LuckyWithdrawRound::create([
+                'start_date' => $newRoundStart,
+                'end_date' => $newRoundEnd,
+                'status' => 'active',
+            ]);
+
             // Send notification to all users about new round
             $users = User::where('role', 'USER')->get();
             foreach ($users as $user) {
                 \App\Models\UserNotification::create([
                     'user_id' => $user->id,
                     'title' => 'New Lucky Draw Round Started!',
-                    'message' => "A new Lucky Draw round has started! Enter now for a chance to win Plan 3 (Rs. 7,000). Round ends on " . date('M d, Y', strtotime($newRoundEnd)) . ".",
-                    'type' => 'info',
+                    'message' => "A new Lucky Draw round #{$newRound->round_number} has started! Enter now for a chance to win Plan 3 (Rs. 7,000). Round ends on " . date('M d, Y', strtotime($newRoundEnd)) . ".",
+                    'type' => 'new_offer',
                     'is_read' => false,
                     'is_important' => false,
                 ]);
@@ -637,9 +651,9 @@ class LuckyWithdrawController extends Controller
 
             DB::commit();
 
-            Log::info("Lucky Draw - New round started manually. Start: {$newRoundStart}, End: {$newRoundEnd}");
+            Log::info("Lucky Draw - New round #{$newRound->round_number} started manually. Start: {$newRoundStart}, End: {$newRoundEnd}");
 
-            return back()->with('success', "New Lucky Draw round started successfully! Round runs from " . date('M d, Y', strtotime($newRoundStart)) . " to " . date('M d, Y', strtotime($newRoundEnd)) . ". Users have been notified.");
+            return back()->with('success', "New Lucky Draw round #{$newRound->round_number} started successfully! Round runs from " . date('M d, Y', strtotime($newRoundStart)) . " to " . date('M d, Y', strtotime($newRoundEnd)) . ". Users have been notified.");
 
         } catch (\Exception $e) {
             DB::rollBack();

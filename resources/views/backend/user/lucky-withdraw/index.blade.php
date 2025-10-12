@@ -108,13 +108,14 @@
     </div>
 
     <!-- Current Round Information -->
+    @if($activeRound)
     <div class="row mb-4">
         <div class="col-md-6">
             <div class="stats-card">
                 <div class="card-body p-3">
-                    <h6 class="mb-2"><i class="fa-solid fa-calendar me-2"></i>Current Round</h6>
-                    <p class="mb-1"><strong>Start:</strong> {{ \Carbon\Carbon::parse($currentRoundStart)->format('M d, Y') }}</p>
-                    <p class="mb-0"><strong>End:</strong> {{ \Carbon\Carbon::parse($currentRoundEnd)->format('M d, Y') }}</p>
+                    <h6 class="mb-2"><i class="fa-solid fa-calendar me-2"></i>Round #{{ $activeRound->round_number }}</h6>
+                    <p class="mb-1"><strong>Start:</strong> {{ $activeRound->start_date->format('M d, Y') }}</p>
+                    <p class="mb-0"><strong>End:</strong> {{ $activeRound->end_date->format('M d, Y') }}</p>
                 </div>
             </div>
         </div>
@@ -122,12 +123,22 @@
             <div class="stats-card">
                 <div class="card-body p-3">
                     <h6 class="mb-2"><i class="fa-solid fa-users me-2"></i>Participants</h6>
-                    <h4 class="mb-0">{{ $currentRoundEntries }} entries</h4>
+                    <h4 class="mb-0">{{ $activeRound->total_entries }} entries</h4>
                     <small>Approved participants</small>
                 </div>
             </div>
         </div>
     </div>
+    @else
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <h5><i class="fa-solid fa-info-circle"></i> No Active Round</h5>
+                <p class="mb-0">There is no active Lucky Draw round at the moment. Please check back later!</p>
+            </div>
+        </div>
+    </div>
+    @endif
 
     <!-- Wallet Balance Information -->
     <div class="row mb-4">
@@ -238,7 +249,7 @@
                                 <h5 class="mb-3"><i class="fa-solid fa-plus-circle me-2"></i>Enter Lucky Withdraw</h5>
                                 <p class="mb-3">Deposit Rs. 100 to participate in the current round and get a chance to win Plan 3 (Rs. 7,000) absolutely free!</p>
                                 
-                                @if($isRoundActive)
+                                @if($activeRound && $activeRound->isInDateRange() && $activeRound->status === 'active')
                                     <a href="{{ route('lucky-withdraw.create') }}" class="btn btn-primary btn-lg">
                                         <i class="fa-solid fa-ticket me-2"></i>Enter Contest (Rs. 100)
                                     </a>
@@ -274,16 +285,17 @@
                     <div class="card-body p-4">
                         <h5 class="mb-3"><i class="fa-solid fa-trophy me-2"></i>Recent Winners</h5>
                         <div class="row">
-                            @foreach($recentWinners as $winner)
+                            @foreach($recentWinners as $round)
                                 <div class="col-md-6 col-lg-4 mb-3">
                                     <div class="card bg-light text-dark">
                                         <div class="card-body p-3 text-center">
                                             <div class="mb-2">
                                                 <i class="fa-solid fa-crown fa-2x text-warning"></i>
                                             </div>
-                                            <h6 class="mb-1">{{ $winner->user->name }}</h6>
-                                            <p class="mb-1 small">Entry Code: {{ $winner->entry_code }}</p>
-                                            <p class="mb-0 small text-muted">{{ $winner->updated_at->format('M d, Y') }}</p>
+                                            <h6 class="mb-1">{{ $round->winner->name }}</h6>
+                                            <p class="mb-1 small">Round #{{ $round->round_number }}</p>
+                                            <p class="mb-1 small">Entry Code: {{ $round->winnerEntry->entry_code }}</p>
+                                            <p class="mb-0 small text-muted">{{ $round->draw_date->format('M d, Y') }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -320,7 +332,14 @@
                                     @foreach($userEntries as $entry)
                                         <tr>
                                             <td><code>{{ $entry->entry_code }}</code></td>
-                                            <td>{{ \Carbon\Carbon::parse($entry->round_start_date)->format('M d') }} - {{ \Carbon\Carbon::parse($entry->round_end_date)->format('M d') }}</td>
+                                            <td>
+                                                @if($entry->round)
+                                                    Round #{{ $entry->round->round_number }}<br>
+                                                    <small>{{ $entry->round->start_date->format('M d') }} - {{ $entry->round->end_date->format('M d') }}</small>
+                                                @else
+                                                    <small class="text-muted">No round</small>
+                                                @endif
+                                            </td>
                                             <td>Rs. {{ number_format($entry->entry_amount) }}</td>
                                             <td>
                                                 @if($entry->is_winner)
@@ -410,17 +429,24 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Update countdown timer
     function updateCountdown() {
-        const endDate = new Date('{{ $currentRoundEnd }}').getTime();
-        const now = new Date().getTime();
-        const distance = endDate - now;
-        
-        if (distance < 0) {
-            document.getElementById('countdown').innerHTML = "0";
-            return;
-        }
-        
-        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        document.getElementById('countdown').innerHTML = days;
+        @if($currentRoundEnd)
+            const endDate = new Date('{{ $currentRoundEnd }}').getTime();
+            const now = new Date().getTime();
+            const distance = endDate - now;
+            
+            if (distance < 0) {
+                document.getElementById('countdown').innerHTML = "0";
+                return;
+            }
+            
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            document.getElementById('countdown').innerHTML = days;
+        @else
+            const countdownElement = document.getElementById('countdown');
+            if (countdownElement) {
+                countdownElement.innerHTML = "-";
+            }
+        @endif
     }
     
     updateCountdown();

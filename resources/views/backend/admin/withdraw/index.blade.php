@@ -71,7 +71,7 @@
                             <td>{{ $item['user']['name'] }}</td>
                             <td>{!! $item['status'] == 'requested' ? $accountBalance[$item['user_id']] : 'Account Updated<br>after Withdrawal' !!}</td>
                             <td>{{ $item['amount'] }}</td>
-                            <td>{{ $item['userBankAccount']['account_number'] }}<br>{{ $item['userBankAccount']['account_title'] }}</td>
+                            <td>{{ $item['userBankAccount']['account_number'] }}<br>{{ $item['userBankAccount']['account_title'] }}<br>{{ $item['userBankAccount']['bank_name'] }}</td>
                             <td>{{ date('d-M-Y', strtotime($item['created_at'])) }}</td>
                             <td>{{ $item['status'] }}</td>
                             <td>

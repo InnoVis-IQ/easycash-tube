@@ -168,7 +168,7 @@
                             </div>
                             <div class="d-flex justify-content-between mt-1">
                                 <small class="text-muted">{{ $daysWatched }} days watched</small>
-                                <small class="text-muted">5 days required</small>
+                                <small class="text-muted">{{ $totalPlanDays-$daysWatched }} days required</small>
                             </div>
                         </div>
                     </div>

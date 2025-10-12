@@ -38,7 +38,7 @@
                             </div>
                             <div class="col-md-3">
                                 <p class="mb-1"><strong>Total Contestants:</strong></p>
-                                <p class="text-success" style="font-size: 1.5rem; font-weight: bold;">{{ $contestants->total() }}</p>
+                                <p class="text-success" style="font-size: 1.5rem; font-weight: bold;">{{ method_exists($contestants, 'total') ? $contestants->total() : $contestants->count() }}</p>
                             </div>
                             <div class="col-md-3">
                                 <p class="mb-1"><strong>Round Status:</strong></p>
@@ -106,7 +106,7 @@
     <div class="card">
         <div class="card-header">
             <h4 style="font-weight: bold;">Lucky Draw Contestants</h4>
-            <p class="text-muted mb-0">Total Contestants: {{ $contestants->total() }} | Showing {{ $contestants->count() }} results</p>
+            <p class="text-muted mb-0">Total Contestants: {{ method_exists($contestants, 'total') ? $contestants->total() : $contestants->count() }} | Showing {{ $contestants->count() }} results</p>
         </div>
         <div class="card-body">
             @if($contestants->count() > 0)
@@ -185,7 +185,7 @@
                                             @if(!$isEligibleForPlan)
                                                 @if($hasSubscribedPlan3)
                                                     Plan 3 already subscribed<br>
-                                                @endif
+                                            xes@endif
                                                 @if($activePlansCount >= 2)
                                                     Max active plans reached
                                                 @endif

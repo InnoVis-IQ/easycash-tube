@@ -285,9 +285,13 @@ class LuckyWithdrawController extends Controller
             return view('backend.admin.lucky-withdraw.contestants', [
                 'activeRound' => null,
                 'contestants' => collect(),
+                'existingWinner' => false,
                 'request' => $request
             ]);
         }
+        
+        // Check if there's already a winner for this round
+        $existingWinner = $activeRound->winner_id ? true : false;
         
         // Get all approved entries for active round
         $query = $activeRound->approvedEntries()->with(['user', 'user.subscriptions.plan']);
@@ -306,6 +310,7 @@ class LuckyWithdrawController extends Controller
         return view('backend.admin.lucky-withdraw.contestants', compact(
             'activeRound',
             'contestants',
+            'existingWinner',
             'request'
         ));
     }
